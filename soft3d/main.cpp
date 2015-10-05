@@ -41,7 +41,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     //HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SOFT3D));
-	soft3d::soft3dEngine engine(hWnd, 800, 600);
+	soft3d::DirectXHelper::Instance()->Init(hWnd, 800, 600);
 
     MSG msg;
     // 主消息循环: 
@@ -56,7 +56,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             DispatchMessage(&msg);
         }
 		else
-			engine.Display();
+			soft3d::DirectXHelper::Instance()->Display();
     }
 
     return (int) msg.wParam;

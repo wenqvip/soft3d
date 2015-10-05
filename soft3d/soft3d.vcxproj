@@ -141,20 +141,32 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FragmentProcessor.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="DirectXHelper.h" />
+    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="soft3d.h" />
+    <ClInclude Include="Soft3dPipeline.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="VertexBufferObject.h" />
+    <ClInclude Include="VertexProcessor.h" />
+    <ClInclude Include="vmath.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FragmentProcessor.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="soft3d.cpp" />
+    <ClCompile Include="DirectXHelper.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="Soft3dPipeline.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="VertexBufferObject.cpp" />
+    <ClCompile Include="VertexProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="soft3d.rc" />

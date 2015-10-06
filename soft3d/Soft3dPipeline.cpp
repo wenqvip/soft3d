@@ -102,49 +102,6 @@ namespace soft3d
 		}
 	}
 
-	void Soft3dPipeline::Bresenhamline(int x0, int y0, int x1, int y1, uint32 color0, uint32 color1)
-	{
-		int x, y, dx, dy;
-		dx = x1 - x0;
-		dy = y1 - y0;
-		x = x0;
-		y = y0;
-		if (abs(dy) <= abs(dx))
-		{
-			int e = -abs(dx);
-			for (int i = 0; i <= abs(dx); i++)
-			{
-				uint32 color = color0 * (x - x0) / (float)dx;
-				color += color1 * (x1 - x) / (float)dx;
-				DirectXHelper::Instance()->DrawPixel(x, y, color);
-				x = dx > 0 ? x + 1 : x - 1;
-				e += 2 * abs(dy);
-				if (e >= 0)
-				{
-					y = dy > 0 ? y + 1 : y - 1;
-					e -= 2 * abs(dx);
-				}
-			}
-		}
-		else
-		{
-			int e = -abs(dy);
-			for (int i = 0; i <= abs(dy); i++)
-			{
-				uint32 color = color0 * (y - y0) / (float)dy;
-				color += color1 * (y1 - y) / (float)dy;
-				DirectXHelper::Instance()->DrawPixel(x, y, color);
-				y = dy > 0 ? y + 1 : y - 1;
-				e += 2 * abs(dx);
-				if (e >= 0)
-				{
-					x = dx > 0 ? x + 1 : x - 1;
-					e -= 2 * abs(dy);
-				}
-			}
-		}
-	}
-
 	void Soft3dPipeline::Process()
 	{
 		SceneManager::Instance()->Update();
@@ -156,8 +113,16 @@ namespace soft3d
 		std::shared_ptr<FragmentProcessor> fp(new FragmentProcessor());
 		for (int i = 0; i < m_vbo->GetSize(); i++)
 		{
-			vp->color = m_vbo->GetColor(i);
-			vp->pos = m_vbo->GetPos(i);
+			if (m_vbo->useIndex())
+			{
+				vp->color = m_vbo->GetColor(m_vbo->GetIndex(i));
+				vp->pos = m_vbo->GetPos(m_vbo->GetIndex(i));
+			}
+			else
+			{
+				vp->color = m_vbo->GetColor(i);
+				vp->pos = m_vbo->GetPos(i);
+			}
 			vp->mv_matrix = &(m_vbo->mv_matrix);
 			vp->proj_matrix = &(m_vbo->proj_matrix);
 			vp->out_color = &(m_inout.color[i]);
@@ -174,6 +139,14 @@ namespace soft3d
 		{
 			for (int j = 0; j < 3; j++)
 			{
+				vec4 a = m_inout.pos[i] - m_inout.pos[i + 1];
+				vec4 b = m_inout.pos[i + 1] - m_inout.pos[i + 2];
+				vec3 c = vec3(a[0], a[1], a[2]);
+				vec3 d = vec3(b[0], b[1], b[2]);
+				vec3 r = cross(c, d);
+				if (r[2] <= 0.0f)
+					break;
+
 				fp->color = &(m_inout.color[i + j]);
 				fp->out_color = &(m_inout.color[i + j]);
 				fp->Process();

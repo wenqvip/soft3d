@@ -50,7 +50,6 @@ namespace soft3d
 		void Process();
 		void SetVBO(std::shared_ptr<VertexBufferObject> vbo);
 		void Bresenhamline(int x0, int y0, int x1, int y1, const vmath::vec3* color0, const vmath::vec3* color1);
-		void Bresenhamline(int x0, int y0, int x1, int y1, uint32 color0, uint32 color1);
 
 	protected:
 		Soft3dPipeline();

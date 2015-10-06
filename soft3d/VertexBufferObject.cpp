@@ -12,6 +12,9 @@ namespace soft3d
 		m_size = 0;
 		m_stride = stride;
 
+		m_indexBuffer = nullptr;
+		m_indexSize = 0;
+
 		m_posOffset = -1;
 		m_colorOffset = -1;
 		m_uvOffset = -1;
@@ -35,30 +38,46 @@ namespace soft3d
 
 	const vec4* VertexBufferObject::GetPos(uint32 index) const
 	{
-		if (m_posOffset == -1)
+		if (m_posOffset == -1 || index >= m_size)
 			return nullptr;
 		return (vec4*)&(m_buffer[m_stride * index + m_posOffset]);
 	}
 
 	const uint32* VertexBufferObject::GetColor(uint32 index) const
 	{
-		if (m_colorOffset == -1)
+		if (m_colorOffset == -1 || index >= m_size)
 			return nullptr;
 		return (uint32*)&(m_buffer[m_stride * index + m_colorOffset]);
 	}
 
 	const vec3* VertexBufferObject::GetNormal(uint32 index) const
 	{
-		if (m_normalOffset == -1)
+		if (m_normalOffset == -1 || index >= m_size)
 			return nullptr;
 		return (vec3*)&(m_buffer[m_stride * index + m_normalOffset]);
 	}
 
 	const vec2* VertexBufferObject::GetUV(uint32 index) const
 	{
-		if (m_uvOffset == -1)
+		if (m_uvOffset == -1 || index >= m_size)
 			return nullptr;
 		return (vec2*)&(m_buffer[m_stride * index + m_uvOffset]);
 	}
 
+	void VertexBufferObject::CopyIndexBuffer(const void* buffer, uint32 size)
+	{
+		if (m_indexBuffer != nullptr)
+			delete[] m_indexBuffer;
+		m_indexSize = size;
+		m_indexBuffer = new uint32[size];
+		memcpy(m_indexBuffer, buffer, size * sizeof(uint32));
+	}
+
+	uint32 VertexBufferObject::GetIndex(uint32 index)
+	{
+		if (index < m_indexSize)
+			return m_indexBuffer[index];
+		else
+			return 0xffffffff;
+	}
 }

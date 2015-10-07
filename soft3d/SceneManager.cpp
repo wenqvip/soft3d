@@ -1,15 +1,12 @@
-#include "stdafx.h"
+#include "soft3d.h"
 #include "SceneManager.h"
-#include "VertexBufferObject.h"
-#include "vmath.h"
-#include "Soft3dPipeline.h"
-#include <time.h>
+#include "SceneManagerTriangle.h"
 
 using namespace std;
 using namespace vmath;
-
 namespace soft3d
 {
+
 	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManager());
 
 	SceneManager::SceneManager()
@@ -22,9 +19,11 @@ namespace soft3d
 	}
 
 
-	shared_ptr<VertexBufferObject> vbo(new VertexBufferObject(5));
-	void SceneManager::Init()
+	void SceneManager::InitScene(uint16 width, uint16 height)
 	{
+		m_width = width;
+		m_height = height;
+
 		float cube[] = {
 			1.0f, 1.0f, 1.0f, 1.0f,
 			0.0f,
@@ -69,27 +68,32 @@ namespace soft3d
 			7, 3, 1,
 		};
 
-		vbo->CopyFromBuffer(cube, sizeof(cube)/20);
+		shared_ptr<VertexBufferObject> vbo(new VertexBufferObject(5));
+		vbo->CopyFromBuffer(cube, sizeof(cube) / 20);
 		vbo->m_posOffset = 0;
 		vbo->m_colorOffset = 4;
 
-		vbo->CopyIndexBuffer(cubeIndex, sizeof(cubeIndex)/4);
+		vbo->CopyIndexBuffer(cubeIndex, sizeof(cubeIndex) / 4);
+
+		vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
+		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
+		Soft3dPipeline::Instance()->SetVBO(vbo);
 	}
 
 	void SceneManager::Update()
 	{
-		float aspect = (float)DirectXHelper::Instance()->GetWidth() / (float)DirectXHelper::Instance()->GetHeight();
+		float aspect = (float)m_width / (float)m_height;
 		mat4 proj_matrix = perspective(60.0f, aspect, 0.1f, 1000.0f);
-		mat4 view_matrix = lookat(vec3(0.0f, -2.0f, 4.0f),
+		mat4 view_matrix = lookat(vec3(0.0f, 2.0f, 4.0f),
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
 		float factor = GetTickCount() / 10 % 360;
 		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f) * rotate(factor, vec3(0.0f, 1.0f, 0.0f));
 
-		vbo->mv_matrix = mv_matrix;
-		vbo->proj_matrix = proj_matrix;
+		Soft3dPipeline::Instance()->CurrentVBO()->mv_matrix = mv_matrix;
+		Soft3dPipeline::Instance()->CurrentVBO()->proj_matrix = proj_matrix;
 
-		Soft3dPipeline::Instance()->SetVBO(vbo);
+		Soft3dPipeline::Instance()->Clear(0);
 	}
 
 }

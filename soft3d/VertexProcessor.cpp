@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "VertexProcessor.h"
 #include <assert.h>
+#include "soft3d.h"
+#include "VertexProcessor.h"
 
 using namespace std;
 using namespace vmath;
@@ -19,8 +19,11 @@ namespace soft3d
 
 	void VertexProcessor::Process()
 	{
+		//*out_pos = (*pos) * 0.3f;
+		//*out_pos = (*proj_matrix) * (*out_pos);
+		//(*out_pos)[3] = 1.0f;
 		*out_pos = (*proj_matrix) * (*mv_matrix) * (*pos);
-		*out_color = *color;
+		uC2fC(*color, out_color);
 	}
 
 }

@@ -1,7 +1,6 @@
 // soft3d.cpp : 定义应用程序的入口点。
 //
-
-#include "stdafx.h"
+#include <Windows.h>
 #include "soft3d.h"
 #include "Resource.h"
 
@@ -41,7 +40,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     //HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SOFT3D));
-	soft3d::DirectXHelper::Instance()->Init(hWnd, 800, 600);
+	soft3d::Soft3dPipeline::Instance()->InitPipeline(hWnd, 800, 600);
 
     MSG msg;
     // 主消息循环: 
@@ -56,7 +55,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             DispatchMessage(&msg);
         }
 		else
-			soft3d::DirectXHelper::Instance()->Display();
+			soft3d::Soft3dPipeline::Instance()->Process();
     }
 
     return (int) msg.wParam;

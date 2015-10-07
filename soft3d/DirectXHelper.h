@@ -22,16 +22,8 @@ namespace soft3d
 		}
 		~DirectXHelper();
 
-		void Init(HWND hwnd, uint16 width, uint16 height);
-		void Display();
-		int DrawPixel(uint16 x, uint16 y, uint32 color, uint16 size = 1);
-		int Clear(uint32 color);
-		uint16 GetWidth() {
-			return m_width;
-		}
-		uint16 GetHeight() {
-			return m_height;
-		}
+		void Init(HWND hwnd);
+		void Paint(const uint32* buffer, uint16 width, uint16 height);
 
 	protected:
 		DirectXHelper();
@@ -46,12 +38,9 @@ namespace soft3d
 			}
 		}
 
-		void SetOperateBuffer(uint32 index, uint32 value);
 
 	private:
 		HWND m_hWnd;
-		uint16 m_width;
-		uint16 m_height;
 
 		ID2D1Factory1* m_d2dFactory;
 		ID2D1Device* m_d2dDevice;
@@ -59,8 +48,6 @@ namespace soft3d
 		D3D_FEATURE_LEVEL m_featureLevel;
 		IDXGISwapChain1* m_swapChain;
 		ID2D1Bitmap1* m_d2dTargetBitmap;
-
-		unsigned int* m_operateBuffer;
 
 		static std::shared_ptr<DirectXHelper> s_instance;
 	};

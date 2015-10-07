@@ -1,8 +1,5 @@
-#include "stdafx.h"
 #include "soft3d.h"
 #include "DirectXHelper.h"
-#include "Soft3dPipeline.h"
-#include "SceneManager.h"
 
 using namespace Microsoft::WRL;
 
@@ -17,20 +14,14 @@ namespace soft3d {
 
 	DirectXHelper::~DirectXHelper()
 	{
-		delete[] m_operateBuffer;
 		ReleaseD2D();
 	}
 
 
-	void DirectXHelper::Init(HWND hwnd, uint16 width, uint16 height)
+	void DirectXHelper::Init(HWND hwnd)
 	{
 		m_hWnd = hwnd;
-		m_width = width;
-		m_height = height;
-		m_operateBuffer = new unsigned int[m_width * m_height];
 		InitD2D();
-
-		SceneManager::Instance()->Init();
 	}
 
 
@@ -126,17 +117,15 @@ namespace soft3d {
 		m_d2dTargetBitmap->Release();
 	}
 
-	void DirectXHelper::Display()
+	void DirectXHelper::Paint(const uint32* buffer, uint16 width, uint16 height)
 	{
 		if (m_d2dContext == NULL)
 			return;
 
-		m_d2dContext->BeginDraw();
+		D2D1_RECT_U rect = { 0, 0, width, height };
+		ThrowIfFailed(m_d2dTargetBitmap->CopyFromMemory(&rect, buffer, width * 4));
 
-		Clear(0);
-		Soft3dPipeline::Instance()->Process();
-		D2D1_RECT_U rect = { 0, 0, m_width, m_height };
-		ThrowIfFailed(m_d2dTargetBitmap->CopyFromMemory(&rect, m_operateBuffer, m_width * 4));
+		m_d2dContext->BeginDraw();
 
 		ThrowIfFailed(m_d2dContext->EndDraw());
 
@@ -146,34 +135,6 @@ namespace soft3d {
 		parameters.pScrollOffset = NULL;
 		parameters.pScrollRect = NULL;
 		ThrowIfFailed(m_swapChain->Present1(1, 0, &parameters));
-	}
-
-	int DirectXHelper::DrawPixel(uint16 x, uint16 y, uint32 color, uint16 size)
-	{
-		if (x > m_width || y > m_height)
-			return -1;
-		if (size > 100 || size < 1)
-			size = 1;
-
-		for (uint16 i = 0; i < size; i++)
-		{
-			for (uint16 j = 0; j < size; j++)
-				SetOperateBuffer((y+j - size/2) * m_width + x+i - size/2, color);
-		}
-		return 0;
-	}
-
-	void DirectXHelper::SetOperateBuffer(uint32 index, uint32 value)
-	{
-		if (index >= (uint32)m_width * m_height)
-			return;
-		m_operateBuffer[index] = value;
-	}
-
-	int DirectXHelper::Clear(uint32 color)
-	{
-		memset(m_operateBuffer, color, m_width * m_height * sizeof(uint32));
-		return 0;
 	}
 
 }

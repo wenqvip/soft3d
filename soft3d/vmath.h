@@ -1115,6 +1115,12 @@ static inline T min(T a, T b)
     return a < b ? a : b;
 }
 
+template <typename T>
+static inline T min(T a, T b, T c)
+{
+	return min(a < b ? a : b, c);
+}
+
 #ifdef max
 #undef max
 #endif
@@ -1123,6 +1129,12 @@ template <typename T>
 static inline T max(T a, T b)
 {
     return a >= b ? a : b;
+}
+
+template <typename T>
+static inline T max(T a, T b, T c)
+{
+	return max(a >= b ? a : b, c);
 }
 
 template <typename T, const int N>

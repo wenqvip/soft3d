@@ -1,6 +1,15 @@
 #pragma once
+#include <memory>
+#include "vmath.h"
 
-typedef unsigned short uint16;
-typedef unsigned int uint32;
+namespace soft3d
+{
 
-#include "DirectXHelper.h"
+	typedef unsigned short uint16;
+	typedef unsigned int uint32;
+
+	void uC2fC(uint32 color, vmath::vec3* colorf);
+	uint32 fC2uC(const vmath::vec3& colorf);
+
+}
+#include "Soft3dPipeline.h"

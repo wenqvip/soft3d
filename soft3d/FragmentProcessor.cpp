@@ -1,5 +1,8 @@
-#include "stdafx.h"
+#include "soft3d.h"
+#include "VertexProcessor.h"
 #include "FragmentProcessor.h"
+
+using namespace vmath;
 
 namespace soft3d
 {
@@ -15,6 +18,7 @@ namespace soft3d
 
 	void FragmentProcessor::Process()
 	{
-		*out_color = *color;
+		//color = vec3(1.0f);
+		*out_color = fC2uC(color);
 	}
 }

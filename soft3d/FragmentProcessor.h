@@ -1,5 +1,4 @@
 #pragma once
-#include "VertexProcessor.h"
 
 namespace soft3d
 {
@@ -12,7 +11,7 @@ namespace soft3d
 
 		virtual void Process();
 
-		const uint32* color;
+		vmath::vec3 color;
 		uint32* out_color;
 	};
 

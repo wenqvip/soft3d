@@ -1,4 +1,5 @@
-#include "stdafx.h"
+#include "soft3d.h"
+#include "vmath.h"
 #include "VertexBufferObject.h"
 
 using namespace vmath;
@@ -19,6 +20,8 @@ namespace soft3d
 		m_colorOffset = -1;
 		m_uvOffset = -1;
 		m_normalOffset = -1;
+
+		m_mode = RENDER_LINE;
 	}
 
 

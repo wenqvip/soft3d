@@ -1,6 +1,4 @@
 #pragma once
-#include "soft3d.h"
-#include "vmath.h"
 
 namespace soft3d
 {
@@ -29,6 +27,12 @@ namespace soft3d
 		}
 		uint32 GetIndex(uint32 index);
 
+		enum RENDER_MODEL
+		{
+			RENDER_LINE,
+			RENDER_TRIANGLE,
+		};
+
 	public:
 		vmath::mat4 mv_matrix;
 		vmath::mat4 proj_matrix;
@@ -37,6 +41,8 @@ namespace soft3d
 		int m_colorOffset;
 		int m_normalOffset;
 		int m_uvOffset;
+
+		RENDER_MODEL m_mode;
 
 	private:
 		float* m_buffer;

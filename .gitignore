@@ -3,6 +3,8 @@
 *.ilk
 *.pdb
 *.ipch
-soft3d/Debug/*.*
+soft3d/Debug/*
+soft3d/x64/Debug/*
+*.aps
 *.exe
 *.opensdf

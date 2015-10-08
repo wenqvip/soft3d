@@ -18,7 +18,6 @@ namespace soft3d
 
 	void FragmentProcessor::Process()
 	{
-		//color = vec3(1.0f);
-		*out_color = fC2uC(color);
+		*out_color = color;
 	}
 }

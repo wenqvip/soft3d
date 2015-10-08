@@ -10,7 +10,7 @@ namespace soft3d
 		vmath::vec4* pos;
 		vmath::vec3* normal;
 		vmath::vec2* uv;
-		vmath::vec3* color;
+		vmath::vec4* color;
 
 		VS_OUT()
 		{
@@ -39,9 +39,9 @@ namespace soft3d
 	class Soft3dPipeline
 	{
 	public:
-		static std::shared_ptr<Soft3dPipeline> Instance()
+		static Soft3dPipeline* Instance()
 		{
-			return s_instance;
+			return s_instance.get();
 		}
 		~Soft3dPipeline();
 		void InitPipeline(HWND hwnd, uint16 width, uint16 height);
@@ -52,18 +52,17 @@ namespace soft3d
 		void Process();
 
 		int DrawPixel(uint16 x, uint16 y, uint32 color, uint16 size = 1);
-		uint32* GetFBPixelPtr(uint16 x, uint16 y);
-		void Fragment(uint32* out_color, uint32 src0, uint32 src1, float ratio);
-		void Fragment(uint32* out_color, uint32 src0, uint32 src1, uint32 src2, float ratio0, float ratio1);
-		void BresenhamLine(int x0, int y0, int x1, int y1, uint32 src0, uint32 src1);
-		void Triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32 src0, uint32 src1, uint32 src2);
+		vmath::vec4* GetFBPixelPtr(uint16 x, uint16 y);
+		inline const VS_OUT* GetVSOut() const {
+			return &m_vsOut;
+		};
 
 	protected:
 		Soft3dPipeline();
 		Soft3dPipeline(Soft3dPipeline&) {};
 		static std::shared_ptr<Soft3dPipeline> s_instance;
 
-		void SetFrameBuffer(uint32 index, uint32 value);
+		void SetFrameBuffer(uint32 index, const vmath::vec4* value);
 
 	private:
 		std::shared_ptr<VertexBufferObject> m_vbo;
@@ -71,7 +70,7 @@ namespace soft3d
 
 		uint16 m_width;
 		uint16 m_height;
-		uint32* m_frameBuffer;
+		vmath::vec4* m_frameBuffer;
 	};
 
 }

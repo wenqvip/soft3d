@@ -76,7 +76,7 @@ namespace soft3d
 		vbo->CopyIndexBuffer(cubeIndex, sizeof(cubeIndex) / 4);
 
 		vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
-		vbo->m_mode = VertexBufferObject::RENDER_LINE;
+		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
 		Soft3dPipeline::Instance()->SetVBO(vbo);
 	}
 
@@ -88,7 +88,7 @@ namespace soft3d
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
 		float factor = GetTickCount() / 10 % 360;
-		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f) * rotate(factor, vec3(0.0f, 1.0f, 0.0f));
+		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f);// *rotate(factor, vec3(0.0f, 1.0f, 0.0f));
 
 		Soft3dPipeline::Instance()->CurrentVBO()->mv_matrix = mv_matrix;
 		Soft3dPipeline::Instance()->CurrentVBO()->proj_matrix = proj_matrix;

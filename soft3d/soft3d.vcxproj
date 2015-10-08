@@ -142,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FragmentProcessor.h" />
+    <ClInclude Include="Rasterizer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="DirectXHelper.h" />
     <ClInclude Include="SceneManager.h" />
@@ -156,6 +157,7 @@
     <ClCompile Include="FragmentProcessor.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="DirectXHelper.cpp" />
+    <ClCompile Include="Rasterizer.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneManagerTriangle.cpp" />
     <ClCompile Include="Soft3dPipeline.cpp" />

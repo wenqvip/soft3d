@@ -11,8 +11,8 @@ namespace soft3d
 
 		virtual void Process();
 
-		vmath::vec3 color;
-		uint32* out_color;
+		vmath::vec4 color;
+		vmath::vec4* out_color;
 	};
 
 }

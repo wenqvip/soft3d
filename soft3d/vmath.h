@@ -251,6 +251,7 @@ protected:
         int n;
         for (n = 0; n < len; n++)
             data[n] = that.data[n];
+		//memcpy(this, &that, sizeof(T)*len);
     }
 };
 

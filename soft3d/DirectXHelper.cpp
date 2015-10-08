@@ -60,7 +60,7 @@ namespace soft3d {
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = { 0 };
 		swapChainDesc.Width = 0;                           // use automatic sizing
 		swapChainDesc.Height = 0;
-		swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // this is the most common swapchain format
+		swapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM; // this is the most common swapchain format
 		swapChainDesc.Stereo = false;
 		swapChainDesc.SampleDesc.Count = 1;                // don't use multi-sampling
 		swapChainDesc.SampleDesc.Quality = 0;
@@ -93,7 +93,7 @@ namespace soft3d {
 		// swap chain associated with the window.
 		D2D1_PIXEL_FORMAT pixelFormat;
 
-		pixelFormat.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		pixelFormat.alphaMode = D2D1_ALPHA_MODE_IGNORE;
 		D2D1_BITMAP_PROPERTIES1 bitmapProperties =
 		{
@@ -144,18 +144,13 @@ namespace soft3d {
 		m_d2dFactory->Release();
 	}
 
-	uint32* transBuffer = new uint32[800 * 600];
-	void DirectXHelper::Paint(const vmath::vec4* buffer, uint16 width, uint16 height)
+	void DirectXHelper::Paint(const uint32* buffer, uint16 width, uint16 height)
 	{
 		if (m_d2dContext == NULL)
 			return;
 
-		for (int i = 0; i < width*height; i++)
-		{
-			transBuffer[i] = fC2uC(buffer[i]);
-		}
 		D2D1_RECT_U rect = { 0, 0, width, height };
-		ThrowIfFailed(m_d2dTargetBitmap->CopyFromMemory(&rect, transBuffer, width * 4));
+		ThrowIfFailed(m_d2dTargetBitmap->CopyFromMemory(&rect, buffer, width * 4));
 
 		m_d2dContext->BeginDraw();
 

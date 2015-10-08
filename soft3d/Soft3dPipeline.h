@@ -10,7 +10,7 @@ namespace soft3d
 		vmath::vec4* pos;
 		vmath::vec3* normal;
 		vmath::vec2* uv;
-		vmath::vec4* color;
+		uint32* color;
 
 		VS_OUT()
 		{
@@ -52,7 +52,7 @@ namespace soft3d
 		void Process();
 
 		int DrawPixel(uint16 x, uint16 y, uint32 color, uint16 size = 1);
-		vmath::vec4* GetFBPixelPtr(uint16 x, uint16 y);
+		uint32* GetFBPixelPtr(uint16 x, uint16 y);
 		inline const VS_OUT* GetVSOut() const {
 			return &m_vsOut;
 		};
@@ -62,7 +62,7 @@ namespace soft3d
 		Soft3dPipeline(Soft3dPipeline&) {};
 		static std::shared_ptr<Soft3dPipeline> s_instance;
 
-		void SetFrameBuffer(uint32 index, const vmath::vec4* value);
+		void SetFrameBuffer(uint32 index, uint32 value);
 
 	private:
 		std::shared_ptr<VertexBufferObject> m_vbo;
@@ -70,7 +70,7 @@ namespace soft3d
 
 		uint16 m_width;
 		uint16 m_height;
-		vmath::vec4* m_frameBuffer;
+		uint32* m_frameBuffer;
 	};
 
 }

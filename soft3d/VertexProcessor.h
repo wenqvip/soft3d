@@ -14,7 +14,7 @@ namespace soft3d
 		const vmath::vec4* pos;
 		const uint32* color;
 		vmath::vec4* out_pos;
-		vmath::vec4* out_color;
+		uint32* out_color;
 
 		const vmath::mat4* mv_matrix;
 		const vmath::mat4* proj_matrix;

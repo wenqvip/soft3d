@@ -27,7 +27,7 @@ namespace soft3d
 	{
 		m_width = width;
 		m_height = height;
-		m_frameBuffer = new vec4[m_width * m_height];
+		m_frameBuffer = new uint32[m_width * m_height];
 
 		soft3d::DirectXHelper::Instance()->Init(hwnd);
 
@@ -44,7 +44,7 @@ namespace soft3d
 			if(m_vsOut.pos != nullptr)
 				delete[] m_vsOut.pos;
 
-			m_vsOut.color = new vec4[vbo->GetSize()];
+			m_vsOut.color = new uint32[vbo->GetSize()];
 			m_vsOut.pos = new vec4[vbo->GetSize()];
 			m_vsOut.capacity = vbo->GetSize();
 		}
@@ -55,7 +55,7 @@ namespace soft3d
 		return m_vbo;
 	}
 
-	vec4* Soft3dPipeline::GetFBPixelPtr(uint16 x, uint16 y)
+	uint32* Soft3dPipeline::GetFBPixelPtr(uint16 x, uint16 y)
 	{
 		y = 599 - y;//ÉÏÏÂµßµ¹
 		if (x > m_width || y > m_height)
@@ -75,26 +75,24 @@ namespace soft3d
 		if (size > 100 || size < 1)
 			size = 1;
 
-		vec4 colorf;
-		uC2fC(color, &colorf);
 		for (uint16 i = 0; i < size; i++)
 		{
 			for (uint16 j = 0; j < size; j++)
-				SetFrameBuffer((y + j - size / 2) * m_width + x + i - size / 2, &colorf);
+				SetFrameBuffer((y + j - size / 2) * m_width + x + i - size / 2, color);
 		}
 		return 0;
 	}
 
-	void Soft3dPipeline::SetFrameBuffer(uint32 index, const vec4* value)
+	void Soft3dPipeline::SetFrameBuffer(uint32 index, uint32 value)
 	{
 		if (index >= (uint32)m_width * m_height)
 			return;
-		m_frameBuffer[index] = *value;
+		m_frameBuffer[index] = value;
 	}
 
 	int Soft3dPipeline::Clear(uint32 color)
 	{
-		memset(m_frameBuffer, color, m_width * m_height * sizeof(vec4));
+		memset(m_frameBuffer, color, m_width * m_height * sizeof(uint32));
 		return 0;
 	}
 
@@ -157,7 +155,7 @@ namespace soft3d
 					int x1 = (m_vsOut.pos[i + (j + 1) % 3][0] + 1.0f) / 2.0f * m_width;
 					int y1 = (m_vsOut.pos[i + (j + 1) % 3][1] + 1.0f) / 2.0f * m_height;
 
-					//DrawPixel(x0, y0, fC2uC(m_vsOut.color[i + j]), 5);
+					DrawPixel(x0, y0, m_vsOut.color[i + j], 5);
 
 					rasterizer->BresenhamLine(x0, y0, x1, y1, i + j, i + (j + 1) % 3);
 				}

@@ -28,5 +28,32 @@ namespace soft3d
 		return color;
 	}
 
+	inline uint32 colorMultiFloat(uint32 color, float ratio)
+	{
+		uint32 cc = 0;
+		cc += uint32((color & 0xff0000) * ratio) & 0xff0000;
+		cc += uint32((color & 0xff00) * ratio) & 0xff00;
+		cc += uint32((color & 0xff) * ratio) & 0xff;
+		return cc;
+	}
+
+	struct Color
+	{
+		unsigned char B;
+		unsigned char G;
+		unsigned char R;
+		unsigned char A;
+	};
+
+	Color operator*(const Color& lf, float ratio)
+	{
+		Color cc;
+		cc.B = lf.B * ratio;
+		cc.G = lf.G * ratio;
+		cc.R = lf.R * ratio;
+		cc.A = lf.A * ratio;
+		return cc;
+	}
+
 }
 #include "Soft3dPipeline.h"

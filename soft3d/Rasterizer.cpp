@@ -1,6 +1,7 @@
 #include "soft3d.h"
 #include "FragmentProcessor.h"
 #include "Rasterizer.h"
+#include <stdlib.h>
 
 using namespace vmath;
 
@@ -16,37 +17,20 @@ namespace soft3d
 	{
 	}
 
-	void Rasterizer::Fragment(vec4* out_color, uint32 src0, uint32 src1, float ratio)
+	void Rasterizer::Fragment(uint32* out_color, uint32 src0, uint32 src1, float ratio)
 	{
-		vec4* colorVsOut = Soft3dPipeline::Instance()->GetVSOut()->color;
-		m_fp.color = colorVsOut[src0] * ratio + colorVsOut[src1] * (1.0f - ratio);
+		uint32* colorVsOut = Soft3dPipeline::Instance()->GetVSOut()->color;
+		m_fp.color = colorMultiFloat(colorVsOut[src0], ratio) + colorMultiFloat(colorVsOut[src1], (1.0f - ratio));
 		m_fp.out_color = out_color;
 		m_fp.Process();
 	}
 
-	void Rasterizer::Fragment(vec4* out_color, uint32 src0, uint32 src1, uint32 src2, float ratio0, float ratio1)
+	void Rasterizer::Fragment(uint32* out_color, uint32 src0, uint32 src1, uint32 src2, float ratio0, float ratio1)
 	{
-		vec4* colorVsOut = Soft3dPipeline::Instance()->GetVSOut()->color;
+		uint32* colorVsOut = Soft3dPipeline::Instance()->GetVSOut()->color;
 		float ratio2 = 1.0f - ratio0 - ratio1;
 
-		//
-		//float x = 1.232;
-		//for (int i = 0; i < 3; i++)
-		//{
-		//	x *= ratio0 * ratio1;
-		//}
-		//for (int i = 0; i < 3; i++)
-		//{
-		//	x *= ratio1 * ratio2;
-		//}
-		//for (int i = 0; i < 3; i++)
-		//{
-		//	x *= ratio2 * ratio0;
-		//}
-		//*out_color = 0xff;
-		//return;
-
-		m_fp.color = colorVsOut[src0] * ratio0 + colorVsOut[src1] * ratio1 + colorVsOut[src2] * ratio2;
+		m_fp.color = colorMultiFloat(colorVsOut[src0], ratio0) + colorMultiFloat(colorVsOut[src1], ratio1) + colorMultiFloat(colorVsOut[src2], ratio2);
 		m_fp.out_color = out_color;
 		m_fp.Process();
 	}

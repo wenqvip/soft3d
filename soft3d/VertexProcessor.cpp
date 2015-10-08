@@ -23,7 +23,7 @@ namespace soft3d
 		//*out_pos = (*proj_matrix) * (*out_pos);
 		//(*out_pos)[3] = 1.0f;
 		*out_pos = (*proj_matrix) * (*mv_matrix) * (*pos);
-		uC2fC(*color, out_color);
+		*out_color = *color;
 	}
 
 }

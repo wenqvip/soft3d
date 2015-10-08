@@ -23,7 +23,7 @@ namespace soft3d
 		~DirectXHelper();
 
 		void Init(HWND hwnd);
-		void Paint(const vmath::vec4* buffer, uint16 width, uint16 height);
+		void Paint(const uint32* buffer, uint16 width, uint16 height);
 
 	protected:
 		DirectXHelper();

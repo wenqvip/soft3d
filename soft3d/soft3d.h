@@ -43,17 +43,20 @@ namespace soft3d
 		unsigned char G;
 		unsigned char R;
 		unsigned char A;
+
+		void operator=(uint32 color)
+		{
+			memcpy(this, &color, sizeof(uint32));
+		}
+
+		operator uint32()
+		{
+			return *((uint32*)(this));
+		}
 	};
 
-	Color operator*(const Color& lf, float ratio)
-	{
-		Color cc;
-		cc.B = lf.B * ratio;
-		cc.G = lf.G * ratio;
-		cc.R = lf.R * ratio;
-		cc.A = lf.A * ratio;
-		return cc;
-	}
+	Color operator*(const Color& lf, float ratio);
+	Color operator+(const Color& lf, const Color& rf);
 
 }
 #include "Soft3dPipeline.h"

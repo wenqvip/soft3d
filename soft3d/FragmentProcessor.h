@@ -11,7 +11,7 @@ namespace soft3d
 
 		virtual void Process();
 
-		uint32 color;
+		Color color;
 		uint32* out_color;
 	};
 

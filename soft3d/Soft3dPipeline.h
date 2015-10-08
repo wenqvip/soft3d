@@ -10,7 +10,7 @@ namespace soft3d
 		vmath::vec4* pos;
 		vmath::vec3* normal;
 		vmath::vec2* uv;
-		uint32* color;
+		Color* color;
 
 		VS_OUT()
 		{

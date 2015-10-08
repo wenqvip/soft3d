@@ -12,6 +12,26 @@ using namespace vmath;
 namespace soft3d
 {
 
+	Color operator*(const Color& lf, float ratio)
+	{
+		Color cc;
+		cc.B = lf.B * ratio;
+		cc.G = lf.G * ratio;
+		cc.R = lf.R * ratio;
+		cc.A = lf.A * ratio;
+		return cc;
+	}
+
+	Color operator+(const Color& lf, const Color& rf)
+	{
+		Color cc;
+		cc.B = lf.B + rf.B;
+		cc.G = lf.G + rf.G;
+		cc.R = lf.R + rf.R;
+		cc.A = lf.A + rf.A;
+		return cc;
+	}
+
 	std::shared_ptr<Soft3dPipeline> Soft3dPipeline::s_instance(new Soft3dPipeline());
 
 	Soft3dPipeline::Soft3dPipeline()
@@ -44,7 +64,7 @@ namespace soft3d
 			if(m_vsOut.pos != nullptr)
 				delete[] m_vsOut.pos;
 
-			m_vsOut.color = new uint32[vbo->GetSize()];
+			m_vsOut.color = new Color[vbo->GetSize()];
 			m_vsOut.pos = new vec4[vbo->GetSize()];
 			m_vsOut.capacity = vbo->GetSize();
 		}

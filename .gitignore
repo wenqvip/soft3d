@@ -1,0 +1,7 @@
+*.sdf
+.vs
+*.ilk
+*.pdb
+*.ipch
+soft3d/Debug/*.*
+*.exe

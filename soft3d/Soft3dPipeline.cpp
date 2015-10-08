@@ -24,7 +24,7 @@ namespace soft3d
 		uint32 color = 0;
 		color += (uint32)(0xff * cc[0]) * 0x10000;
 		color += (uint32)(0xff * cc[1]) * 0x100;
-		color += 0xff * cc[2];
+		color += (uint32)(0xff * cc[2]);
 
 		return color;
 	}
@@ -166,10 +166,10 @@ namespace soft3d
 			{
 				for (int j = 0; j < 3; j++)
 				{
-					int x0 = (((const float*)m_vsOut.pos[i + j])[0] + 1.0f) / 2.0f * m_width;
-					int y0 = (((const float*)m_vsOut.pos[i + j])[1] + 1.0f) / 2.0f * m_height;
-					int x1 = (((const float*)m_vsOut.pos[i + (j + 1) % 3])[0] + 1.0f) / 2.0f * m_width;
-					int y1 = (((const float*)m_vsOut.pos[i + (j + 1) % 3])[1] + 1.0f) / 2.0f * m_height;
+					int x0 = (m_vsOut.pos[i + j][0] + 1.0f) / 2.0f * m_width;
+					int y0 = (m_vsOut.pos[i + j][1] + 1.0f) / 2.0f * m_height;
+					int x1 = (m_vsOut.pos[i + (j + 1) % 3][0] + 1.0f) / 2.0f * m_width;
+					int y1 = (m_vsOut.pos[i + (j + 1) % 3][1] + 1.0f) / 2.0f * m_height;
 
 					DrawPixel(x0, y0, fC2uC(m_vsOut.color[i + j]), 5);
 
@@ -180,12 +180,12 @@ namespace soft3d
 
 			case VertexBufferObject::RENDER_TRIANGLE:
 			{
-				int x0 = (((const float*)m_vsOut.pos[i])[0] + 1.0f) / 2.0f * m_width;
-				int y0 = (((const float*)m_vsOut.pos[i])[1] + 1.0f) / 2.0f * m_height;
-				int x1 = (((const float*)m_vsOut.pos[i + 1])[0] + 1.0f) / 2.0f * m_width;
-				int y1 = (((const float*)m_vsOut.pos[i + 1])[1] + 1.0f) / 2.0f * m_height;
-				int x2 = (((const float*)m_vsOut.pos[i + 2])[0] + 1.0f) / 2.0f * m_width;
-				int y2 = (((const float*)m_vsOut.pos[i + 2])[1] + 1.0f) / 2.0f * m_height;
+				int x0 = (m_vsOut.pos[i][0] + 1.0f) / 2.0f * m_width;
+				int y0 = (m_vsOut.pos[i][1] + 1.0f) / 2.0f * m_height;
+				int x1 = (m_vsOut.pos[i + 1][0] + 1.0f) / 2.0f * m_width;
+				int y1 = (m_vsOut.pos[i + 1][1] + 1.0f) / 2.0f * m_height;
+				int x2 = (m_vsOut.pos[i + 2][0] + 1.0f) / 2.0f * m_width;
+				int y2 = (m_vsOut.pos[i + 2][1] + 1.0f) / 2.0f * m_height;
 				Triangle(x0, y0, x1, y1, x2, y2, i, i + 1, i + 2);
 
 				for (int j = 0; j < 3; j++)

@@ -49,6 +49,13 @@ namespace soft3d
 		IDXGISwapChain1* m_swapChain;
 		ID2D1Bitmap1* m_d2dTargetBitmap;
 
+		ID2D1SolidColorBrush* m_pGreenBrush;
+		IDWriteTextFormat* m_pTextFormat;
+
+		DWORD m_lastTickCount;
+		uint16 m_fps;
+		uint16 m_lastFps;
+
 		static std::shared_ptr<DirectXHelper> s_instance;
 	};
 

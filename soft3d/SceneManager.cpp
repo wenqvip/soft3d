@@ -76,7 +76,7 @@ namespace soft3d
 		vbo->CopyIndexBuffer(cubeIndex, sizeof(cubeIndex) / 4);
 
 		vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
-		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
+		vbo->m_mode = VertexBufferObject::RENDER_LINE;
 		Soft3dPipeline::Instance()->SetVBO(vbo);
 	}
 

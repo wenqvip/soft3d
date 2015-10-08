@@ -1,5 +1,7 @@
 #include "soft3d.h"
 #include "DirectXHelper.h"
+#include <dwrite.h>
+#pragma comment(lib, "dwrite.lib")
 
 using namespace Microsoft::WRL;
 
@@ -9,6 +11,9 @@ namespace soft3d {
 
 	DirectXHelper::DirectXHelper()
 	{
+		m_lastFps = 0;
+		m_fps = 0;
+		m_lastTickCount = 0;
 	}
 
 
@@ -107,14 +112,36 @@ namespace soft3d {
 
 		// Now we can set the Direct2D render target.
 		m_d2dContext->SetTarget(m_d2dTargetBitmap);
+
+		ThrowIfFailed(m_d2dContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Green), &m_pGreenBrush));
+
+		IDWriteFactory* pWriteFactory;
+		ThrowIfFailed(DWriteCreateFactory(
+			DWRITE_FACTORY_TYPE_SHARED,
+			__uuidof(IDWriteFactory),
+			reinterpret_cast<IUnknown**>(&pWriteFactory)
+			));
+		ThrowIfFailed(pWriteFactory->CreateTextFormat(
+			L"Cambria",
+			NULL,
+			DWRITE_FONT_WEIGHT_REGULAR,
+			DWRITE_FONT_STYLE_NORMAL,
+			DWRITE_FONT_STRETCH_NORMAL,
+			20.0f,
+			L"en-us",
+			&m_pTextFormat
+			));
+		pWriteFactory->Release();
 	}
 
 	void DirectXHelper::ReleaseD2D()
 	{
+		m_pTextFormat->Release();
+		m_d2dTargetBitmap->Release();
+		m_pGreenBrush->Release();
 		m_d2dContext->Release();
 		m_d2dDevice->Release();
 		m_d2dFactory->Release();
-		m_d2dTargetBitmap->Release();
 	}
 
 	void DirectXHelper::Paint(const uint32* buffer, uint16 width, uint16 height)
@@ -126,6 +153,18 @@ namespace soft3d {
 		ThrowIfFailed(m_d2dTargetBitmap->CopyFromMemory(&rect, buffer, width * 4));
 
 		m_d2dContext->BeginDraw();
+
+		m_fps++;
+		if (GetTickCount() - m_lastTickCount > 1000)
+		{
+			m_lastFps = m_fps;
+			m_fps = 0;
+			m_lastTickCount = GetTickCount();
+		}
+		D2D1_RECT_F rectf = { 0.0f, 0.0f, (float)width, 0.0f };
+		wchar_t buf[64];
+		swprintf(buf, L"FPS:%d", m_lastFps);
+		m_d2dContext->DrawTextW(buf, sizeof(wchar_t) * 3, m_pTextFormat, rectf, m_pGreenBrush);
 
 		ThrowIfFailed(m_d2dContext->EndDraw());
 

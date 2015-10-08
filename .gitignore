@@ -5,3 +5,4 @@
 *.ipch
 soft3d/Debug/*.*
 *.exe
+*.opensdf

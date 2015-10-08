@@ -37,23 +37,5 @@ namespace soft3d
 		return cc;
 	}
 
-	struct Color
-	{
-		unsigned char B;
-		unsigned char G;
-		unsigned char R;
-		unsigned char A;
-	};
-
-	Color operator*(const Color& lf, float ratio)
-	{
-		Color cc;
-		cc.B = lf.B * ratio;
-		cc.G = lf.G * ratio;
-		cc.R = lf.R * ratio;
-		cc.A = lf.A * ratio;
-		return cc;
-	}
-
 }
 #include "Soft3dPipeline.h"

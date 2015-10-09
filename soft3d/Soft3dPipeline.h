@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include "VertexBufferObject.h"
+#include "Texture.h"
 
 namespace soft3d
 {
@@ -47,7 +48,12 @@ namespace soft3d
 		void InitPipeline(HWND hwnd, uint16 width, uint16 height);
 
 		void SetVBO(std::shared_ptr<VertexBufferObject> vbo);
-		std::shared_ptr<VertexBufferObject> CurrentVBO();
+		VertexBufferObject* CurrentVBO();
+
+		void SetTexture(std::shared_ptr<Texture> tex);
+		const Texture* CurrentTex() {
+			return m_tex.get();
+		}
 		int Clear(uint32 color);
 		void Process();
 
@@ -67,6 +73,7 @@ namespace soft3d
 	private:
 		std::shared_ptr<VertexBufferObject> m_vbo;
 		VS_OUT m_vsOut;
+		std::shared_ptr<Texture> m_tex;
 
 		uint16 m_width;
 		uint16 m_height;

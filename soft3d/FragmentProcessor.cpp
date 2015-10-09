@@ -18,6 +18,6 @@ namespace soft3d
 
 	void FragmentProcessor::Process()
 	{
-		*out_color = color;
+		*out_color = tex->Sampler2D(&uv);
 	}
 }

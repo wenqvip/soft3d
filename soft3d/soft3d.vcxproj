@@ -149,6 +149,7 @@
     <ClInclude Include="SceneManagerTriangle.h" />
     <ClInclude Include="soft3d.h" />
     <ClInclude Include="Soft3dPipeline.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="VertexBufferObject.h" />
     <ClInclude Include="VertexProcessor.h" />
     <ClInclude Include="vmath.h" />
@@ -161,6 +162,7 @@
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneManagerTriangle.cpp" />
     <ClCompile Include="Soft3dPipeline.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VertexBufferObject.cpp" />
     <ClCompile Include="VertexProcessor.cpp" />
   </ItemGroup>

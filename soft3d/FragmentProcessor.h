@@ -13,6 +13,8 @@ namespace soft3d
 
 		Color color;
 		uint32* out_color;
+		vmath::vec2 uv;
+		const Texture* tex;
 	};
 
 }

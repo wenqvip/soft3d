@@ -20,7 +20,15 @@ namespace soft3d
 	void Rasterizer::Fragment(uint32* out_color, uint32 src0, uint32 src1, float ratio)
 	{
 		Color* colorVsOut = Soft3dPipeline::Instance()->GetVSOut()->color;
+		vec2* uv = Soft3dPipeline::Instance()->GetVSOut()->uv;
+
+		//in
 		m_fp.color = colorVsOut[src0] * ratio + colorVsOut[src1] * (1.0f - ratio);
+		m_fp.uv[0] = uv[src0][0] * ratio + uv[src1][0] * (1.0f - ratio);
+		m_fp.uv[1] = uv[src0][1] * ratio + uv[src1][1] * (1.0f - ratio);
+		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
+
+		//out
 		m_fp.out_color = out_color;
 		m_fp.Process();
 	}
@@ -28,9 +36,16 @@ namespace soft3d
 	void Rasterizer::Fragment(uint32* out_color, uint32 src0, uint32 src1, uint32 src2, float ratio0, float ratio1)
 	{
 		Color* colorVsOut = Soft3dPipeline::Instance()->GetVSOut()->color;
+		vec2* uv = Soft3dPipeline::Instance()->GetVSOut()->uv;
 		float ratio2 = 1.0f - ratio0 - ratio1;
 
+		//in
 		m_fp.color = colorVsOut[src0] * ratio0 + colorVsOut[src1] * ratio1 + colorVsOut[src2] * ratio2;
+		m_fp.uv[0] = uv[src0][0] * ratio0 + uv[src1][0] * ratio1 + uv[src2][0] * ratio2;
+		m_fp.uv[1] = uv[src0][1] * ratio0 + uv[src1][1] * ratio1 + uv[src2][1] * ratio2;
+		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
+
+		//out
 		m_fp.out_color = out_color;
 		m_fp.Process();
 	}
@@ -76,7 +91,7 @@ namespace soft3d
 		}
 	}
 
-	void Rasterizer::Triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32 src0, uint32 src1, uint32 src2)
+	void Rasterizer::Triangle(int x0, int y0, float z0, int x1, int y1, float z1, int x2, int y2, float z2, uint32 src0, uint32 src1, uint32 src2)
 	{
 		float fy1 = y0;
 		float fy2 = y1;
@@ -116,8 +131,15 @@ namespace soft3d
 			{
 				if (Cx1 <= 0 && Cx2 <= 0 && Cx3 <= 0)
 				{
-					float ratio1 = ((y - y2)*(x0 - x2) - (y0 - y2)*(x - x2)) / (float)((y1 - y2)*(x0 - x2) - (y0 - y2)*(x1 - x2));
-					float ratio0 = ((y - y2)*(x1 - x2) - (x - x2)*(y1 - y2)) / (float)((y0 - y2)*(x1 - x2) - (x0 - x2)*(y1 - y2));
+					float wx0 = (float)x0 * (1.0f - z0);
+					float wy0 = (float)y0 * (1.0f - z0);
+					float wx1 = (float)x1 * (1.0f - z1);
+					float wy1 = (float)y1 * (1.0f - z1);
+					float wx2 = (float)x2 * (1.0f - z2);
+					float wy2 = (float)y2 * (1.0f - z2);
+
+					float ratio1 = ((y - wy2)*(wx0 - wx2) - (wy0 - wy2)*(x - wx2)) / (float)((wy1 - wy2)*(wx0 - wx2) - (wy0 - wy2)*(wx1 - wx2));
+					float ratio0 = ((y - wy2)*(wx1 - wx2) - (x - wx2)*(wy1 - wy2)) / (float)((wy0 - wy2)*(wx1 - wx2) - (wx0 - wx2)*(wy1 - wy2));
 					Fragment(Soft3dPipeline::Instance()->GetFBPixelPtr(x, y), src0, src1, src2, ratio0, ratio1);
 					//Soft3dPipeline::Instance()->DrawPixel(x, y, 0xffffff);
 				}

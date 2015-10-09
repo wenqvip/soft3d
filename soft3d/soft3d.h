@@ -55,8 +55,25 @@ namespace soft3d
 		}
 	};
 
-	Color operator*(const Color& lf, float ratio);
-	Color operator+(const Color& lf, const Color& rf);
+	inline Color operator*(const Color& lf, float ratio)
+	{
+		Color cc;
+		cc.B = lf.B * ratio;
+		cc.G = lf.G * ratio;
+		cc.R = lf.R * ratio;
+		cc.A = lf.A * ratio;
+		return cc;
+	}
+
+	inline Color operator+(const Color& lf, const Color& rf)
+	{
+		Color cc;
+		cc.B = lf.B + rf.B;
+		cc.G = lf.G + rf.G;
+		cc.R = lf.R + rf.R;
+		cc.A = lf.A + rf.A;
+		return cc;
+	}
 
 }
 #include "Soft3dPipeline.h"

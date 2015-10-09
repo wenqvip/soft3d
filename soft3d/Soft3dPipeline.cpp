@@ -12,7 +12,7 @@ using namespace vmath;
 namespace soft3d
 {
 
-	Color operator*(const Color& lf, float ratio)
+	/*Color operator*(const Color& lf, float ratio)
 	{
 		Color cc;
 		cc.B = lf.B * ratio;
@@ -20,9 +20,9 @@ namespace soft3d
 		cc.R = lf.R * ratio;
 		cc.A = lf.A * ratio;
 		return cc;
-	}
+	}*/
 
-	Color operator+(const Color& lf, const Color& rf)
+	/*Color operator+(const Color& lf, const Color& rf)
 	{
 		Color cc;
 		cc.B = lf.B + rf.B;
@@ -30,7 +30,7 @@ namespace soft3d
 		cc.R = lf.R + rf.R;
 		cc.A = lf.A + rf.A;
 		return cc;
-	}
+	}*/
 
 	std::shared_ptr<Soft3dPipeline> Soft3dPipeline::s_instance(new Soft3dPipeline());
 
@@ -66,13 +66,19 @@ namespace soft3d
 
 			m_vsOut.color = new Color[vbo->GetSize()];
 			m_vsOut.pos = new vec4[vbo->GetSize()];
+			m_vsOut.uv = new vec2[vbo->GetSize()];
 			m_vsOut.capacity = vbo->GetSize();
 		}
 	}
 
-	std::shared_ptr<VertexBufferObject> Soft3dPipeline::CurrentVBO()
+	VertexBufferObject* Soft3dPipeline::CurrentVBO()
 	{
-		return m_vbo;
+		return m_vbo.get();
+	}
+
+	void Soft3dPipeline::SetTexture(shared_ptr<Texture> tex)
+	{
+		m_tex = tex;
 	}
 
 	uint32* Soft3dPipeline::GetFBPixelPtr(uint16 x, uint16 y)
@@ -142,6 +148,9 @@ namespace soft3d
 			vp->out_pos = &(m_vsOut.pos[i]);
 			vp->Process();//这一步进行视图变换和投影变换
 
+			if(m_vbo->hasUV())
+				m_vsOut.uv[i] = *(m_vbo->GetUV(i));
+
 			//除以w
 			m_vsOut.pos[i][0] /= m_vsOut.pos[i][3];
 			m_vsOut.pos[i][1] /= m_vsOut.pos[i][3];
@@ -152,14 +161,25 @@ namespace soft3d
 		shared_ptr<Rasterizer> rasterizer(new Rasterizer());
 		for (int i = 0; i < m_vbo->GetSize(); i += 3)
 		{
-			//进行背面拣选
-			vec4 a = m_vsOut.pos[i] - m_vsOut.pos[i + 1];
-			vec4 b = m_vsOut.pos[i + 1] - m_vsOut.pos[i + 2];
-			vec3 c = vec3(a[0], a[1], a[2]);
-			vec3 d = vec3(b[0], b[1], b[2]);
-			vec3 r = cross(c, d);
-			if (r[2] <= 0.0f)
-				continue;
+			if (m_vbo->m_cullMode != VertexBufferObject::CULL_NONE)
+			{
+				//进行背面拣选
+				vec4 a = m_vsOut.pos[i] - m_vsOut.pos[i + 1];
+				vec4 b = m_vsOut.pos[i + 1] - m_vsOut.pos[i + 2];
+				vec3 c = vec3(a[0], a[1], a[2]);
+				vec3 d = vec3(b[0], b[1], b[2]);
+				vec3 r = cross(c, d);
+				if (m_vbo->m_cullMode == VertexBufferObject::CULL_CCW)
+				{
+					if (r[2] <= 0.0f)
+						continue;
+				}
+				else
+				{
+					if (r[2] >= 0.0f)
+						continue;
+				}
+			}
 
 			//todo:进行裁剪
 			//
@@ -191,7 +211,11 @@ namespace soft3d
 				int x2 = (m_vsOut.pos[i + 2][0] + 1.0f) / 2.0f * m_width;
 				int y2 = (m_vsOut.pos[i + 2][1] + 1.0f) / 2.0f * m_height;
 
-				rasterizer->Triangle(x0, y0, x1, y1, x2, y2, i, i + 1, i + 2);
+				rasterizer->Triangle(
+					x0, y0, m_vsOut.pos[i][2], 
+					x1, y1, m_vsOut.pos[i+1][2], 
+					x2, y2, m_vsOut.pos[i+2][2],
+					i, i + 1, i + 2);
 				break;
 			}
 

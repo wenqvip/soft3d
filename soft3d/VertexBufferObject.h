@@ -9,7 +9,7 @@ namespace soft3d
 		VertexBufferObject(uint32 stride);
 		~VertexBufferObject();
 
-		void CopyFromBuffer(const void* buffer, uint32 size);
+		void CopyVertexBuffer(const void* buffer, uint32 size);
 		const vmath::vec4* GetPos(uint32 index) const;
 		const uint32* GetColor(uint32 index) const;
 		const vmath::vec3* GetNormal(uint32 index) const;
@@ -27,10 +27,22 @@ namespace soft3d
 		}
 		uint32 GetIndex(uint32 index);
 
-		enum RENDER_MODEL
+		void CopyUVBuffer(const void* buffer, uint32 size);
+		inline bool hasUV() {
+			return m_uvBuffer != nullptr;
+		}
+
+		enum RENDER_MODE
 		{
 			RENDER_LINE,
 			RENDER_TRIANGLE,
+		};
+
+		enum CULL_MODE
+		{
+			CULL_CCW,
+			CULL_CW,
+			CULL_NONE,
 		};
 
 	public:
@@ -42,7 +54,8 @@ namespace soft3d
 		int m_normalOffset;
 		int m_uvOffset;
 
-		RENDER_MODEL m_mode;
+		RENDER_MODE m_mode;
+		CULL_MODE m_cullMode;
 
 	private:
 		float* m_buffer;
@@ -51,6 +64,8 @@ namespace soft3d
 
 		uint32* m_indexBuffer;
 		uint32 m_indexSize;
+
+		vmath::vec2* m_uvBuffer;
 	};
 
 }

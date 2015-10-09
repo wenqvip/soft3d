@@ -7,7 +7,7 @@ using namespace vmath;
 namespace soft3d
 {
 
-	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManager());
+	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManagerTriangle());
 
 	SceneManager::SceneManager()
 	{
@@ -68,16 +68,42 @@ namespace soft3d
 			7, 3, 1,
 		};
 
+		float cubeuv[] = {
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+		};
+
 		shared_ptr<VertexBufferObject> vbo(new VertexBufferObject(5));
-		vbo->CopyFromBuffer(cube, sizeof(cube) / 20);
+		vbo->CopyVertexBuffer(cube, sizeof(cube) / 20);
 		vbo->m_posOffset = 0;
 		vbo->m_colorOffset = 4;
 
-		vbo->CopyIndexBuffer(cubeIndex, sizeof(cubeIndex) / 4);
+		vbo->CopyIndexBuffer(cubeIndex, sizeof(cubeIndex) / sizeof(uint32));
+		vbo->CopyUVBuffer(cubeuv, sizeof(cubeuv)/sizeof(float));
 
 		vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
 		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
 		Soft3dPipeline::Instance()->SetVBO(vbo);
+
+		uint32 tex_data[] = {
+			0xff0000, 0x00ff00, 0x0000ff,
+			0x00ff00, 0x0000ff, 0xff0000,
+			0x0000ff, 0xff0000, 0x00ff00,
+		};
+
+		shared_ptr<Texture> tex(new Texture());
+		tex->CopyFromBuffer(tex_data, 3, 3);
+		Soft3dPipeline::Instance()->SetTexture(tex);
 	}
 
 	void SceneManager::Update()
@@ -88,7 +114,7 @@ namespace soft3d
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
 		float factor = GetTickCount() / 10 % 360;
-		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f) * rotate(factor, vec3(0.0f, 1.0f, 0.0f));
+		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f);// *rotate(factor, vec3(0.0f, 1.0f, 0.0f));
 
 		Soft3dPipeline::Instance()->CurrentVBO()->mv_matrix = mv_matrix;
 		Soft3dPipeline::Instance()->CurrentVBO()->proj_matrix = proj_matrix;

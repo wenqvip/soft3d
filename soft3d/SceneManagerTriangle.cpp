@@ -27,27 +27,27 @@ void SceneManagerTriangle::InitScene(uint16 width, uint16 height)
 		0.0f,
 		1.0f, -1.0f, 0.0f, 1.0f,
 		0.0f,
-		//-1.0f, 1.0f, 0.0f, 1.0f,
-		//0.0f,
-		//-1.0f, -1.0f, 0.0f, 1.0f,
-		//0.0f,
-		//1.0f, 1.0f, 0.0f, 1.0f,
-		//0.0f,
+		-1.0f, 1.0f, 0.0f, 1.0f,
+		0.0f,
+		-1.0f, -1.0f, 0.0f, 1.0f,
+		0.0f,
+		1.0f, 1.0f, 0.0f, 1.0f,
+		0.0f,
 	};
 	(*(uint32*)&(cube[4])) = 0xff0000;
 	(*(uint32*)&(cube[9])) = 0x00ff00;
 	(*(uint32*)&(cube[14])) = 0x0000ff;
-	//(*(uint32*)&(cube[19])) = 0xff0000;
-	//(*(uint32*)&(cube[24])) = 0x00ff00;
-	//(*(uint32*)&(cube[29])) = 0x0000ff;
+	(*(uint32*)&(cube[19])) = 0xff0000;
+	(*(uint32*)&(cube[24])) = 0x00ff00;
+	(*(uint32*)&(cube[29])) = 0x0000ff;
 
 	float uv[] = {
 		1.0f, 0.0f,
 		0.0f, 1.0f,
 		1.0f, 1.0f,
-		//0.0f, 0.0f,
-		//0.0f, 1.0f,
-		//1.0f, 0.0f,
+		0.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 0.0f,
 	};
 
 	shared_ptr<VertexBufferObject> vbo(new VertexBufferObject(5));
@@ -81,7 +81,7 @@ void SceneManagerTriangle::Update()
 		vec3(0.0f, 0.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f));
 	float factor = GetTickCount() / 50 % 360;
-	mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f) * rotate(30.0f, vec3(1.0f, 0.0f, 0.0f));
+	mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f) * rotate(-30.0f, vec3(1.0f, 1.0f, 0.0f));
 
 	Soft3dPipeline::Instance()->CurrentVBO()->mv_matrix = mv_matrix;
 	Soft3dPipeline::Instance()->CurrentVBO()->proj_matrix = proj_matrix;

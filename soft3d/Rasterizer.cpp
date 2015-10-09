@@ -131,15 +131,8 @@ namespace soft3d
 			{
 				if (Cx1 <= 0 && Cx2 <= 0 && Cx3 <= 0)
 				{
-					float wx0 = (float)x0 * (1.0f - z0);
-					float wy0 = (float)y0 * (1.0f - z0);
-					float wx1 = (float)x1 * (1.0f - z1);
-					float wy1 = (float)y1 * (1.0f - z1);
-					float wx2 = (float)x2 * (1.0f - z2);
-					float wy2 = (float)y2 * (1.0f - z2);
-
-					float ratio1 = ((y - wy2)*(wx0 - wx2) - (wy0 - wy2)*(x - wx2)) / (float)((wy1 - wy2)*(wx0 - wx2) - (wy0 - wy2)*(wx1 - wx2));
-					float ratio0 = ((y - wy2)*(wx1 - wx2) - (x - wx2)*(wy1 - wy2)) / (float)((wy0 - wy2)*(wx1 - wx2) - (wx0 - wx2)*(wy1 - wy2));
+					float ratio1 = ((y - y2)*(x0 - x2) - (y0 - y2)*(x - x2)) / (float)((y1 - y2)*(x0 - x2) - (y0 - y2)*(x1 - x2));
+					float ratio0 = ((y - y2)*(x1 - x2) - (x - x2)*(y1 - y2)) / (float)((y0 - y2)*(x1 - x2) - (x0 - x2)*(y1 - y2));
 					Fragment(Soft3dPipeline::Instance()->GetFBPixelPtr(x, y), src0, src1, src2, ratio0, ratio1);
 					//Soft3dPipeline::Instance()->DrawPixel(x, y, 0xffffff);
 				}

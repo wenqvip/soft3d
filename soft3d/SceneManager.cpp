@@ -7,7 +7,7 @@ using namespace vmath;
 namespace soft3d
 {
 
-	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManagerTriangle());
+	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManager());
 
 	SceneManager::SceneManager()
 	{
@@ -72,15 +72,15 @@ namespace soft3d
 			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
 			0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+			1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+			1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+			1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 		};
 
 		shared_ptr<VertexBufferObject> vbo(new VertexBufferObject(5));
@@ -96,9 +96,9 @@ namespace soft3d
 		Soft3dPipeline::Instance()->SetVBO(vbo);
 
 		uint32 tex_data[] = {
-			0xff0000, 0x00ff00, 0x0000ff,
-			0x00ff00, 0x0000ff, 0xff0000,
-			0x0000ff, 0xff0000, 0x00ff00,
+			0x992222, 0x229922, 0x222299,
+			0x229922, 0x222299, 0x992222,
+			0x222299, 0x992222, 0x229922,
 		};
 
 		shared_ptr<Texture> tex(new Texture());
@@ -114,7 +114,7 @@ namespace soft3d
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
 		float factor = GetTickCount() / 10 % 360;
-		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f);// *rotate(factor, vec3(0.0f, 1.0f, 0.0f));
+		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f) *rotate(factor, vec3(0.0f, 1.0f, 0.0f));
 
 		Soft3dPipeline::Instance()->CurrentVBO()->mv_matrix = mv_matrix;
 		Soft3dPipeline::Instance()->CurrentVBO()->proj_matrix = proj_matrix;

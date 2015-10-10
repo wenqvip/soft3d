@@ -6,14 +6,15 @@
 
 namespace soft3d
 {
-	struct VS_OUT
+	class Rasterizer;
+	struct PipeLineData
 	{
 		vmath::vec4* pos;
 		vmath::vec3* normal;
 		vmath::vec2* uv;
 		Color* color;
 
-		VS_OUT()
+		PipeLineData()
 		{
 			pos = nullptr;
 			normal = nullptr;
@@ -22,7 +23,7 @@ namespace soft3d
 			capacity = 0;
 		}
 
-		~VS_OUT()
+		~PipeLineData()
 		{
 			if (pos != nullptr)
 				delete[] pos;
@@ -54,12 +55,11 @@ namespace soft3d
 		const Texture* CurrentTex() {
 			return m_tex.get();
 		}
-		int Clear(uint32 color);
 		void Process();
 
-		int DrawPixel(uint16 x, uint16 y, uint32 color, uint16 size = 1);
-		uint32* GetFBPixelPtr(uint16 x, uint16 y);
-		inline const VS_OUT* GetVSOut() const {
+		int Clear(uint32 color);
+
+		inline const PipeLineData* GetVSOut() const {
 			return &m_vsOut;
 		};
 
@@ -68,16 +68,14 @@ namespace soft3d
 		Soft3dPipeline(Soft3dPipeline&) {};
 		static std::shared_ptr<Soft3dPipeline> s_instance;
 
-		void SetFrameBuffer(uint32 index, uint32 value);
-
 	private:
 		std::shared_ptr<VertexBufferObject> m_vbo;
-		VS_OUT m_vsOut;
+		PipeLineData m_vsOut;
 		std::shared_ptr<Texture> m_tex;
+		std::shared_ptr<Rasterizer> m_rasterizer;
 
 		uint16 m_width;
 		uint16 m_height;
-		uint32* m_frameBuffer;
 	};
 
 }

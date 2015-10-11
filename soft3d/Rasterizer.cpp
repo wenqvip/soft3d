@@ -95,6 +95,8 @@ namespace soft3d
 
 		//out
 		m_fp.out_color = GetFBPixelPtr(x, y);
+		if (m_fp.out_color == nullptr)
+			return;
 		m_fp.Process();
 	}
 
@@ -148,12 +150,12 @@ namespace soft3d
 
 	void Rasterizer::Triangle(const PipeLineData* pipelineData, uint32 src0, uint32 src1, uint32 src2)
 	{
-		float fx1 = pipelineData->pos[src0][0];
-		float fy1 = pipelineData->pos[src0][1];
-		float fx2 = pipelineData->pos[src1][0];
-		float fy2 = pipelineData->pos[src1][1];
-		float fx3 = pipelineData->pos[src2][0];
-		float fy3 = pipelineData->pos[src2][1];
+		float fx1 = pipelineData->pos[src0][0] + 0.5f;
+		float fy1 = pipelineData->pos[src0][1] + 0.5f;
+		float fx2 = pipelineData->pos[src1][0] + 0.5f;
+		float fy2 = pipelineData->pos[src1][1] + 0.5f;
+		float fx3 = pipelineData->pos[src2][0] + 0.5f;
+		float fy3 = pipelineData->pos[src2][1] + 0.5f;
 
 		int x1 = fx1;
 		int x2 = fx2;
@@ -183,12 +185,12 @@ namespace soft3d
 		float Cy2 = C2 + Dx23 * miny - Dy23 * minx;
 		float Cy3 = C3 + Dx31 * miny - Dy31 * minx;
 
-		for (int y = miny; y < maxy; y++)
+		for (int y = miny; y <= maxy; y++)
 		{
 			float Cx1 = Cy1;
 			float Cx2 = Cy2;
 			float Cx3 = Cy3;
-			for (int x = minx; x < maxx; x++)
+			for (int x = minx; x <= maxx; x++)
 			{
 				if (Cx1 <= 0 && Cx2 <= 0 && Cx3 <= 0)
 				{

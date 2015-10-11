@@ -114,8 +114,9 @@ namespace soft3d
 		mat4 view_matrix = lookat(vec3(0.0f, 2.0f, 4.0f),
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
-		float factor = GetTickCount() / 50 % 360;
-		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f) *rotate(factor, vec3(0.0f, 1.0f, 0.0f));
+		float factor = GetTickCount() / 10 % 360;
+		mat4 model_matrix = rotate(factor, vec3(0.0f, 1.0f, 0.0f)) * translate(0.0f, 0.0f, 0.0f) * scale(1.0f);
+		mat4 mv_matrix = view_matrix * model_matrix;
 
 		Soft3dPipeline::Instance()->CurrentVBO()->mv_matrix = mv_matrix;
 		Soft3dPipeline::Instance()->CurrentVBO()->proj_matrix = proj_matrix;

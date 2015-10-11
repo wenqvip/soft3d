@@ -7,22 +7,10 @@ using namespace vmath;
 
 namespace soft3d
 {
-
-	VertexProcessor::VertexProcessor()
-	{
-	}
-
-
-	VertexProcessor::~VertexProcessor()
-	{
-	}
-
 	void VertexProcessor::Process()
 	{
-		//*out_pos = (*pos) * 0.3f;
-		//*out_pos = (*proj_matrix) * (*out_pos);
-		//(*out_pos)[3] = 1.0f;
-		*out_pos = (*proj_matrix) * (*mv_matrix) * (*pos);
+		vec4 pos_vs = (*mv_matrix) * (*pos);
+		*out_pos = (*proj_matrix) * pos_vs;
 		*out_color = *color;
 	}
 

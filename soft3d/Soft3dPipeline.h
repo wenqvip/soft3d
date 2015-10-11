@@ -36,6 +36,7 @@ namespace soft3d
 				delete[] normal;
 		}
 
+		VertexBufferObject::CULL_MODE cullMode;
 		uint32 capacity;
 	};
 

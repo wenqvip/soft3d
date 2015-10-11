@@ -66,6 +66,7 @@ namespace soft3d
 			m_vsOut.pos = new vec4[vbo->GetSize()];
 			m_vsOut.uv = new vec2[vbo->GetSize()];
 			m_vsOut.rhw = new float[vbo->GetSize()];
+			m_vsOut.cullMode = vbo->m_cullMode;
 			m_vsOut.capacity = vbo->GetSize();
 		}
 	}
@@ -131,44 +132,45 @@ namespace soft3d
 
 		for (int i = 0; i < m_vbo->GetSize(); i += 3)
 		{
-			if (m_vbo->m_cullMode != VertexBufferObject::CULL_NONE)
-			{
-				//进行背面拣选
-				vec4 a = m_vsOut.pos[i] - m_vsOut.pos[i + 1];
-				vec4 b = m_vsOut.pos[i + 1] - m_vsOut.pos[i + 2];
-				vec3 c = vec3(a[0], a[1], a[2]);
-				vec3 d = vec3(b[0], b[1], b[2]);
-				vec3 r = cross(c, d);
-				if (m_vbo->m_cullMode == VertexBufferObject::CULL_CCW)
-				{
-					if (r[2] <= 0.0f)
-						continue;
-				}
-				else
-				{
-					if (r[2] >= 0.0f)
-						continue;
-				}
-			}
+			VertexBufferObject::CULL_MODE cull_mode = VertexBufferObject::CULL_NONE;
+			//进行背面拣选
+			vec4 a = m_vsOut.pos[i] - m_vsOut.pos[i + 1];
+			vec4 b = m_vsOut.pos[i + 1] - m_vsOut.pos[i + 2];
+			vec3 c = vec3(a[0], a[1], a[2]);
+			vec3 d = vec3(b[0], b[1], b[2]);
+			vec3 r = cross(c, d);
+			if (r[2] < 0.0f)
+				cull_mode = VertexBufferObject::CULL_CW;
+			else if (r[2] > 0.0f)
+				cull_mode = VertexBufferObject::CULL_CCW;
+
+			if (m_vbo->m_cullMode != VertexBufferObject::CULL_NONE && m_vbo->m_cullMode != cull_mode)
+				continue;
 
 			//todo:进行裁剪
 			//
+
+			//make triangle always ccw sorting
+			uint32 index[3] = { i, i + 1, i + 2 };
+			if (cull_mode == VertexBufferObject::CULL_CW)
+			{
+				index[0] = i + 2;
+				index[2] = i;
+			}
 
 			switch (m_vbo->m_mode)
 			{
 			case VertexBufferObject::RENDER_LINE:
 			{
-				for (int j = 0; j < 3; j++)
-				{
-					m_rasterizer->BresenhamLine(&m_vsOut, i + j, i + (j + 1) % 3);
-				}
+				m_rasterizer->BresenhamLine(&m_vsOut, index[0], index[1]);
+				m_rasterizer->BresenhamLine(&m_vsOut, index[1], index[2]);
+				m_rasterizer->BresenhamLine(&m_vsOut, index[2], index[0]);
 				break;
 			}
 
 			case VertexBufferObject::RENDER_TRIANGLE:
 			{
-
-				m_rasterizer->Triangle(&m_vsOut, i, i + 1, i + 2);
+				m_rasterizer->Triangle(&m_vsOut, index[0], index[1], index[2]);
 				break;
 			}
 

@@ -6,8 +6,8 @@ namespace soft3d
 	class VertexProcessor
 	{
 	public:
-		VertexProcessor();
-		virtual ~VertexProcessor();
+		VertexProcessor() {};
+		virtual ~VertexProcessor() {};
 
 		virtual void Process();
 

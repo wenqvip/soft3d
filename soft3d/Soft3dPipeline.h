@@ -13,6 +13,7 @@ namespace soft3d
 		vmath::vec3* normal;
 		vmath::vec2* uv;
 		Color* color;
+		float* rhw;
 
 		PipeLineData()
 		{

@@ -96,13 +96,14 @@ namespace soft3d
 		Soft3dPipeline::Instance()->SetVBO(vbo);
 
 		uint32 tex_data[] = {
-			0x992222, 0x229922, 0x222299,
-			0x229922, 0x222299, 0x992222,
-			0x222299, 0x992222, 0x229922,
+			0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
+			0x3FBCEF, 0xFFFFFF, 0x3FBCEF, 0xFFFFFF,
+			0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
+			0x3FBCEF, 0xFFFFFF, 0x3FBCEF, 0xFFFFFF,
 		};
 
 		shared_ptr<Texture> tex(new Texture());
-		tex->CopyFromBuffer(tex_data, 3, 3);
+		tex->CopyFromBuffer(tex_data, 4, 4);
 		Soft3dPipeline::Instance()->SetTexture(tex);
 	}
 
@@ -113,7 +114,7 @@ namespace soft3d
 		mat4 view_matrix = lookat(vec3(0.0f, 2.0f, 4.0f),
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
-		float factor = GetTickCount() / 10 % 360;
+		float factor = GetTickCount() / 50 % 360;
 		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f) *rotate(factor, vec3(0.0f, 1.0f, 0.0f));
 
 		Soft3dPipeline::Instance()->CurrentVBO()->mv_matrix = mv_matrix;

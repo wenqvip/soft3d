@@ -65,6 +65,7 @@ namespace soft3d
 			m_vsOut.color = new Color[vbo->GetSize()];
 			m_vsOut.pos = new vec4[vbo->GetSize()];
 			m_vsOut.uv = new vec2[vbo->GetSize()];
+			m_vsOut.rhw = new float[vbo->GetSize()];
 			m_vsOut.capacity = vbo->GetSize();
 		}
 	}
@@ -115,10 +116,17 @@ namespace soft3d
 				m_vsOut.uv[i] = *(m_vbo->GetUV(i));
 
 			//除以w
-			m_vsOut.pos[i][0] /= m_vsOut.pos[i][3];
-			m_vsOut.pos[i][1] /= m_vsOut.pos[i][3];
-			m_vsOut.pos[i][2] /= m_vsOut.pos[i][3];
-			//m_vsOut.pos[i][3] /= m_vsOut.pos[i][3];
+			float rhw = 1.0f / m_vsOut.pos[i][3];
+			m_vsOut.pos[i][0] *= rhw;
+			m_vsOut.pos[i][1] *= rhw;
+			m_vsOut.pos[i][2] *= rhw;
+			m_vsOut.pos[i][3] = 1.0f;
+			m_vsOut.rhw[i] = rhw;
+
+			m_vsOut.pos[i][0] = (m_vsOut.pos[i][0] + 1.0f) * 0.5f * m_width;
+			m_vsOut.pos[i][1] = (m_vsOut.pos[i][1] + 1.0f) * 0.5f * m_height;
+
+			m_vsOut.uv[i] *= rhw;//uv在这里除以w，以后乘回来，为了能正确计算纹理uv
 		}
 
 		for (int i = 0; i < m_vbo->GetSize(); i += 3)

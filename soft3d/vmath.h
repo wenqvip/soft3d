@@ -385,6 +385,11 @@ public:
         base::data[2] = v[1];
         base::data[3] = v[2];
     }
+
+	Tvec3<T> xyz()
+	{
+		return Tvec3<T>(base::data[0], base::data[1], base::data[2]);
+	}
 };
 
 // These types don't exist in GLSL and don't have full implementations
@@ -945,6 +950,46 @@ typedef Tmat4<float> mat4;
 typedef Tmat4<int> imat4;
 typedef Tmat4<unsigned int> umat4;
 typedef Tmat4<double> dmat4;
+
+template <typename T>
+class Tmat3 : public matNM<T, 3, 3>
+{
+public:
+	typedef matNM<T, 3, 3> base;
+	typedef Tmat3<T> my_type;
+
+	inline Tmat3() {}
+	inline Tmat3(const my_type& that) : base(that) {}
+	inline Tmat3(const base& that) : base(that) {}
+	inline Tmat3(const vecN<T, 3>& v) : base(v) {}
+	inline Tmat3(const vecN<T, 3>& v0,
+		const vecN<T, 3>& v1,
+		const vecN<T, 3>& v2)
+	{
+		base::data[0] = v0;
+		base::data[1] = v1;
+		base::data[2] = v2;
+	}
+	inline Tmat3(const Tmat4<T>& m4)
+	{
+		base::data[0][0] = m4[0][0];
+		base::data[0][1] = m4[0][1];
+		base::data[0][2] = m4[0][2];
+
+		base::data[1][0] = m4[1][0];
+		base::data[1][1] = m4[1][1];
+		base::data[1][2] = m4[1][2];
+
+		base::data[2][0] = m4[0][0];
+		base::data[2][1] = m4[0][1];
+		base::data[2][2] = m4[0][2];
+	}
+};
+
+typedef Tmat3<float> mat3;
+typedef Tmat3<int> imat3;
+typedef Tmat3<unsigned int> umat3;
+typedef Tmat3<double> dmat3;
 
 template <typename T>
 class Tmat2 : public matNM<T,2,2>

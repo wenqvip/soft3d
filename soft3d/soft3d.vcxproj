@@ -71,12 +71,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>..\fbxsdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\fbxsdk\lib\vs2013\x86\debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>..\fbxsdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\fbxsdk\lib\vs2013\x86\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -141,11 +145,14 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FbxLoader.h" />
     <ClInclude Include="FragmentProcessor.h" />
     <ClInclude Include="Rasterizer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="DirectXHelper.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SceneManagerFbx.h" />
+    <ClInclude Include="SceneManagerPlane.h" />
     <ClInclude Include="SceneManagerTriangle.h" />
     <ClInclude Include="soft3d.h" />
     <ClInclude Include="Soft3dPipeline.h" />
@@ -155,11 +162,14 @@
     <ClInclude Include="vmath.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FbxLoader.cpp" />
     <ClCompile Include="FragmentProcessor.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="DirectXHelper.cpp" />
     <ClCompile Include="Rasterizer.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SceneManagerFbx.cpp" />
+    <ClCompile Include="SceneManagerPlane.cpp" />
     <ClCompile Include="SceneManagerTriangle.cpp" />
     <ClCompile Include="Soft3dPipeline.cpp" />
     <ClCompile Include="Texture.cpp" />

@@ -97,20 +97,28 @@ namespace soft3d
 		std::shared_ptr<VertexProcessor> vp(new VertexProcessor());
 		for (int i = 0; i < m_vbo->GetSize(); i++)
 		{
+			const uint32* colorptr = nullptr;
 			if (m_vbo->useIndex())
 			{
-				vp->color = m_vbo->GetColor(m_vbo->GetIndex(i));
+				colorptr = m_vbo->GetColor(m_vbo->GetIndex(i));
 				vp->pos = m_vbo->GetPos(m_vbo->GetIndex(i));
 			}
 			else
 			{
-				vp->color = m_vbo->GetColor(i);
+				colorptr = m_vbo->GetColor(i);
 				vp->pos = m_vbo->GetPos(i);
 			}
+			if (colorptr != nullptr)
+				vp->color = colorptr;
+			else
+				vp->color = (uint32*)this;//随机颜色
+			vp->normal = m_vbo->GetNormal(i);
+
 			vp->mv_matrix = &(m_vbo->mv_matrix);
 			vp->proj_matrix = &(m_vbo->proj_matrix);
 			vp->out_color = &(m_vsOut.color[i]);
 			vp->out_pos = &(m_vsOut.pos[i]);
+			vp->out_normal = &(m_vsOut.normal[i]);
 			vp->Process();//这一步进行视图变换和投影变换
 
 			if(m_vbo->hasUV())

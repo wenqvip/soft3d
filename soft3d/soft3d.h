@@ -28,6 +28,18 @@ namespace soft3d
 		return color;
 	}
 
+	inline uint32 fC2uC(const vmath::vec3& colorf)
+	{
+		//return 0xfff;
+		uint32 color = 0;
+		color += (uint32)(0xff * colorf[2]) << 16;
+		color += (uint32)(0xff * colorf[1]) << 8;
+		color += (uint32)(0xff * colorf[0]);
+		color += (uint32)(0xf0) << 24;
+
+		return color;
+	}
+
 	inline uint32 colorMultiFloat(uint32 color, float ratio)
 	{
 		uint32 cc = 0;

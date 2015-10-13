@@ -62,10 +62,12 @@ namespace soft3d
 		return 0;
 	}
 
-	void Rasterizer::Fragment(const PipeLineData* pipelineData, uint32* out_color, uint32 src0, uint32 src1, float ratio)
+	void Rasterizer::Fragment(const PipeLineData* pipelineData, uint32 x, uint32 y, uint32 src0, uint32 src1, float ratio)
 	{
 		Color* colorVsOut = pipelineData->color;
 		vec2* uv = pipelineData->uv;
+		float* rhw = pipelineData->rhw;
+		float ratio1 = 1.0f - ratio;
 
 		//in
 		m_fp.color = colorVsOut[src0] * ratio + colorVsOut[src1] * (1.0f - ratio);
@@ -73,8 +75,13 @@ namespace soft3d
 		m_fp.uv[1] = uv[src0][1] * ratio + uv[src1][1] * (1.0f - ratio);
 		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
 
+		float fp_rhw = rhw[src0] * ratio + rhw[src1] * ratio1;//也要对rhw做插值
+		m_fp.uv /= fp_rhw;//把w乘回来，这样就可能得到正确的uv了，不知道为什么
+
 		//out
-		m_fp.out_color = out_color;
+		m_fp.out_color = GetFBPixelPtr(x, y);
+		if (m_fp.out_color == nullptr)
+			return;
 		m_fp.Process();
 	}
 
@@ -107,6 +114,15 @@ namespace soft3d
 		int x1 = pipelineData->pos[src1][0];
 		int y1 = pipelineData->pos[src1][1];
 
+		if (x0 < 0 || x0 > m_width)
+			return;
+		if (x1 < 0 || x1 > m_width)
+			return;
+		if (y0 < 0 || y0 > m_height)
+			return;
+		if (y1 < 0 || y1 > m_height)
+			return;
+
 		DrawPixel(x0, y0, pipelineData->color[src0], 5);
 
 		int x, y, dx, dy;
@@ -120,7 +136,7 @@ namespace soft3d
 			for (int i = 0; i <= abs(dx); i++)
 			{
 				float ratio = (x1 - x) / (float)dx;
-				Fragment(pipelineData, GetFBPixelPtr(x, y), src0, src1, ratio);
+				Fragment(pipelineData, x, y, src0, src1, ratio);
 				x = dx > 0 ? x + 1 : x - 1;
 				e += 2 * abs(dy);
 				if (e >= 0)
@@ -136,7 +152,7 @@ namespace soft3d
 			for (int i = 0; i <= abs(dy); i++)
 			{
 				float ratio = (y1 - y) / (float)dy;
-				Fragment(pipelineData, GetFBPixelPtr(x, y), src0, src1, ratio);
+				Fragment(pipelineData, x, y, src0, src1, ratio);
 				y = dy > 0 ? y + 1 : y - 1;
 				e += 2 * abs(dx);
 				if (e >= 0)

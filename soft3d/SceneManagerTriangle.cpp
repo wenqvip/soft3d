@@ -22,24 +22,21 @@ void SceneManagerTriangle::InitScene(uint16 width, uint16 height)
 
 	float cube[] = {
 		1.0f, 1.0f, 0.0f, 1.0f,
-		0.0f,
 		-1.0f, -1.0f, 0.0f, 1.0f,
-		0.0f,
 		1.0f, -1.0f, 0.0f, 1.0f,
-		0.0f,
 		-1.0f, 1.0f, 0.0f, 1.0f,
-		0.0f,
 		-1.0f, -1.0f, 0.0f, 1.0f,
-		0.0f,
 		1.0f, 1.0f, 0.0f, 1.0f,
-		0.0f,
 	};
-	(*(uint32*)&(cube[4])) = 0xff0000;
-	(*(uint32*)&(cube[9])) = 0x00ff00;
-	(*(uint32*)&(cube[14])) = 0x0000ff;
-	(*(uint32*)&(cube[19])) = 0xff0000;
-	(*(uint32*)&(cube[24])) = 0x00ff00;
-	(*(uint32*)&(cube[29])) = 0x0000ff;
+
+	uint32 cubeColor[] = {
+		0xff0000,
+		0x00ff00,
+		0x0000ff,
+		0xff0000,
+		0x00ff00,
+		0x0000ff,
+	};
 
 	float uv[] = {
 		1.0f, 0.0f,
@@ -50,12 +47,20 @@ void SceneManagerTriangle::InitScene(uint16 width, uint16 height)
 		1.0f, 0.0f,
 	};
 
-	shared_ptr<VertexBufferObject> vbo(new VertexBufferObject(5));
-	vbo->CopyVertexBuffer(cube, sizeof(cube) / 20);
-	vbo->m_posOffset = 0;
-	vbo->m_colorOffset = 4;
+	float cubeNormal[] = {
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+	};
 
+	shared_ptr<VertexBufferObject> vbo(new VertexBufferObject());
+	vbo->CopyVertexBuffer(cube, sizeof(cube) / sizeof(float));
+	vbo->CopyColorBuffer(cubeColor, sizeof(cubeColor) / sizeof(uint32));
 	vbo->CopyUVBuffer(uv, sizeof(uv) / sizeof(float));
+	vbo->CopyNormalBuffer(cubeNormal, sizeof(cubeNormal) / sizeof(float));
 
 	vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
 	//vbo->m_mode = VertexBufferObject::RENDER_LINE;
@@ -70,7 +75,7 @@ void SceneManagerTriangle::InitScene(uint16 width, uint16 height)
 
 	shared_ptr<Texture> tex(new Texture());
 	tex->CopyFromBuffer(tex_data, 3, 3);
-	Soft3dPipeline::Instance()->SetTexture(tex);
+	//Soft3dPipeline::Instance()->SetTexture(tex);
 }
 
 void SceneManagerTriangle::Update()

@@ -1,13 +1,15 @@
 #include "soft3d.h"
 #include "SceneManager.h"
 #include "SceneManagerTriangle.h"
+#include "SceneManagerFbx.h"
+#include "SceneManagerPlane.h"
 
 using namespace std;
 using namespace vmath;
 namespace soft3d
 {
 
-	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManager());
+	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManagerTriangle());
 
 	SceneManager::SceneManager()
 	{
@@ -26,32 +28,25 @@ namespace soft3d
 
 		float cube[] = {
 			1.0f, 1.0f, 1.0f, 1.0f,
-			0.0f,
 			-1.0f, 1.0f, 1.0f, 1.0f,
-			0.0f,
 			1.0f, -1.0f, 1.0f, 1.0f,
-			0.0f,
 			-1.0f, -1.0f, 1.0f, 1.0f,
-			0.0f,
-
 			1.0f, 1.0f, -1.0f, 1.0f,
-			0.0f,
 			-1.0f, 1.0f, -1.0f, 1.0f,
-			0.0f,
 			1.0f, -1.0f, -1.0f, 1.0f,
-			0.0f,
 			-1.0f, -1.0f, -1.0f, 1.0f,
-			0.0f,
 		};
-		(*(uint32*)&(cube[4])) = 0xff0000;
-		(*(uint32*)&(cube[9])) = 0x00ff00;
-		(*(uint32*)&(cube[14])) = 0x0000ff;
-		(*(uint32*)&(cube[19])) = 0xff0000;
 
-		(*(uint32*)&(cube[24])) = 0xffff00;
-		(*(uint32*)&(cube[29])) = 0xff00ff;
-		(*(uint32*)&(cube[34])) = 0x00ffff;
-		(*(uint32*)&(cube[39])) = 0xffff00;
+		uint32 cubeColor[] = {
+			0xff0000,
+			0x00ff00,
+			0x0000ff,
+			0xff0000,
+			0xffff00,
+			0xff00ff,
+			0x00ffff,
+			0xffff00,
+		};
 
 		uint32 cubeIndex[] = {
 			0, 1, 2,
@@ -83,11 +78,9 @@ namespace soft3d
 			1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 		};
 
-		shared_ptr<VertexBufferObject> vbo(new VertexBufferObject(5));
-		vbo->CopyVertexBuffer(cube, sizeof(cube) / 20);
-		vbo->m_posOffset = 0;
-		vbo->m_colorOffset = 4;
-
+		shared_ptr<VertexBufferObject> vbo(new VertexBufferObject());
+		vbo->CopyVertexBuffer(cube, sizeof(cube) / sizeof(float));
+		vbo->CopyColorBuffer(cubeColor, sizeof(cubeColor) / sizeof(uint32));
 		vbo->CopyIndexBuffer(cubeIndex, sizeof(cubeIndex) / sizeof(uint32));
 		vbo->CopyUVBuffer(cubeuv, sizeof(cubeuv)/sizeof(float));
 

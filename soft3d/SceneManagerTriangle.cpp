@@ -21,37 +21,46 @@ void SceneManagerTriangle::InitScene(uint16 width, uint16 height)
 	m_height = height;
 
 	float cube[] = {
-		 1.0f,  1.0f, 0.0f, 1.0f,
-		-0.0f, -0.0f, 0.0f, 1.0f,
-		 1.0f, -0.0f, 0.0f, 1.0f,
+		// 1.0f,  1.0f, 0.0f, 1.0f,
+		//-0.0f, -0.0f, 0.0f, 1.0f,
+		// 1.0f, -0.0f, 0.0f, 1.0f,
 
-		 0.0f,  1.0f, 0.0f, 1.0f,
-		-0.0f, -0.0f, 0.0f, 1.0f,
-		 1.0f,  1.0f, 0.0f, 1.0f,
+		// 0.0f,  1.0f, 0.0f, 1.0f,
+		//-0.0f, -0.0f, 0.0f, 1.0f,
+		// 1.0f,  1.0f, 0.0f, 1.0f,
 
-		 0.0f,  1.0f, 0.0f, 1.0f,
-		-1.0f,  0.0f, 0.0f, 1.0f,
-		 0.0f,  0.0f, 0.0f, 1.0f,
+		// 0.0f,  1.0f, 0.0f, 1.0f,
+		//-1.0f,  0.0f, 0.0f, 1.0f,
+		// 0.0f,  0.0f, 0.0f, 1.0f,
 
-		-1.0f,  1.0f, 0.0f, 1.0f,
-		-1.0f,  0.0f, 0.0f, 1.0f,
-		 0.0f,  1.0f, 0.0f, 1.0f,
+		//-1.0f,  1.0f, 0.0f, 1.0f,
+		//-1.0f,  0.0f, 0.0f, 1.0f,
+		// 0.0f,  1.0f, 0.0f, 1.0f,
 
-		-1.0f,  0.0f, 0.0f, 1.0f,
-		-1.0f, -1.0f, 0.0f, 1.0f,
-		 0.0f,  0.0f, 0.0f, 1.0f,
+		//-1.0f,  0.0f, 0.0f, 1.0f,
+		//-1.0f, -1.0f, 0.0f, 1.0f,
+		// 0.0f,  0.0f, 0.0f, 1.0f,
 
-		 0.0f,  0.0f, 0.0f, 1.0f,
-		-1.0f, -1.0f, 0.0f, 1.0f,
-		 0.0f, -1.0f, 0.0f, 1.0f,
+		// 0.0f,  0.0f, 0.0f, 1.0f,
+		//-1.0f, -1.0f, 0.0f, 1.0f,
+		// 0.0f, -1.0f, 0.0f, 1.0f,
 
-		 0.0f,  0.0f, 0.0f, 1.0f,
-		 0.0f, -1.0f, 0.0f, 1.0f,
-		 1.0f,  0.0f, 0.0f, 1.0f,
+		// 0.0f,  0.0f, 0.0f, 1.0f,
+		// 0.0f, -1.0f, 0.0f, 1.0f,
+		// 1.0f,  0.0f, 0.0f, 1.0f,
 
-		 1.0f,  0.0f, 0.0f, 1.0f,
-		 0.0f, -1.0f, 0.0f, 1.0f,
-		 1.0f, -1.0f, 0.0f, 1.0f,
+		// 1.0f,  0.0f, 0.0f, 1.0f,
+		// 0.0f, -1.0f, 0.0f, 1.0f,
+		// 1.0f, -1.0f, 0.0f, 1.0f,
+		-1.000000, -1.000000, 0.000000, 1.000000,
+		 0.000000, -1.000000, 0.000000, 1.000000,
+		 1.000000, -1.000000, 0.000000, 1.000000,
+		-1.000000,  0.000000, 0.000000, 1.000000,
+		 0.000000,  0.000000, 0.000000, 1.000000,
+		 1.000000,  0.000000, 0.000000, 1.000000,
+		-1.000000,  1.000000, 0.000000, 1.000000,
+		 0.000000,  1.000000, 0.000000, 1.000000,
+		 1.000000,  1.000000, 0.000000, 1.000000,
 	};
 
 	uint32 cubeColor[] = {
@@ -117,14 +126,26 @@ void SceneManagerTriangle::InitScene(uint16 width, uint16 height)
 		0.0f, 0.0f, 1.0f,
 	};
 
+	uint32 cubeIndex[] = {
+		3,0,4,
+		1,4,0,
+		4,1,5,
+		2,5,1,
+		6,3,7,
+		4,7,3,
+		7,4,8,
+		5,8,4,
+	};
+
 	shared_ptr<VertexBufferObject> vbo(new VertexBufferObject());
 	vbo->CopyVertexBuffer(cube, sizeof(cube) / sizeof(float));
 	vbo->CopyColorBuffer(cubeColor, sizeof(cubeColor) / sizeof(uint32));
 	//vbo->CopyUVBuffer(uv, sizeof(uv) / sizeof(float));
 	vbo->CopyNormalBuffer(cubeNormal, sizeof(cubeNormal) / sizeof(float));
+	vbo->CopyIndexBuffer(cubeIndex, sizeof(cubeIndex) / sizeof(uint32));
 
 	vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
-	vbo->m_mode = VertexBufferObject::RENDER_LINE;
+	//vbo->m_mode = VertexBufferObject::RENDER_LINE;
 	vbo->m_cullMode = VertexBufferObject::CULL_NONE;
 	Soft3dPipeline::Instance()->SetVBO(vbo);
 

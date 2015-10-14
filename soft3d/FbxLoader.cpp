@@ -85,11 +85,11 @@ namespace soft3d
 				FbxLayerElementNormal* pNormal = pLayer->GetNormals();
 				m_normalCount = pNormal->mDirectArray->GetCount();
 				m_normalBuffer = new float[m_normalCount * 3];
-				for (int i = 0; i < m_normalCount * 3; i+=4)
+				for (int i = 0; i < m_normalCount * 3; i+=3)
 				{
-					m_normalBuffer[i] = (*pNormal->mDirectArray)[i / 4][0];
-					m_normalBuffer[i + 1] = (*pNormal->mDirectArray)[i / 4][1];
-					m_normalBuffer[i + 2] = (*pNormal->mDirectArray)[i / 4][2];
+					m_normalBuffer[i] = (*pNormal->mDirectArray)[i / 3][0];
+					m_normalBuffer[i + 1] = (*pNormal->mDirectArray)[i / 3][1];
+					m_normalBuffer[i + 2] = (*pNormal->mDirectArray)[i / 3][2];
 					//m_normalBuffer[i + 3] = (*pNormal->mDirectArray)[i / 4][3];
 				}
 			}

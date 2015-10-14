@@ -15,7 +15,7 @@ namespace soft3d
 		m_height = height;
 
 		FbxLoader fbxLoader;
-		fbxLoader.LoadFbx("plane10x10.fbx");
+		fbxLoader.LoadFbx("plane2x2.fbx");
 
 		shared_ptr<VertexBufferObject> vbo(new VertexBufferObject());
 		vbo->CopyVertexBuffer(fbxLoader.GetVertexBuffer(), fbxLoader.GetVertexCount() * 4);
@@ -36,7 +36,7 @@ namespace soft3d
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
 		float factor = ((int)GetTickCount() / 50 % 180) - 90;
-		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(2.0f) * rotate(factor, vec3(1.0f, 0.0f, 0.0f));
+		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f) * rotate(factor, vec3(1.0f, 0.0f, 0.0f));
 
 		Soft3dPipeline::Instance()->CurrentVBO()->mv_matrix = mv_matrix;
 		Soft3dPipeline::Instance()->CurrentVBO()->proj_matrix = proj_matrix;

@@ -62,7 +62,7 @@ namespace soft3d
 		int Clear(uint32 color);
 
 		inline const PipeLineData* GetVSOut() const {
-			return &m_vsOut;
+			return &m_pipeLineData;
 		};
 
 	protected:
@@ -72,7 +72,7 @@ namespace soft3d
 
 	private:
 		std::shared_ptr<VertexBufferObject> m_vbo;
-		PipeLineData m_vsOut;
+		PipeLineData m_pipeLineData;
 		std::shared_ptr<Texture> m_tex;
 		std::shared_ptr<Rasterizer> m_rasterizer;
 

@@ -55,19 +55,19 @@ namespace soft3d
 	void Soft3dPipeline::SetVBO(shared_ptr<VertexBufferObject> vbo)
 	{
 		m_vbo = vbo;
-		if (m_vsOut.capacity < vbo->GetSize())
+		if (m_pipeLineData.capacity < vbo->GetSize())
 		{
-			if(m_vsOut.color != nullptr)
-				delete[] m_vsOut.color;
-			if(m_vsOut.pos != nullptr)
-				delete[] m_vsOut.pos;
+			if(m_pipeLineData.color != nullptr)
+				delete[] m_pipeLineData.color;
+			if(m_pipeLineData.pos != nullptr)
+				delete[] m_pipeLineData.pos;
 
-			m_vsOut.color = new Color[vbo->GetSize()];
-			m_vsOut.pos = new vec4[vbo->GetSize()];
-			m_vsOut.uv = new vec2[vbo->GetSize()];
-			m_vsOut.rhw = new float[vbo->GetSize()];
-			m_vsOut.cullMode = vbo->m_cullMode;
-			m_vsOut.capacity = vbo->GetSize();
+			m_pipeLineData.color = new Color[vbo->GetSize()];
+			m_pipeLineData.pos = new vec4[vbo->GetSize()];
+			m_pipeLineData.uv = new vec2[vbo->GetSize()];
+			m_pipeLineData.rhw = new float[vbo->GetSize()];
+			m_pipeLineData.cullMode = vbo->m_cullMode;
+			m_pipeLineData.capacity = vbo->GetSize();
 		}
 	}
 
@@ -116,34 +116,34 @@ namespace soft3d
 
 			vp->mv_matrix = &(m_vbo->mv_matrix);
 			vp->proj_matrix = &(m_vbo->proj_matrix);
-			vp->out_color = &(m_vsOut.color[i]);
-			vp->out_pos = &(m_vsOut.pos[i]);
-			vp->out_normal = &(m_vsOut.normal[i]);
+			vp->out_color = &(m_pipeLineData.color[i]);
+			vp->out_pos = &(m_pipeLineData.pos[i]);
+			vp->out_normal = &(m_pipeLineData.normal[i]);
 			vp->Process();//这一步进行视图变换和投影变换
 
 			if(m_vbo->hasUV())
-				m_vsOut.uv[i] = *(m_vbo->GetUV(i));
+				m_pipeLineData.uv[i] = *(m_vbo->GetUV(i));
 
 			//除以w
-			float rhw = 1.0f / m_vsOut.pos[i][3];
-			m_vsOut.pos[i][0] *= rhw;
-			m_vsOut.pos[i][1] *= rhw;
-			m_vsOut.pos[i][2] *= rhw;
-			m_vsOut.pos[i][3] = 1.0f;
-			m_vsOut.rhw[i] = rhw;
+			float rhw = 1.0f / m_pipeLineData.pos[i][3];
+			m_pipeLineData.pos[i][0] *= rhw;
+			m_pipeLineData.pos[i][1] *= rhw;
+			m_pipeLineData.pos[i][2] *= rhw;
+			m_pipeLineData.pos[i][3] = 1.0f;
+			m_pipeLineData.rhw[i] = rhw;
 
-			m_vsOut.pos[i][0] = (m_vsOut.pos[i][0] + 1.0f) * 0.5f * m_width;
-			m_vsOut.pos[i][1] = (m_vsOut.pos[i][1] + 1.0f) * 0.5f * m_height;
+			m_pipeLineData.pos[i][0] = (m_pipeLineData.pos[i][0] + 1.0f) * 0.5f * m_width;
+			m_pipeLineData.pos[i][1] = (m_pipeLineData.pos[i][1] + 1.0f) * 0.5f * m_height;
 
-			m_vsOut.uv[i] *= rhw;//uv在这里除以w，以后乘回来，为了能正确计算纹理uv
+			m_pipeLineData.uv[i] *= rhw;//uv在这里除以w，以后乘回来，为了能正确计算纹理uv
 		}
 
 		for (int i = 0; i < m_vbo->GetSize(); i += 3)
 		{
 			VertexBufferObject::CULL_MODE cull_mode = VertexBufferObject::CULL_NONE;
 			//进行背面拣选
-			vec4 a = m_vsOut.pos[i] - m_vsOut.pos[i + 1];
-			vec4 b = m_vsOut.pos[i + 1] - m_vsOut.pos[i + 2];
+			vec4 a = m_pipeLineData.pos[i] - m_pipeLineData.pos[i + 1];
+			vec4 b = m_pipeLineData.pos[i + 1] - m_pipeLineData.pos[i + 2];
 			vec3 c = vec3(a[0], a[1], a[2]);
 			vec3 d = vec3(b[0], b[1], b[2]);
 			vec3 r = cross(c, d);
@@ -170,15 +170,15 @@ namespace soft3d
 			{
 			case VertexBufferObject::RENDER_LINE:
 			{
-				m_rasterizer->BresenhamLine(&m_vsOut, index[0], index[1]);
-				m_rasterizer->BresenhamLine(&m_vsOut, index[1], index[2]);
-				m_rasterizer->BresenhamLine(&m_vsOut, index[2], index[0]);
+				m_rasterizer->BresenhamLine(&m_pipeLineData, index[0], index[1]);
+				m_rasterizer->BresenhamLine(&m_pipeLineData, index[1], index[2]);
+				m_rasterizer->BresenhamLine(&m_pipeLineData, index[2], index[0]);
 				break;
 			}
 
 			case VertexBufferObject::RENDER_TRIANGLE:
 			{
-				m_rasterizer->Triangle(&m_vsOut, index[0], index[1], index[2]);
+				m_rasterizer->Triangle(&m_pipeLineData, index[0], index[1], index[2]);
 				break;
 			}
 

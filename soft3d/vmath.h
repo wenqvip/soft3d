@@ -980,9 +980,9 @@ public:
 		base::data[1][1] = m4[1][1];
 		base::data[1][2] = m4[1][2];
 
-		base::data[2][0] = m4[0][0];
-		base::data[2][1] = m4[0][1];
-		base::data[2][2] = m4[0][2];
+		base::data[2][0] = m4[2][0];
+		base::data[2][1] = m4[2][1];
+		base::data[2][2] = m4[2][2];
 	}
 };
 

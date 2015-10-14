@@ -21,15 +21,58 @@ void SceneManagerTriangle::InitScene(uint16 width, uint16 height)
 	m_height = height;
 
 	float cube[] = {
-		1.0f, 1.0f, 0.0f, 1.0f,
+		 1.0f,  1.0f, 0.0f, 1.0f,
+		-0.0f, -0.0f, 0.0f, 1.0f,
+		 1.0f, -0.0f, 0.0f, 1.0f,
+
+		 0.0f,  1.0f, 0.0f, 1.0f,
+		-0.0f, -0.0f, 0.0f, 1.0f,
+		 1.0f,  1.0f, 0.0f, 1.0f,
+
+		 0.0f,  1.0f, 0.0f, 1.0f,
+		-1.0f,  0.0f, 0.0f, 1.0f,
+		 0.0f,  0.0f, 0.0f, 1.0f,
+
+		-1.0f,  1.0f, 0.0f, 1.0f,
+		-1.0f,  0.0f, 0.0f, 1.0f,
+		 0.0f,  1.0f, 0.0f, 1.0f,
+
+		-1.0f,  0.0f, 0.0f, 1.0f,
 		-1.0f, -1.0f, 0.0f, 1.0f,
-		1.0f, -1.0f, 0.0f, 1.0f,
-		-1.0f, 1.0f, 0.0f, 1.0f,
+		 0.0f,  0.0f, 0.0f, 1.0f,
+
+		 0.0f,  0.0f, 0.0f, 1.0f,
 		-1.0f, -1.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 0.0f, 1.0f,
+		 0.0f, -1.0f, 0.0f, 1.0f,
+
+		 0.0f,  0.0f, 0.0f, 1.0f,
+		 0.0f, -1.0f, 0.0f, 1.0f,
+		 1.0f,  0.0f, 0.0f, 1.0f,
+
+		 1.0f,  0.0f, 0.0f, 1.0f,
+		 0.0f, -1.0f, 0.0f, 1.0f,
+		 1.0f, -1.0f, 0.0f, 1.0f,
 	};
 
 	uint32 cubeColor[] = {
+		0xff0000,
+		0x00ff00,
+		0x0000ff,
+		0xff0000,
+		0x00ff00,
+		0x0000ff,
+		0xff0000,
+		0x00ff00,
+		0x0000ff,
+		0xff0000,
+		0x00ff00,
+		0x0000ff,
+		0xff0000,
+		0x00ff00,
+		0x0000ff,
+		0xff0000,
+		0x00ff00,
+		0x0000ff,
 		0xff0000,
 		0x00ff00,
 		0x0000ff,
@@ -54,16 +97,34 @@ void SceneManagerTriangle::InitScene(uint16 width, uint16 height)
 		0.0f, 0.0f, 1.0f,
 		0.0f, 0.0f, 1.0f,
 		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
 	};
 
 	shared_ptr<VertexBufferObject> vbo(new VertexBufferObject());
 	vbo->CopyVertexBuffer(cube, sizeof(cube) / sizeof(float));
 	vbo->CopyColorBuffer(cubeColor, sizeof(cubeColor) / sizeof(uint32));
-	vbo->CopyUVBuffer(uv, sizeof(uv) / sizeof(float));
+	//vbo->CopyUVBuffer(uv, sizeof(uv) / sizeof(float));
 	vbo->CopyNormalBuffer(cubeNormal, sizeof(cubeNormal) / sizeof(float));
 
 	vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
-	//vbo->m_mode = VertexBufferObject::RENDER_LINE;
+	vbo->m_mode = VertexBufferObject::RENDER_LINE;
 	vbo->m_cullMode = VertexBufferObject::CULL_NONE;
 	Soft3dPipeline::Instance()->SetVBO(vbo);
 

@@ -111,8 +111,8 @@ namespace soft3d
 		mat4 model_matrix = rotate(factor, vec3(0.0f, 1.0f, 0.0f)) * translate(0.0f, 0.0f, 0.0f) * scale(1.0f);
 		mat4 mv_matrix = view_matrix * model_matrix;
 
-		Soft3dPipeline::Instance()->CurrentVBO()->mv_matrix = mv_matrix;
-		Soft3dPipeline::Instance()->CurrentVBO()->proj_matrix = proj_matrix;
+		SetUniform(0, mv_matrix);
+		SetUniform(1, proj_matrix);
 
 		Soft3dPipeline::Instance()->Clear(0);
 	}

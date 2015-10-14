@@ -170,8 +170,8 @@ void SceneManagerTriangle::Update()
 	float factor = GetTickCount() / 50 % 360;
 	mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f) * rotate(factor, vec3(1.0f, 0.0f, 0.0f));
 
-	Soft3dPipeline::Instance()->CurrentVBO()->mv_matrix = mv_matrix;
-	Soft3dPipeline::Instance()->CurrentVBO()->proj_matrix = proj_matrix;
+	SetUniform(0, mv_matrix);
+	SetUniform(1, proj_matrix);
 
 	Soft3dPipeline::Instance()->Clear(0);
 }

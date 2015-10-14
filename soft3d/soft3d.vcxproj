@@ -71,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\fbxsdk\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\fbxsdk\include;..\..\boost_1_58_0;$(IncludePath)</IncludePath>
     <LibraryPath>..\fbxsdk\lib\vs2013\x86\debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -79,7 +79,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\fbxsdk\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\fbxsdk\include;..\..\boost_1_58_0;$(IncludePath)</IncludePath>
     <LibraryPath>..\fbxsdk\lib\vs2013\x86\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

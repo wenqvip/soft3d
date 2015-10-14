@@ -61,7 +61,7 @@ namespace soft3d
 			memcpy(this, &color, sizeof(uint32));
 		}
 
-		operator uint32()
+		operator uint32() const
 		{
 			return *((uint32*)(this));
 		}

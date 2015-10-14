@@ -5,6 +5,7 @@
 #include "VertexProcessor.h"
 #include "FragmentProcessor.h"
 #include "Rasterizer.h"
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace vmath;
@@ -32,15 +33,25 @@ namespace soft3d
 		return cc;
 	}*/
 
+
 	std::shared_ptr<Soft3dPipeline> Soft3dPipeline::s_instance(new Soft3dPipeline());
 
 	Soft3dPipeline::Soft3dPipeline()
 	{
+		for (int i = 0; i < 16; i++)
+		{
+			m_uniforms[i] = nullptr;
+		}
 	}
 
 
 	Soft3dPipeline::~Soft3dPipeline()
 	{
+		for (int i = 0; i < 16; i++)
+		{
+			if (m_uniforms[i] != nullptr)
+				delete m_uniforms[i];
+		}
 	}
 
 	void Soft3dPipeline::InitPipeline(HWND hwnd, uint16 width, uint16 height)
@@ -54,26 +65,26 @@ namespace soft3d
 
 	void Soft3dPipeline::SetVBO(shared_ptr<VertexBufferObject> vbo)
 	{
-		m_vbo = vbo;
-		if (m_pipeLineData.capacity < vbo->GetSize())
-		{
-			if(m_pipeLineData.color != nullptr)
-				delete[] m_pipeLineData.color;
-			if(m_pipeLineData.pos != nullptr)
-				delete[] m_pipeLineData.pos;
+		shared_ptr<PipeLineData> pd(new PipeLineData());
+		pd->vp = boost::shared_array<VertexProcessor>(new VertexProcessor[vbo->GetSize()]);
+		pd->cullMode = vbo->m_cullMode;
+		pd->capacity = vbo->GetSize();
 
-			m_pipeLineData.color = new Color[vbo->GetSize()];
-			m_pipeLineData.pos = new vec4[vbo->GetSize()];
-			m_pipeLineData.uv = new vec2[vbo->GetSize()];
-			m_pipeLineData.rhw = new float[vbo->GetSize()];
-			m_pipeLineData.cullMode = vbo->m_cullMode;
-			m_pipeLineData.capacity = vbo->GetSize();
-		}
+		m_pipeDataVector.push_back(pd);
+		m_vboVector.push_back(vbo);
 	}
 
-	VertexBufferObject* Soft3dPipeline::CurrentVBO()
+	void Soft3dPipeline::SetUniform(uint16 index, void* uniform)
 	{
-		return m_vbo.get();
+		if (index < 16)
+		{
+			if (m_uniforms[index] != nullptr)
+			{
+				delete m_uniforms[index];
+				m_uniforms[index] = nullptr;
+			}
+			m_uniforms[index] = uniform;
+		}
 	}
 
 	void Soft3dPipeline::SetTexture(shared_ptr<Texture> tex)
@@ -91,99 +102,101 @@ namespace soft3d
 	{
 		SceneManager::Instance()->Update();
 
-		if (m_vbo == nullptr)
-			return;
-
-		std::shared_ptr<VertexProcessor> vp(new VertexProcessor());
-		for (int i = 0; i < m_vbo->GetSize(); i++)
+		for (int idx = 0; idx < m_pipeDataVector.size(); idx++)
 		{
-			const uint32* colorptr = nullptr;
-			if (m_vbo->useIndex())
+			shared_ptr<PipeLineData>& pipeData = m_pipeDataVector[idx];
+			VertexBufferObject* vbo = m_vboVector[idx].get();
+			for (int i = 0; i < pipeData->capacity; i++)
 			{
-				colorptr = m_vbo->GetColor(m_vbo->GetIndex(i));
-				vp->pos = m_vbo->GetPos(m_vbo->GetIndex(i));
-			}
-			else
-			{
-				colorptr = m_vbo->GetColor(i);
-				vp->pos = m_vbo->GetPos(i);
-			}
-			if (colorptr != nullptr)
-				vp->color = colorptr;
-			else
-				vp->color = (uint32*)this;//随机颜色
-			vp->normal = m_vbo->GetNormal(i);
+				VertexProcessor& cur_vp = pipeData->vp[i];
+				const uint32* colorptr = nullptr;
+				if (vbo->useIndex())
+				{
+					colorptr = vbo->GetColor(vbo->GetIndex(i));
+					cur_vp.pos = vbo->GetPos(vbo->GetIndex(i));
+				}
+				else
+				{
+					colorptr = vbo->GetColor(i);
+					cur_vp.pos = vbo->GetPos(i);
+				}
+				if (colorptr != nullptr)
+					cur_vp.color = colorptr;
+				else
+					cur_vp.color = (uint32*)this;//随机颜色
+				cur_vp.normal = vbo->GetNormal(i);
 
-			vp->mv_matrix = &(m_vbo->mv_matrix);
-			vp->proj_matrix = &(m_vbo->proj_matrix);
-			vp->out_color = &(m_pipeLineData.color[i]);
-			vp->out_pos = &(m_pipeLineData.pos[i]);
-			vp->out_normal = &(m_pipeLineData.normal[i]);
-			vp->Process();//这一步进行视图变换和投影变换
+				cur_vp.uniforms = m_uniforms;
+				cur_vp.Process();//这一步进行视图变换和投影变换
 
-			if(m_vbo->hasUV())
-				m_pipeLineData.uv[i] = *(m_vbo->GetUV(i));
+				if (vbo->hasUV())
+					cur_vp.vs_out.uv = *(vbo->GetUV(i));
 
-			//除以w
-			float rhw = 1.0f / m_pipeLineData.pos[i][3];
-			m_pipeLineData.pos[i][0] *= rhw;
-			m_pipeLineData.pos[i][1] *= rhw;
-			m_pipeLineData.pos[i][2] *= rhw;
-			m_pipeLineData.pos[i][3] = 1.0f;
-			m_pipeLineData.rhw[i] = rhw;
+				//除以w
+				float rhw = 1.0f / cur_vp.vs_out.pos[3];
+				cur_vp.vs_out.pos[0] *= rhw;
+				cur_vp.vs_out.pos[1] *= rhw;
+				cur_vp.vs_out.pos[2] *= rhw;
+				cur_vp.vs_out.pos[3] = 1.0f;
+				cur_vp.vs_out.rhw = rhw;
 
-			m_pipeLineData.pos[i][0] = (m_pipeLineData.pos[i][0] + 1.0f) * 0.5f * m_width;
-			m_pipeLineData.pos[i][1] = (m_pipeLineData.pos[i][1] + 1.0f) * 0.5f * m_height;
+				cur_vp.vs_out.pos[0] = (cur_vp.vs_out.pos[0] + 1.0f) * 0.5f * m_width;
+				cur_vp.vs_out.pos[1] = (cur_vp.vs_out.pos[1] + 1.0f) * 0.5f * m_height;
 
-			m_pipeLineData.uv[i] *= rhw;//uv在这里除以w，以后乘回来，为了能正确计算纹理uv
-		}
-
-		for (int i = 0; i < m_vbo->GetSize(); i += 3)
-		{
-			VertexBufferObject::CULL_MODE cull_mode = VertexBufferObject::CULL_NONE;
-			//进行背面拣选
-			vec4 a = m_pipeLineData.pos[i] - m_pipeLineData.pos[i + 1];
-			vec4 b = m_pipeLineData.pos[i + 1] - m_pipeLineData.pos[i + 2];
-			vec3 c = vec3(a[0], a[1], a[2]);
-			vec3 d = vec3(b[0], b[1], b[2]);
-			vec3 r = cross(c, d);
-			if (r[2] < 0.0f)
-				cull_mode = VertexBufferObject::CULL_CW;
-			else if (r[2] > 0.0f)
-				cull_mode = VertexBufferObject::CULL_CCW;
-
-			if (m_vbo->m_cullMode != VertexBufferObject::CULL_NONE && m_vbo->m_cullMode != cull_mode)
-				continue;
-
-			//todo:进行裁剪
-			//
-
-			//make triangle always ccw sorting
-			uint32 index[3] = { i, i + 1, i + 2 };
-			if (cull_mode == VertexBufferObject::CULL_CW)
-			{
-				index[0] = i + 2;
-				index[2] = i;
+				cur_vp.vs_out.uv *= rhw;//uv在这里除以w，以后乘回来，为了能正确计算纹理uv
 			}
 
-			switch (m_vbo->m_mode)
+			for (int i = 0; i < pipeData->capacity; i += 3)
 			{
-			case VertexBufferObject::RENDER_LINE:
-			{
-				m_rasterizer->BresenhamLine(&m_pipeLineData, index[0], index[1]);
-				m_rasterizer->BresenhamLine(&m_pipeLineData, index[1], index[2]);
-				m_rasterizer->BresenhamLine(&m_pipeLineData, index[2], index[0]);
-				break;
-			}
+				VertexProcessor& vp1 = pipeData->vp[i];
+				VertexProcessor& vp2 = pipeData->vp[i + 1];
+				VertexProcessor& vp3 = pipeData->vp[i + 2];
 
-			case VertexBufferObject::RENDER_TRIANGLE:
-			{
-				m_rasterizer->Triangle(&m_pipeLineData, index[0], index[1], index[2]);
-				break;
-			}
+				VertexBufferObject::CULL_MODE cull_mode = VertexBufferObject::CULL_NONE;
+				//进行背面拣选
+				vec4 a = vp1.vs_out.pos - vp2.vs_out.pos;
+				vec4 b = vp2.vs_out.pos - vp3.vs_out.pos;
+				vec3 c = vec3(a[0], a[1], a[2]);
+				vec3 d = vec3(b[0], b[1], b[2]);
+				vec3 r = cross(c, d);
+				if (r[2] < 0.0f)
+					cull_mode = VertexBufferObject::CULL_CW;
+				else if (r[2] > 0.0f)
+					cull_mode = VertexBufferObject::CULL_CCW;
 
-			default:
-				break;
+				if (vbo->m_cullMode != VertexBufferObject::CULL_NONE && vbo->m_cullMode != cull_mode)
+					continue;
+
+				//todo:进行裁剪
+				//
+
+				//make triangle always ccw sorting
+				uint32 index[3] = { i, i + 1, i + 2 };
+				if (cull_mode == VertexBufferObject::CULL_CW)
+				{
+					index[0] = i + 2;
+					index[2] = i;
+				}
+
+				switch (vbo->m_mode)
+				{
+				case VertexBufferObject::RENDER_LINE:
+				{
+					m_rasterizer->BresenhamLine(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out));
+					m_rasterizer->BresenhamLine(&(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out));
+					m_rasterizer->BresenhamLine(&(pipeData->vp[index[2]].vs_out), &(pipeData->vp[index[0]].vs_out));
+					break;
+				}
+
+				case VertexBufferObject::RENDER_TRIANGLE:
+				{
+					m_rasterizer->Triangle(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out));
+					break;
+				}
+
+				default:
+					break;
+				}
 			}
 		}
 

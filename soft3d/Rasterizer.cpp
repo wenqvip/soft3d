@@ -62,20 +62,17 @@ namespace soft3d
 		return 0;
 	}
 
-	void Rasterizer::Fragment(const PipeLineData* pipelineData, uint32 x, uint32 y, uint32 src0, uint32 src1, float ratio)
+	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio)
 	{
-		Color* colorVsOut = pipelineData->color;
-		vec2* uv = pipelineData->uv;
-		float* rhw = pipelineData->rhw;
 		float ratio1 = 1.0f - ratio;
 
 		//in
-		m_fp.color = colorVsOut[src0] * ratio + colorVsOut[src1] * (1.0f - ratio);
-		m_fp.uv[0] = uv[src0][0] * ratio + uv[src1][0] * (1.0f - ratio);
-		m_fp.uv[1] = uv[src0][1] * ratio + uv[src1][1] * (1.0f - ratio);
+		m_fp.color = vo0->color * ratio + vo1->color * (1.0f - ratio);
+		m_fp.uv[0] = vo0->uv[0] * ratio + vo1->uv[0] * (1.0f - ratio);
+		m_fp.uv[1] = vo0->uv[1] * ratio + vo1->uv[1] * (1.0f - ratio);
 		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
 
-		float fp_rhw = rhw[src0] * ratio + rhw[src1] * ratio1;//也要对rhw做插值
+		float fp_rhw = vo0->rhw * ratio + vo1->rhw * ratio1;//也要对rhw做插值
 		m_fp.uv /= fp_rhw;//把w乘回来，这样就可能得到正确的uv了，不知道为什么
 
 		//out
@@ -85,18 +82,15 @@ namespace soft3d
 		m_fp.Process();
 	}
 
-	void Rasterizer::Fragment(const PipeLineData* pipelineData, uint32 x, uint32 y, uint32 src0, uint32 src1, uint32 src2, float ratio0, float ratio1)
+	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1)
 	{
-		Color* colorVsOut = pipelineData->color;
-		vec2* uv = pipelineData->uv;
-		float* rhw = pipelineData->rhw;
 		float ratio2 = 1.0f - ratio0 - ratio1;
 		
 		//in
-		m_fp.color = colorVsOut[src0] * ratio0 + colorVsOut[src1] * ratio1 + colorVsOut[src2] * ratio2;
-		m_fp.uv[0] = uv[src0][0] * ratio0 + uv[src1][0] * ratio1 + uv[src2][0] * ratio2;
-		m_fp.uv[1] = uv[src0][1] * ratio0 + uv[src1][1] * ratio1 + uv[src2][1] * ratio2;
-		float fp_rhw = rhw[src0] * ratio0 + rhw[src1] * ratio1 + rhw[src2] * ratio2;//也要对rhw做插值
+		m_fp.color = vo0->color * ratio0 + vo1->color * ratio1 + vo2->color * ratio2;
+		m_fp.uv[0] = vo0->uv[0] * ratio0 + vo1->uv[0] * ratio1 + vo2->uv[0] * ratio2;
+		m_fp.uv[1] = vo0->uv[1] * ratio0 + vo1->uv[1] * ratio1 + vo2->uv[1] * ratio2;
+		float fp_rhw = vo0->rhw * ratio0 + vo1->rhw * ratio1 + vo2->rhw * ratio2;//也要对rhw做插值
 		m_fp.uv /= fp_rhw;//把w乘回来，这样就可能得到正确的uv了，不知道为什么
 		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
 
@@ -107,12 +101,12 @@ namespace soft3d
 		m_fp.Process();
 	}
 
-	void Rasterizer::BresenhamLine(const PipeLineData* pipelineData, uint32 src0, uint32 src1)
+	void Rasterizer::BresenhamLine(const VS_OUT* vo0, const VS_OUT* vo1)
 	{
-		int x0 = pipelineData->pos[src0][0];
-		int y0 = pipelineData->pos[src0][1];
-		int x1 = pipelineData->pos[src1][0];
-		int y1 = pipelineData->pos[src1][1];
+		int x0 = vo0->pos[0];
+		int y0 = vo0->pos[1];
+		int x1 = vo1->pos[0];
+		int y1 = vo1->pos[1];
 
 		if (x0 < 0 || x0 > m_width)
 			return;
@@ -123,7 +117,7 @@ namespace soft3d
 		if (y1 < 0 || y1 > m_height)
 			return;
 
-		DrawPixel(x0, y0, pipelineData->color[src0], 5);
+		DrawPixel(x0, y0, (uint32)(vo0->color), 5);
 
 		int x, y, dx, dy;
 		dx = x1 - x0;
@@ -136,7 +130,7 @@ namespace soft3d
 			for (int i = 0; i <= abs(dx); i++)
 			{
 				float ratio = (x1 - x) / (float)dx;
-				Fragment(pipelineData, x, y, src0, src1, ratio);
+				Fragment(vo0, vo1, x, y, ratio);
 				x = dx > 0 ? x + 1 : x - 1;
 				e += 2 * abs(dy);
 				if (e >= 0)
@@ -152,7 +146,7 @@ namespace soft3d
 			for (int i = 0; i <= abs(dy); i++)
 			{
 				float ratio = (y1 - y) / (float)dy;
-				Fragment(pipelineData, x, y, src0, src1, ratio);
+				Fragment(vo0, vo1, x, y, ratio);
 				y = dy > 0 ? y + 1 : y - 1;
 				e += 2 * abs(dx);
 				if (e >= 0)
@@ -164,14 +158,14 @@ namespace soft3d
 		}
 	}
 
-	void Rasterizer::Triangle(const PipeLineData* pipelineData, uint32 src0, uint32 src1, uint32 src2)
+	void Rasterizer::Triangle(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2)
 	{
-		float fx1 = pipelineData->pos[src0][0] + 0.5f;
-		float fy1 = pipelineData->pos[src0][1] + 0.5f;
-		float fx2 = pipelineData->pos[src1][0] + 0.5f;
-		float fy2 = pipelineData->pos[src1][1] + 0.5f;
-		float fx3 = pipelineData->pos[src2][0] + 0.5f;
-		float fy3 = pipelineData->pos[src2][1] + 0.5f;
+		float fx1 = vo0->pos[0] + 0.5f;
+		float fy1 = vo0->pos[1] + 0.5f;
+		float fx2 = vo1->pos[0] + 0.5f;
+		float fy2 = vo1->pos[1] + 0.5f;
+		float fx3 = vo2->pos[0] + 0.5f;
+		float fy3 = vo2->pos[1] + 0.5f;
 
 		int x1 = fx1;
 		int x2 = fx2;
@@ -212,7 +206,7 @@ namespace soft3d
 				{
 					float ratio1 = ((y - y3)*(x1 - x3) - (y1 - y3)*(x - x3)) / (float)((y2 - y3)*(x1 - x3) - (y1 - y3)*(x2 - x3));
 					float ratio0 = ((y - y3)*(x2 - x3) - (x - x3)*(y2 - y3)) / (float)((y1 - y3)*(x2 - x3) - (x1 - x3)*(y2 - y3));
-					Fragment(pipelineData, x, y, src0, src1, src2, ratio0, ratio1);
+					Fragment(vo0, vo1, vo2, x, y, ratio0, ratio1);
 					//Soft3dPipeline::Instance()->DrawPixel(x, y, 0xffffff);
 				}
 				Cx1 -= Dy12;

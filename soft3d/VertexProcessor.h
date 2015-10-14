@@ -3,24 +3,27 @@
 namespace soft3d
 {
 
-	class VertexProcessor
-	{
-	public:
-		VertexProcessor() {};
-		virtual ~VertexProcessor() {};
+	typedef void* UniformPtr;
 
+	struct VS_OUT
+	{
+		vmath::vec4 pos;
+		Color color;
+		const vmath::vec3 normal;
+		vmath::vec2 uv;
+		float rhw;
+	};
+
+	struct VertexProcessor
+	{
 		virtual void Process();
 
 		const vmath::vec4* pos;
 		const uint32* color;
 		const vmath::vec3* normal;
 
-		vmath::vec4* out_pos;
-		Color* out_color;
-		const vmath::vec3* out_normal;
-
-		const vmath::mat4* mv_matrix;
-		const vmath::mat4* proj_matrix;
+		VS_OUT vs_out;
+		UniformPtr* uniforms;
 	};
 
 }

@@ -14,10 +14,10 @@ namespace soft3d
 		int DrawPixel(uint16 x, uint16 y, uint32 color, uint16 size = 1);
 		uint32* GetFBPixelPtr(uint16 x, uint16 y);
 
-		void Fragment(const PipeLineData* pipelineData, uint32 x, uint32 y, uint32 src0, uint32 src1, float ratio);
-		void Fragment(const PipeLineData* pipelineData, uint32 x, uint32 y, uint32 src0, uint32 src1, uint32 src2, float ratio0, float ratio1);
-		void BresenhamLine(const PipeLineData* pipelineData, uint32 src0, uint32 src1);
-		void Triangle(const PipeLineData* pipelineData, uint32 src0, uint32 src1, uint32 src2);
+		void Fragment(const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio);
+		void Fragment(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1);
+		void BresenhamLine(const VS_OUT* vo0, const VS_OUT* vo1);
+		void Triangle(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2);
 
 		const uint32* GetFrameBuffer() {
 			return m_frameBuffer;

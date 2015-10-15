@@ -78,9 +78,9 @@ namespace soft3d
 
 		inline Color& operator*(const vmath::vec3* v)
 		{
-			this->R *= *v[0];
-			this->G *= *v[1];
-			this->B *= *v[2];
+			this->R *= (*v)[0];
+			this->G *= (*v)[1];
+			this->B *= (*v)[2];
 			return *this;
 		}
 	};

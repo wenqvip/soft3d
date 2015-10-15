@@ -47,9 +47,9 @@ namespace soft3d
 		mat4* mv_matrix = (mat4*)(uniforms[0]);
 		mat4* proj_matrix = (mat4*)(uniforms[1]);
 		vec4 P = (*mv_matrix) * (*pos);
-		//vs_out.N = mat3(*mv_matrix) * (*normal);
-		//vs_out.L = vec3(100.0f, 100.0f, 0.0f) - P.xyz();
-		//vs_out.V = -P.xyz();
+		vs_out.N = mat3(*mv_matrix) * (*normal);
+		vs_out.L = vec3(100.0f, 100.0f, 0.0f) - P.xyz();
+		vs_out.V = -P.xyz();
 
 		//vs_out.N = normalize(vs_out.N);
 		//vs_out.L = normalize(vs_out.L);

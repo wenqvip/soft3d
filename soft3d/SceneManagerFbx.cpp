@@ -15,7 +15,7 @@ namespace soft3d
 		m_height = height;
 
 		FbxLoader fbxLoader;
-		fbxLoader.LoadFbx("plane2x2.fbx");
+		fbxLoader.LoadFbx("sphere.fbx");
 
 		shared_ptr<VertexBufferObject> vbo(new VertexBufferObject());
 		vbo->CopyVertexBuffer(fbxLoader.GetVertexBuffer(), fbxLoader.GetVertexCount() * 4);
@@ -25,13 +25,13 @@ namespace soft3d
 
 		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
 		vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
-		vbo->m_cullMode = VertexBufferObject::CULL_NONE;
+		//vbo->m_cullMode = VertexBufferObject::CULL_NONE;
 		Soft3dPipeline::Instance()->SetVBO(vbo);
 
 		uint32 tex_data[] = {
 			0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
-			0x3FBCEF, 0xFF00FF, 0x3FBCEF, 0xFFFFFF,
-			0xFFFFFF, 0x3FBCEF, 0xFF00FF, 0x3FBCEF,
+			0x3FBCEF, 0xFFFFFF, 0x3FBCEF, 0xFFFFFF,
+			0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
 			0x3FBCEF, 0xFFFFFF, 0x3FBCEF, 0xFFFFFF,
 		};
 

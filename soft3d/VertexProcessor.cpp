@@ -47,22 +47,22 @@ namespace soft3d
 		mat4* mv_matrix = (mat4*)(uniforms[0]);
 		mat4* proj_matrix = (mat4*)(uniforms[1]);
 		vec4 P = (*mv_matrix) * (*pos);
-		vs_out.N = mat3(*mv_matrix) * (*normal);
-		vs_out.L = vec3(100.0f, 100.0f, 0.0f) - P.xyz();
-		vs_out.V = -P.xyz();
+		//vs_out.N = mat3(*mv_matrix) * (*normal);
+		//vs_out.L = vec3(100.0f, 100.0f, 0.0f) - P.xyz();
+		//vs_out.V = -P.xyz();
 
-		vs_out.N = normalize(vs_out.N);
-		vs_out.L = normalize(vs_out.L);
-		vs_out.V = normalize(vs_out.V);
+		//vs_out.N = normalize(vs_out.N);
+		//vs_out.L = normalize(vs_out.L);
+		//vs_out.V = normalize(vs_out.V);
 
-		vec3 R = reflect(-vs_out.L, vs_out.N);
+		//vec3 R = reflect(-vs_out.L, vs_out.N);
 
-		vec3 diffuse = vmath::max<float>(dot(vs_out.N, vs_out.L), 0.0f) * vec3(0.2f, 0.2f, 0.2f);
-		vec3 specular = pow(vmath::max<float>(dot(R, vs_out.V), 0.0f), 4.0f) * vec3(0.7f, 0.7f, 0.7f);
-		vec3 finalcolor = diffuse + specular + vec3(0.1f);
+		//vec3 diffuse = vmath::max<float>(dot(vs_out.N, vs_out.L), 0.0f) * vec3(0.2f, 0.2f, 0.2f);
+		//vec3 specular = pow(vmath::max<float>(dot(R, vs_out.V), 0.0f), 4.0f) * vec3(0.7f, 0.7f, 0.7f);
+		//vec3 finalcolor = diffuse + specular + vec3(0.1f);
 
 		vs_out.pos = (*proj_matrix) * P;
-		vs_out.color = fC2uC(finalcolor);
+		//vs_out.color = fC2uC(finalcolor);
 	}
 
 }

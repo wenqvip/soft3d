@@ -40,6 +40,15 @@ namespace soft3d
 			return m_normalCount;
 		}
 
+		const float* GetUVBuffer() const
+		{
+			return m_uvBuffer;
+		}
+		uint32 GetUVCount()
+		{
+			return m_uvCount;
+		}
+
 	private:
 		void LoadNode(FbxNode* node);
 		void LoadAttribute(FbxNodeAttribute* pAttribute);
@@ -53,6 +62,9 @@ namespace soft3d
 
 		float* m_normalBuffer;
 		uint32 m_normalCount;
+
+		float* m_uvBuffer;
+		uint32 m_uvCount;
 	};
 
 }

@@ -24,7 +24,7 @@ namespace soft3d
 	}
 
 
-	uint32 Texture::Sampler2D(const vmath::vec2* uv) const
+	Color Texture::Sampler2D(const vmath::vec2* uv) const
 	{
 		uint32 u = (uint32)(m_width * (*uv)[0]);
 		uint32 v = (uint32)(m_height * (*uv)[1]);
@@ -32,6 +32,6 @@ namespace soft3d
 			u = m_width - 1;
 		if (v >= m_height)
 			v = m_height - 1;
-		return m_data[u + m_width * v];
+		return Color(m_data[u + m_width * v]);
 	}
 }

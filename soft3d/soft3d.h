@@ -56,6 +56,16 @@ namespace soft3d
 		unsigned char R;
 		unsigned char A;
 
+		Color()
+		{
+			*((uint32*)this) = 0;
+		}
+
+		Color(uint32 color)
+		{
+			memcpy(this, &color, sizeof(uint32));
+		}
+
 		void operator=(uint32 color)
 		{
 			memcpy(this, &color, sizeof(uint32));
@@ -65,15 +75,23 @@ namespace soft3d
 		{
 			return *((uint32*)(this));
 		}
+
+		inline Color& operator*(const vmath::vec3* v)
+		{
+			this->R *= *v[0];
+			this->G *= *v[1];
+			this->B *= *v[2];
+			return *this;
+		}
 	};
 
 	inline Color operator*(const Color& lf, float ratio)
 	{
 		Color cc;
-		cc.B = lf.B * ratio;
-		cc.G = lf.G * ratio;
-		cc.R = lf.R * ratio;
-		cc.A = lf.A * ratio;
+		cc.B = (unsigned char)(lf.B * ratio);
+		cc.G = (unsigned char)(lf.G * ratio);
+		cc.R = (unsigned char)(lf.R * ratio);
+		cc.A = (unsigned char)(lf.A * ratio);
 		return cc;
 	}
 

@@ -18,9 +18,11 @@ namespace soft3d
 
 	void FragmentProcessor::Process()
 	{
-		if (tex != nullptr)
-			*out_color = tex->Sampler2D(&uv);
-		else
-			*out_color = color;
+		vec3 R = reflect(-fs_in.L, fs_in.N);
+		vec3 diffuse = vmath::max<float>(dot(fs_in.N, fs_in.L), 0.0f) * vec3(0.2f, 0.2f, 0.2f);
+		vec3 specular = pow(vmath::max<float>(dot(R, fs_in.V), 0.0f), 4.0f) * vec3(0.7f, 0.7f, 0.7f);
+		vec3 finalcolor = diffuse + specular + vec3(0.1f);
+		*out_color = fC2uC(finalcolor);
+		//*out_color = fs_in.color;
 	}
 }

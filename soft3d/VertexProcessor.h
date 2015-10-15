@@ -12,6 +12,13 @@ namespace soft3d
 		const vmath::vec3 normal;
 		vmath::vec2 uv;
 		float rhw;
+
+		vmath::vec3 N;
+		vmath::vec3 L;
+		vmath::vec3 V;
+
+		void Interpolate(const VS_OUT* vo0, const VS_OUT* vo1, float ratio0, float ratio1);
+		void Interpolate(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2);
 	};
 
 	struct VertexProcessor

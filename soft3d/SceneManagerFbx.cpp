@@ -39,6 +39,7 @@ namespace soft3d
 
 		SetUniform(0, mv_matrix);
 		SetUniform(1, proj_matrix);
+		SetUniform(2, view_matrix);
 
 		Soft3dPipeline::Instance()->Clear(0);
 	}

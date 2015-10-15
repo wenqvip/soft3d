@@ -64,16 +64,9 @@ namespace soft3d
 
 	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio)
 	{
-		float ratio1 = 1.0f - ratio;
-
 		//in
-		m_fp.color = vo0->color * ratio + vo1->color * (1.0f - ratio);
-		m_fp.uv[0] = vo0->uv[0] * ratio + vo1->uv[0] * (1.0f - ratio);
-		m_fp.uv[1] = vo0->uv[1] * ratio + vo1->uv[1] * (1.0f - ratio);
+		m_fp.fs_in.Interpolate(vo0, vo1, ratio, 1.0f - ratio);
 		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
-
-		float fp_rhw = vo0->rhw * ratio + vo1->rhw * ratio1;//也要对rhw做插值
-		m_fp.uv /= fp_rhw;//把w乘回来，这样就可能得到正确的uv了，不知道为什么
 
 		//out
 		m_fp.out_color = GetFBPixelPtr(x, y);
@@ -87,11 +80,7 @@ namespace soft3d
 		float ratio2 = 1.0f - ratio0 - ratio1;
 		
 		//in
-		m_fp.color = vo0->color * ratio0 + vo1->color * ratio1 + vo2->color * ratio2;
-		m_fp.uv[0] = vo0->uv[0] * ratio0 + vo1->uv[0] * ratio1 + vo2->uv[0] * ratio2;
-		m_fp.uv[1] = vo0->uv[1] * ratio0 + vo1->uv[1] * ratio1 + vo2->uv[1] * ratio2;
-		float fp_rhw = vo0->rhw * ratio0 + vo1->rhw * ratio1 + vo2->rhw * ratio2;//也要对rhw做插值
-		m_fp.uv /= fp_rhw;//把w乘回来，这样就可能得到正确的uv了，不知道为什么
+		m_fp.fs_in.Interpolate(vo0, vo1, vo2, ratio0, ratio1, ratio2);
 		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
 
 		//out

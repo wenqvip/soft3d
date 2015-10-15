@@ -11,9 +11,8 @@ namespace soft3d
 
 		virtual void Process();
 
-		Color color;
+		VS_OUT fs_in;
 		uint32* out_color;
-		vmath::vec2 uv;
 		const Texture* tex;
 	};
 

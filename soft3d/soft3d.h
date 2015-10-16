@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <algorithm>
 #include "vmath.h"
 
 namespace soft3d
@@ -14,6 +15,13 @@ namespace soft3d
 		(*colorf)[1] = ((color & 0xff00) >> 8) / 255.0f;
 		(*colorf)[2] = (color & 0xff) / 255.0f;
 		(*colorf)[3] = (color & 0xff000000) / 255.0f;
+	}
+
+	inline void uC2fC(uint32 color, vmath::vec3* colorf)
+	{
+		(*colorf)[0] = ((color & 0xff0000) >> 16) / 255.0f;
+		(*colorf)[1] = ((color & 0xff00) >> 8) / 255.0f;
+		(*colorf)[2] = (color & 0xff) / 255.0f;
 	}
 
 	inline uint32 fC2uC(const vmath::vec4& colorf)
@@ -78,9 +86,16 @@ namespace soft3d
 
 		inline Color& operator*(const vmath::vec3* v)
 		{
-			this->R *= (*v)[0];
-			this->G *= (*v)[1];
-			this->B *= (*v)[2];
+			vmath::vec3 color;
+			uC2fC(*this, &color);
+
+			color[0] *= (*v)[0];
+			color[1] *= (*v)[1];
+			color[2] *= (*v)[2];
+
+			this->R = std::min<float>(color[0], 1.0f) * 255;
+			this->G = std::min<float>(color[1], 1.0f) * 255;
+			this->B = std::min<float>(color[2], 1.0f) * 255;
 			return *this;
 		}
 	};

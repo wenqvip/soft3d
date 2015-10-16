@@ -1,6 +1,7 @@
 #include "soft3d.h"
 #include "SceneManagerFbx.h"
 #include "FbxLoader.h"
+#include "TextureLoader.h"
 
 using namespace std;
 using namespace vmath;
@@ -28,15 +29,16 @@ namespace soft3d
 		//vbo->m_cullMode = VertexBufferObject::CULL_NONE;
 		Soft3dPipeline::Instance()->SetVBO(vbo);
 
-		uint32 tex_data[] = {
-			0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
-			0x3FBCEF, 0xFFFFFF, 0x3FBCEF, 0xFFFFFF,
-			0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
-			0x3FBCEF, 0xFFFFFF, 0x3FBCEF, 0xFFFFFF,
-		};
+		//uint32 tex_data[] = {
+		//	0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
+		//	0x3FBCEF, 0xFFFFFF, 0x3FBCEF, 0xFFFFFF,
+		//	0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
+		//	0x3FBCEF, 0xFFFFFF, 0x3FBCEF, 0xFFFFFF,
+		//};
+		TextureLoader::Instance().LoadTexture(L"earthmap.jpg");
 
 		shared_ptr<Texture> tex(new Texture());
-		tex->CopyFromBuffer(tex_data, 4, 4);
+		tex->CopyFromBuffer(TextureLoader::Instance().GetData(), TextureLoader::Instance().GetWidth(), TextureLoader::Instance().GetHeight());
 		Soft3dPipeline::Instance()->SetTexture(tex);
 	}
 
@@ -48,7 +50,11 @@ namespace soft3d
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
 		float factor = GetTickCount() / 50 % 360;
-		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f) * rotate(factor, vec3(1.0f, 0.0f, 0.0f));
+		mat4 mv_matrix = view_matrix
+			* translate(0.0f, 0.0f, 0.0f)
+			* scale(1.0f)
+			* rotate(90.0f, vec3(1.0f, 0.0f, 0.0f))
+			* rotate(factor, vec3(0.0f, 0.0f, 1.0f));
 
 		SetUniform(0, mv_matrix);
 		SetUniform(1, proj_matrix);

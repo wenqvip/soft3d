@@ -126,11 +126,11 @@ namespace soft3d
 					cur_vp.color = (uint32*)this;//随机颜色
 				cur_vp.normal = vbo->GetNormal(i);
 
-				cur_vp.uniforms = m_uniforms;
-				cur_vp.Process();//这一步进行视图变换和投影变换
-
 				if (vbo->hasUV())
 					cur_vp.vs_out.uv = *(vbo->GetUV(i));
+
+				cur_vp.uniforms = m_uniforms;
+				cur_vp.Process();//这一步进行视图变换和投影变换
 
 				//除以w
 				float rhw = 1.0f / cur_vp.vs_out.pos[3];

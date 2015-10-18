@@ -28,7 +28,8 @@ namespace soft3d
 		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
 		vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
 		//vbo->m_cullMode = VertexBufferObject::CULL_NONE;
-		Soft3dPipeline::Instance()->SetVBO(vbo);
+		m_vbo1 = Soft3dPipeline::Instance()->SetVBO(vbo);
+		m_vbo2 = Soft3dPipeline::Instance()->SetVBO(vbo);
 
 		//uint32 tex_data[] = {
 		//	0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
@@ -53,8 +54,22 @@ namespace soft3d
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
 		float factor = GetTickCount() / 50 % 360;
+
+		Soft3dPipeline::Instance()->SelectVBO(m_vbo1);
 		mat4 mv_matrix = view_matrix
 			* translate(0.0f, 0.0f, 0.0f)
+			* scale(1.0f)
+			* rotate(m_x_angle, vec3(1.0f, 0.0f, 0.0f))
+			* rotate(m_y_angle, vec3(0.0f, 1.0f, 0.0f))
+			* rotate(m_z_angle, vec3(0.0f, 0.0f, 1.0f));
+
+		SetUniform(0, mv_matrix);
+		SetUniform(1, proj_matrix);
+		SetUniform(2, view_matrix);
+
+		Soft3dPipeline::Instance()->SelectVBO(m_vbo2);
+		mv_matrix = view_matrix
+			* translate(-1.0f, -1.0f, -1.0f)
 			* scale(1.0f)
 			* rotate(m_x_angle, vec3(1.0f, 0.0f, 0.0f))
 			* rotate(m_y_angle, vec3(0.0f, 1.0f, 0.0f))

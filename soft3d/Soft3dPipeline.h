@@ -22,6 +22,7 @@ namespace soft3d
 	};
 
 	typedef void* UniformPtr;
+	typedef UniformPtr* UniformStack;
 
 	typedef char DIKEYBOARD[256];
 	typedef boost::function<void(const DIMOUSESTATE& dimouse)> MOUSE_EVENT_CB;
@@ -36,7 +37,8 @@ namespace soft3d
 		}
 		~Soft3dPipeline();
 		void InitPipeline(HINSTANCE hInstance, HWND hwnd, uint16 width, uint16 height);
-		void SetVBO(std::shared_ptr<VertexBufferObject> vbo);
+		int SetVBO(std::shared_ptr<VertexBufferObject> vbo);
+		void SelectVBO(uint32 vboIndex);
 		void SetUniform(uint16 index, void* uniform);
 		void SetTexture(std::shared_ptr<Texture> tex);
 		const Texture* CurrentTex() {
@@ -63,10 +65,11 @@ namespace soft3d
 
 	private:
 		std::vector<std::shared_ptr<VertexBufferObject> > m_vboVector;
+		uint32 m_curVBO;
 		std::shared_ptr<Texture> m_tex;
 		std::shared_ptr<Rasterizer> m_rasterizer;
 		std::vector<std::shared_ptr<PipeLineData> > m_pipeDataVector;
-		UniformPtr m_uniforms[16];
+		std::vector<UniformStack> m_UniformVector;
 
 		uint16 m_width;
 		uint16 m_height;

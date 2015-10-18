@@ -25,6 +25,8 @@ namespace soft3d
 
 	protected:
 		void SetFrameBuffer(uint32 index, uint32 value);
+		void SetZBufferV(uint32 x, uint32 y, float value);
+		float GetZBufferV(uint32 x, uint32 y);
 
 	protected:
 		FragmentProcessor m_fp;
@@ -32,6 +34,7 @@ namespace soft3d
 		uint16 m_width;
 		uint16 m_height;
 		uint32* m_frameBuffer;
+		float* m_zBuffer;
 	};
 
 }

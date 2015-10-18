@@ -41,19 +41,18 @@ namespace soft3d
 
 	Soft3dPipeline::Soft3dPipeline()
 	{
-		for (int i = 0; i < 16; i++)
-		{
-			m_uniforms[i] = nullptr;
-		}
 	}
 
 
 	Soft3dPipeline::~Soft3dPipeline()
 	{
-		for (int i = 0; i < 16; i++)
+		BOOST_FOREACH(UniformPtr* us, m_UniformVector)
 		{
-			if (m_uniforms[i] != nullptr)
-				delete m_uniforms[i];
+			for (int i = 0; i < 16; i++)
+			{
+				if (us[i] != nullptr)
+					delete us[i];
+			}
 		}
 	}
 
@@ -80,27 +79,36 @@ namespace soft3d
 		m_valid = true;
 	}
 
-	void Soft3dPipeline::SetVBO(shared_ptr<VertexBufferObject> vbo)
+	int Soft3dPipeline::SetVBO(shared_ptr<VertexBufferObject> vbo)
 	{
 		shared_ptr<PipeLineData> pd(new PipeLineData());
 		pd->vp = boost::shared_array<VertexProcessor>(new VertexProcessor[vbo->GetSize()]);
 		pd->cullMode = vbo->m_cullMode;
 		pd->capacity = vbo->GetSize();
+		UniformStack stack = new UniformPtr[16]{ nullptr };
 
 		m_pipeDataVector.push_back(pd);
 		m_vboVector.push_back(vbo);
+		m_UniformVector.push_back(stack);
+		m_curVBO = m_vboVector.size() - 1;
+		return m_curVBO;
+	}
+
+	void Soft3dPipeline::SelectVBO(uint32 vboIndex)
+	{
+		m_curVBO = vboIndex;
 	}
 
 	void Soft3dPipeline::SetUniform(uint16 index, void* uniform)
 	{
-		if (index < 16)
+		if (index < VertexBufferObject::MAX_UNIFORM_COUNT)
 		{
-			if (m_uniforms[index] != nullptr)
+			if (m_UniformVector[m_curVBO][index] != nullptr)
 			{
-				delete m_uniforms[index];
-				m_uniforms[index] = nullptr;
+				delete m_UniformVector[m_curVBO][index];
+				m_UniformVector[m_curVBO][index] = nullptr;
 			}
-			m_uniforms[index] = uniform;
+			m_UniformVector[m_curVBO][index] = uniform;
 		}
 	}
 
@@ -165,7 +173,7 @@ namespace soft3d
 				if (vbo->hasUV())
 					cur_vp.vs_out.uv = *(vbo->GetUV(i));
 
-				cur_vp.uniforms = m_uniforms;
+				cur_vp.uniforms = m_UniformVector[idx];
 				cur_vp.Process();//这一步进行视图变换和投影变换
 
 				//除以w

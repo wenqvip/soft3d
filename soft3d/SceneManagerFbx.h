@@ -17,6 +17,9 @@ namespace soft3d
 		float m_x_angle = 90.0f;
 		float m_y_angle = 0.0f;
 		float m_z_angle = 0.0f;
+
+		int m_vbo1;
+		int m_vbo2;
 	};
 
 }

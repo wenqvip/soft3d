@@ -13,6 +13,7 @@ namespace soft3d
 		m_width = width;
 		m_height = height;
 		m_frameBuffer = new uint32[width*height*sizeof(uint32)];
+		m_zBuffer = new float[width*height*sizeof(float)];
 	}
 
 
@@ -56,38 +57,59 @@ namespace soft3d
 		m_frameBuffer[index] = value;
 	}
 
+	void Rasterizer::SetZBufferV(uint32 x, uint32 y, float value)
+	{
+		y = m_height - 1 - y;//上下颠倒
+		if (x > m_width || y > m_height)
+			return;
+		int index = y * m_width + x;
+		m_zBuffer[index] = value;
+	}
+
+	float Rasterizer::GetZBufferV(uint32 x, uint32 y)
+	{
+		y = m_height - 1 - y;//上下颠倒
+		if (x > m_width || y > m_height)
+			return 0.0f;
+		int index = y * m_width + x;
+		return m_zBuffer[index];
+	}
+
 	int Rasterizer::Clear(uint32 color)
 	{
 		memset(m_frameBuffer, color, m_width * m_height * sizeof(uint32));
+		memset(m_zBuffer, 0, m_width* m_height* sizeof(float));
 		return 0;
 	}
 
 	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio)
 	{
-		//in
 		m_fp.fs_in.Interpolate(vo0, vo1, ratio, 1.0f - ratio);
+		if (m_fp.fs_in.rhw < GetZBufferV(x, y))
+			return;
 		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
 
-		//out
 		m_fp.out_color = GetFBPixelPtr(x, y);
 		if (m_fp.out_color == nullptr)
 			return;
 		m_fp.Process();
+		SetZBufferV(x, y, m_fp.fs_in.rhw);
 	}
 
 	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1)
 	{
 		float ratio2 = 1.0f - ratio0 - ratio1;
-		
-		//in
 		m_fp.fs_in.Interpolate(vo0, vo1, vo2, ratio0, ratio1, ratio2);
+		if (m_fp.fs_in.rhw < GetZBufferV(x, y))
+			return;
+
 		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
 
-		//out
 		m_fp.out_color = GetFBPixelPtr(x, y);
 		if (m_fp.out_color == nullptr)
 			return;
 		m_fp.Process();
+		SetZBufferV(x, y, m_fp.fs_in.rhw);
 	}
 
 	void Rasterizer::BresenhamLine(const VS_OUT* vo0, const VS_OUT* vo1)
@@ -196,7 +218,6 @@ namespace soft3d
 					float ratio1 = ((y - y3)*(x1 - x3) - (y1 - y3)*(x - x3)) / (float)((y2 - y3)*(x1 - x3) - (y1 - y3)*(x2 - x3));
 					float ratio0 = ((y - y3)*(x2 - x3) - (x - x3)*(y2 - y3)) / (float)((y1 - y3)*(x2 - x3) - (x1 - x3)*(y2 - y3));
 					Fragment(vo0, vo1, vo2, x, y, ratio0, ratio1);
-					//Soft3dPipeline::Instance()->DrawPixel(x, y, 0xffffff);
 				}
 				Cx1 -= Dy12;
 				Cx2 -= Dy23;

@@ -50,10 +50,12 @@ namespace soft3d
 			CULL_NONE,
 		};
 
-	public:
-		vmath::mat4 mv_matrix;
-		vmath::mat4 proj_matrix;
+		enum UNIFORM_RELATIVE
+		{
+			MAX_UNIFORM_COUNT = 16,
+		};
 
+	public:
 		RENDER_MODE m_mode;
 		CULL_MODE m_cullMode;
 

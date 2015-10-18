@@ -6,6 +6,12 @@
 
 #define MAX_LOADSTRING 100
 
+void QuitProgram(const soft3d::DIKEYBOARD dikeyboard)
+{
+	if(dikeyboard[DIK_ESCAPE] & 0x80)
+		PostQuitMessage(0);
+}
+
 // 全局变量: 
 HWND hWnd;
 HINSTANCE hInst;                                // 当前实例
@@ -40,8 +46,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     //HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SOFT3D));
-	soft3d::Soft3dPipeline::Instance()->InitPipeline(hWnd, 800, 600);
-
+	soft3d::Soft3dPipeline::Instance()->InitPipeline(hInstance, hWnd, 800, 600);
+	soft3d::Soft3dPipeline::Instance()->AddKeyboardEventCB(QuitProgram);
+	soft3d::Soft3dPipeline::Instance()->GetFocus();
     MSG msg;
     // 主消息循环: 
     while (true)
@@ -156,6 +163,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EndPaint(hWnd, &ps);
         }
         break;
+	case WM_SETFOCUS:
+	{
+		soft3d::Soft3dPipeline::Instance()->GetFocus();
+		break;
+	}
+	case WM_KILLFOCUS:
+	{
+		soft3d::Soft3dPipeline::Instance()->LoseFocus();
+		break;
+	}
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

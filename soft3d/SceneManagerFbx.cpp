@@ -2,6 +2,7 @@
 #include "SceneManagerFbx.h"
 #include "FbxLoader.h"
 #include "TextureLoader.h"
+#include <boost/bind.hpp>
 
 using namespace std;
 using namespace vmath;
@@ -40,6 +41,8 @@ namespace soft3d
 		shared_ptr<Texture> tex(new Texture());
 		tex->CopyFromBuffer(TextureLoader::Instance().GetData(), TextureLoader::Instance().GetWidth(), TextureLoader::Instance().GetHeight());
 		Soft3dPipeline::Instance()->SetTexture(tex);
+
+		Soft3dPipeline::Instance()->AddKeyboardEventCB(boost::bind(&SceneManagerFbx::KeyboardEventCB, this, _1));
 	}
 
 	void SceneManagerFbx::Update()
@@ -53,8 +56,9 @@ namespace soft3d
 		mat4 mv_matrix = view_matrix
 			* translate(0.0f, 0.0f, 0.0f)
 			* scale(1.0f)
-			* rotate(90.0f, vec3(1.0f, 0.0f, 0.0f))
-			* rotate(factor, vec3(0.0f, 0.0f, 1.0f));
+			* rotate(m_x_angle, vec3(1.0f, 0.0f, 0.0f))
+			* rotate(m_y_angle, vec3(0.0f, 1.0f, 0.0f))
+			* rotate(m_z_angle, vec3(0.0f, 0.0f, 1.0f));
 
 		SetUniform(0, mv_matrix);
 		SetUniform(1, proj_matrix);
@@ -63,5 +67,33 @@ namespace soft3d
 		Soft3dPipeline::Instance()->Clear(0);
 	}
 
+	void SceneManagerFbx::KeyboardEventCB(const DIKEYBOARD dikeyboard)
+	{
+		if (dikeyboard[DIK_A] & 0x80)
+		{
+			m_z_angle += 1.0f;
+		}
+		else if (dikeyboard[DIK_D] & 0x80)
+		{
+			m_z_angle -= 1.0f;
+		}
 
+		if (dikeyboard[DIK_W] & 0x80)
+		{
+			m_x_angle += 1.0f;
+		}
+		else if (dikeyboard[DIK_S] & 0x80)
+		{
+			m_x_angle -= 1.0f;
+		}
+
+		if (dikeyboard[DIK_Q] & 0x80)
+		{
+			m_y_angle += 1.0f;
+		}
+		else if (dikeyboard[DIK_E] & 0x80)
+		{
+			m_y_angle -= 1.0f;
+		}
+	}
 }

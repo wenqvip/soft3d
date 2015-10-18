@@ -7,6 +7,9 @@
 #include "Rasterizer.h"
 #include <boost/foreach.hpp>
 
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "DXGuid.lib")
+
 using namespace std;
 using namespace vmath;
 
@@ -54,13 +57,27 @@ namespace soft3d
 		}
 	}
 
-	void Soft3dPipeline::InitPipeline(HWND hwnd, uint16 width, uint16 height)
+	void Soft3dPipeline::InitPipeline(HINSTANCE hInstance, HWND hwnd, uint16 width, uint16 height)
 	{
 		m_width = width;
 		m_height = height;
 		m_rasterizer = shared_ptr<Rasterizer>(new Rasterizer(width, height));
 		soft3d::DirectXHelper::Instance()->Init(hwnd);
 		SceneManager::Instance()->InitScene(width, height);
+
+		DirectInput8Create(hInstance, 0x0800, IID_IDirectInput8, (void**)&m_pDirectInput, NULL);
+
+		m_pDirectInput->CreateDevice(GUID_SysMouse, &m_pMouseDevice, NULL);
+		m_pMouseDevice->SetDataFormat(&c_dfDIMouse);
+		m_pMouseDevice->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		m_pMouseDevice->Acquire();
+
+		m_pDirectInput->CreateDevice(GUID_SysKeyboard, &m_pKeyboardDevice, NULL);
+		m_pKeyboardDevice->SetDataFormat(&c_dfDIKeyboard);
+		m_pKeyboardDevice->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
+		m_pKeyboardDevice->Acquire();
+
+		m_valid = true;
 	}
 
 	void Soft3dPipeline::SetVBO(shared_ptr<VertexBufferObject> vbo)
@@ -100,6 +117,25 @@ namespace soft3d
 
 	void Soft3dPipeline::Process()
 	{
+		if (m_haveFocus == false)
+		{
+			Sleep(50);
+			return;
+		}
+
+		DIMOUSESTATE dimouse;
+		m_pMouseDevice->GetDeviceState(sizeof(dimouse), (LPVOID)&dimouse);
+		BOOST_FOREACH(MOUSE_EVENT_CB cb, m_mouseCB)
+		{
+			cb(dimouse);
+		}
+		DIKEYBOARD dkeyboard;
+		m_pKeyboardDevice->GetDeviceState(sizeof(dkeyboard), (LPVOID)dkeyboard);
+		BOOST_FOREACH(KEYBOARD_EVENT_CB cb, m_keyboardCB)
+		{
+			cb(dkeyboard);
+		}
+
 		SceneManager::Instance()->Update();
 
 		for (int idx = 0; idx < m_pipeDataVector.size(); idx++)
@@ -201,6 +237,21 @@ namespace soft3d
 		}
 
 		DirectXHelper::Instance()->Paint(m_rasterizer->GetFrameBuffer(), m_width, m_height);
+	}
+
+	void Soft3dPipeline::LoseFocus()
+	{
+		m_haveFocus = false;
+	}
+
+	void Soft3dPipeline::GetFocus()
+	{
+		if (m_valid)
+		{
+			m_haveFocus = true;
+			m_pMouseDevice->Acquire();
+			m_pKeyboardDevice->Acquire();
+		}
 	}
 
 }

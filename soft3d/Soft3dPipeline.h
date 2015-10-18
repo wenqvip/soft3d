@@ -7,6 +7,8 @@
 #include "Texture.h"
 #include "VertexProcessor.h"
 #include <boost/shared_array.hpp>
+#include <boost/function.hpp>
+#include <dinput.h>
 
 namespace soft3d
 {
@@ -21,6 +23,10 @@ namespace soft3d
 
 	typedef void* UniformPtr;
 
+	typedef char DIKEYBOARD[256];
+	typedef boost::function<void(const DIMOUSESTATE& dimouse)> MOUSE_EVENT_CB;
+	typedef boost::function<void(const DIKEYBOARD& dikeyboard)> KEYBOARD_EVENT_CB;
+
 	class Soft3dPipeline
 	{
 	public:
@@ -29,19 +35,25 @@ namespace soft3d
 			return s_instance.get();
 		}
 		~Soft3dPipeline();
-		void InitPipeline(HWND hwnd, uint16 width, uint16 height);
-
+		void InitPipeline(HINSTANCE hInstance, HWND hwnd, uint16 width, uint16 height);
 		void SetVBO(std::shared_ptr<VertexBufferObject> vbo);
-
 		void SetUniform(uint16 index, void* uniform);
-
 		void SetTexture(std::shared_ptr<Texture> tex);
 		const Texture* CurrentTex() {
 			return m_tex.get();
 		}
 		void Process();
-
 		int Clear(uint32 color);
+
+		//input
+		void AddMouseEventCB(MOUSE_EVENT_CB cb) {
+			m_mouseCB.push_back(cb);
+		}
+		void AddKeyboardEventCB(KEYBOARD_EVENT_CB cb) {
+			m_keyboardCB.push_back(cb);
+		}
+		void LoseFocus();
+		void GetFocus();
 
 
 	protected:
@@ -58,6 +70,16 @@ namespace soft3d
 
 		uint16 m_width;
 		uint16 m_height;
+
+		LPDIRECTINPUT8 m_pDirectInput;
+		LPDIRECTINPUTDEVICE8 m_pMouseDevice;
+		LPDIRECTINPUTDEVICE8 m_pKeyboardDevice;
+
+		std::vector<MOUSE_EVENT_CB> m_mouseCB;
+		std::vector<KEYBOARD_EVENT_CB> m_keyboardCB;
+
+		bool m_haveFocus;
+		bool m_valid = false;
 	};
 
 	template<typename T>

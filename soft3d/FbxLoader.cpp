@@ -15,32 +15,34 @@ namespace soft3d
 		delete[] m_indexBuffer;
 		delete[] m_vertexBuffer;
 		delete[] m_normalBuffer;
+		m_fbxManager->Destroy();
 	}
 
 
 	int FbxLoader::LoadFbx(const char* fbxName)
 	{
-		FbxManager* lSdkManager = FbxManager::Create();
-		FbxIOSettings *ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
-		lSdkManager->SetIOSettings(ios);
-		FbxImporter* lImporter = FbxImporter::Create(lSdkManager, "");
+		m_fbxManager = FbxManager::Create();
+		FbxIOSettings *ios = FbxIOSettings::Create(m_fbxManager, IOSROOT);
+		m_fbxManager->SetIOSettings(ios);
+		FbxImporter* lImporter = FbxImporter::Create(m_fbxManager, "");
 
-		if (!lImporter->Initialize(fbxName, -1, lSdkManager->GetIOSettings())) {
+		if (!lImporter->Initialize(fbxName, -1, m_fbxManager->GetIOSettings())) {
 			printf("Call to FbxImporter::Initialize() failed.\n");
 			printf("Error returned: %s\n\n", lImporter->GetStatus().GetErrorString());
 			return -1;
 		}
 
-		FbxScene* lScene = FbxScene::Create(lSdkManager, "myScene");
+		FbxScene* lScene = FbxScene::Create(m_fbxManager, "myScene");
 		lImporter->Import(lScene);
 		lImporter->Destroy();
 
-		FbxNode* lRootNode = lScene->GetRootNode();
-		if (lRootNode) {
-			for (int i = 0; i < lRootNode->GetChildCount(); i++)
-				LoadNode(lRootNode->GetChild(i));
+		m_rootNode = lScene->GetRootNode();
+		if (m_rootNode) {
+			m_firstNode = m_rootNode->GetChild(0);
+			for (int i = 0; i < m_rootNode->GetChildCount(); i++)
+				LoadNode(m_rootNode->GetChild(i));
 		}
-		lSdkManager->Destroy();
+		m_animEvaluator = lScene->GetAnimationEvaluator();
 		return 0;
 	}
 
@@ -144,5 +146,23 @@ namespace soft3d
 		}
 	}
 
+	FbxAMatrix& FbxLoader::GetRootMatrixGlobalAtTime(double time)
+	{
+		FbxTime ftime;
+		ftime.SetSecondDouble(time);
+		ftime = m_animEvaluator->ValidateTime(ftime);
+		return m_animEvaluator->GetNodeGlobalTransform(m_firstNode, ftime);
+	}
+
+	FbxAMatrix& FbxLoader::GetRootMatrixLocalAtTime(double time)
+	{
+		FbxTime ftime;
+		ftime.SetSecondDouble(time);
+		ftime = m_animEvaluator->ValidateTime(ftime);
+		int total = ftime.GetSecondDouble() * 1000;
+		int real = (int)(time * 1000) % total;
+		ftime.SetSecondDouble(real / 1000.0);
+		return m_animEvaluator->GetNodeLocalTransform(m_firstNode, ftime);
+	}
 
 }

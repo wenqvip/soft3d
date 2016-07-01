@@ -28,6 +28,15 @@ namespace soft3d
 	typedef boost::function<void(const DIMOUSESTATE& dimouse)> MOUSE_EVENT_CB;
 	typedef boost::function<void(const DIKEYBOARD& dikeyboard)> KEYBOARD_EVENT_CB;
 
+	enum UNIFORM_LABEL
+	{
+		UNIFORM_MV_MATRIX = 0,
+		UNIFORM_PROJ_MATRIX,
+		UNIFORM_VIEW_MATRIX,
+
+		UNIFORM_LIGHT_POS = 15,
+	};
+
 	class Soft3dPipeline
 	{
 	public:

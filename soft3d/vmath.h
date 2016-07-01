@@ -1355,6 +1355,12 @@ static inline T mix(const T& A, const T& B, const T& t)
     return B + t * (B - A);
 }
 
+template <typename T>
+static inline T lerp(const T& A, const T& B, float t)
+{
+	return A * (1.0f - t) + B * t;
+}
+
 };
 
 #endif /* __VMATH_H__ */

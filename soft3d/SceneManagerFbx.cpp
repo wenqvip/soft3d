@@ -1,6 +1,5 @@
 #include "soft3d.h"
 #include "SceneManagerFbx.h"
-#include "FbxLoader.h"
 #include "TextureLoader.h"
 #include <boost/bind.hpp>
 
@@ -16,20 +15,19 @@ namespace soft3d
 		m_width = width;
 		m_height = height;
 
-		FbxLoader fbxLoader;
-		fbxLoader.LoadFbx("sphere.fbx");
+		m_fbx.LoadFbx("sphere_anim.fbx");
 
 		shared_ptr<VertexBufferObject> vbo(new VertexBufferObject());
-		vbo->CopyVertexBuffer(fbxLoader.GetVertexBuffer(), fbxLoader.GetVertexCount() * 4);
-		vbo->CopyIndexBuffer(fbxLoader.GetIndexBuffer(), fbxLoader.GetIndexCount());
-		vbo->CopyNormalBuffer(fbxLoader.GetNormalBuffer(), fbxLoader.GetNormalCount() * 3);
-		vbo->CopyUVBuffer(fbxLoader.GetUVBuffer(), fbxLoader.GetUVCount() * 2);
+		vbo->CopyVertexBuffer(m_fbx.GetVertexBuffer(), m_fbx.GetVertexCount() * 4);
+		vbo->CopyIndexBuffer(m_fbx.GetIndexBuffer(), m_fbx.GetIndexCount());
+		vbo->CopyNormalBuffer(m_fbx.GetNormalBuffer(), m_fbx.GetNormalCount() * 3);
+		vbo->CopyUVBuffer(m_fbx.GetUVBuffer(), m_fbx.GetUVCount() * 2);
 
 		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
 		vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
 		//vbo->m_cullMode = VertexBufferObject::CULL_NONE;
 		m_vbo1 = Soft3dPipeline::Instance()->SetVBO(vbo);
-		m_vbo2 = Soft3dPipeline::Instance()->SetVBO(vbo);
+		//m_vbo2 = Soft3dPipeline::Instance()->SetVBO(vbo);
 
 		//uint32 tex_data[] = {
 		//	0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
@@ -48,6 +46,15 @@ namespace soft3d
 
 	void SceneManagerFbx::Update()
 	{
+		double time = GetTickCount() / 1000.0;
+		FbxAMatrix& fmat = m_fbx.GetRootMatrixLocalAtTime(time);
+		mat4 anim_mat;
+		for (int m = 0; m < 4; m++)
+			for (int n = 0; n < 4; n++)
+			{
+				anim_mat[m][n] = fmat.mData[m][n];
+			}
+
 		float aspect = (float)m_width / (float)m_height;
 		mat4 proj_matrix = perspective(60.0f, aspect, 0.1f, 1000.0f);
 		mat4 view_matrix = lookat(vec3(0.0f, 0.0f, 3.0f),
@@ -61,12 +68,14 @@ namespace soft3d
 			* scale(1.0f)
 			* rotate(m_x_angle, vec3(1.0f, 0.0f, 0.0f))
 			* rotate(m_y_angle, vec3(0.0f, 1.0f, 0.0f))
-			* rotate(m_z_angle, vec3(0.0f, 0.0f, 1.0f));
+			* rotate(m_z_angle, vec3(0.0f, 0.0f, 1.0f))
+			* anim_mat;
 
-		SetUniform(0, mv_matrix);
-		SetUniform(1, proj_matrix);
-		SetUniform(2, view_matrix);
-
+		SetUniform(UNIFORM_MV_MATRIX, mv_matrix);
+		SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
+		SetUniform(UNIFORM_VIEW_MATRIX, view_matrix);
+		SetUniform(UNIFORM_LIGHT_POS, vec3(100.0f, 100.0f, 100.0f));
+		/*
 		Soft3dPipeline::Instance()->SelectVBO(m_vbo2);
 		mv_matrix = view_matrix
 			* translate(-1.0f, -1.0f, -1.0f)
@@ -78,7 +87,7 @@ namespace soft3d
 		SetUniform(0, mv_matrix);
 		SetUniform(1, proj_matrix);
 		SetUniform(2, view_matrix);
-
+		*/
 		Soft3dPipeline::Instance()->Clear(0);
 	}
 

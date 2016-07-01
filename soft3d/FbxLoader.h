@@ -49,6 +49,9 @@ namespace soft3d
 			return m_uvCount;
 		}
 
+		FbxAMatrix& GetRootMatrixGlobalAtTime(double time);
+		FbxAMatrix& GetRootMatrixLocalAtTime(double time);
+
 	private:
 		void LoadNode(FbxNode* node);
 		void LoadAttribute(FbxNodeAttribute* pAttribute);
@@ -65,6 +68,11 @@ namespace soft3d
 
 		float* m_uvBuffer;
 		uint32 m_uvCount;
+
+		FbxNode* m_rootNode;
+		FbxNode* m_firstNode;
+		FbxAnimEvaluator* m_animEvaluator;
+		FbxManager* m_fbxManager;
 	};
 
 }

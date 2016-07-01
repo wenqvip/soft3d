@@ -47,11 +47,12 @@ namespace soft3d
 		vs_out.uv[0] = 1.0 - vs_out.uv[0];
 		//vs_out.uv[1] = 1.0 - vs_out.uv[1];
 
-		mat4* mv_matrix = (mat4*)(uniforms[0]);
-		mat4* proj_matrix = (mat4*)(uniforms[1]);
+		mat4* mv_matrix = (mat4*)(uniforms[UNIFORM_MV_MATRIX]);
+		mat4* proj_matrix = (mat4*)(uniforms[UNIFORM_PROJ_MATRIX]);
+		vec3* light_pos = (vec3*)(uniforms[UNIFORM_LIGHT_POS]);
 		vec4 P = (*mv_matrix) * (*pos);
 		vs_out.N = mat3(*mv_matrix) * (*normal);
-		vs_out.L = vec3(-100.0f, 100.0f, 100.0f) - P.xyz();
+		vs_out.L = *light_pos - P.xyz();
 		vs_out.V = -P.xyz();
 
 		//vs_out.N = normalize(vs_out.N);

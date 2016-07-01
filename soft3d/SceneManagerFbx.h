@@ -1,5 +1,6 @@
 #pragma once
 #include "SceneManager.h"
+#include "FbxLoader.h"
 
 namespace soft3d
 {
@@ -20,6 +21,8 @@ namespace soft3d
 
 		int m_vbo1;
 		int m_vbo2;
+
+		FbxLoader m_fbx;
 	};
 
 }

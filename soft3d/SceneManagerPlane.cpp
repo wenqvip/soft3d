@@ -30,7 +30,7 @@ namespace soft3d
 		Soft3dPipeline::Instance()->SetVBO(vbo);
 
 		shared_ptr<Texture> tex(new Texture());
-		TextureLoader::Instance().LoadTexture(L"cathead_small.png");
+		TextureLoader::Instance().LoadTexture(L"cathead_super.png");
 		tex->CopyFromBuffer(TextureLoader::Instance().GetData(), TextureLoader::Instance().GetWidth(), TextureLoader::Instance().GetHeight());
 
 		//uint32 tex_data[] = {

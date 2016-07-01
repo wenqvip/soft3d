@@ -23,11 +23,11 @@ namespace soft3d
 		vbo->CopyNormalBuffer(m_fbx.GetNormalBuffer(), m_fbx.GetNormalCount() * 3);
 		vbo->CopyUVBuffer(m_fbx.GetUVBuffer(), m_fbx.GetUVCount() * 2);
 
+		//vbo->m_cullMode = VertexBufferObject::CULL_NONE;
 		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
 		vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
-		//vbo->m_cullMode = VertexBufferObject::CULL_NONE;
 		m_vbo1 = Soft3dPipeline::Instance()->SetVBO(vbo);
-		//m_vbo2 = Soft3dPipeline::Instance()->SetVBO(vbo);
+		m_vbo2 = Soft3dPipeline::Instance()->SetVBO(vbo);
 
 		//uint32 tex_data[] = {
 		//	0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
@@ -64,7 +64,7 @@ namespace soft3d
 
 		Soft3dPipeline::Instance()->SelectVBO(m_vbo1);
 		mat4 mv_matrix = view_matrix
-			* translate(0.0f, 0.0f, 0.0f)
+			* translate(1.1f, 0.0f, -0.5f)
 			* scale(1.0f)
 			* rotate(m_x_angle, vec3(1.0f, 0.0f, 0.0f))
 			* rotate(m_y_angle, vec3(0.0f, 1.0f, 0.0f))
@@ -74,20 +74,21 @@ namespace soft3d
 		SetUniform(UNIFORM_MV_MATRIX, mv_matrix);
 		SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
 		SetUniform(UNIFORM_VIEW_MATRIX, view_matrix);
-		SetUniform(UNIFORM_LIGHT_POS, vec3(100.0f, 100.0f, 100.0f));
-		/*
+		SetUniform(UNIFORM_LIGHT_POS, vec3(0.0f, 0.0f, 100.0f));
+		
 		Soft3dPipeline::Instance()->SelectVBO(m_vbo2);
 		mv_matrix = view_matrix
-			* translate(-1.0f, -1.0f, -1.0f)
+			* translate(-1.1f, 0.0f, -0.5f)
 			* scale(1.0f)
 			* rotate(m_x_angle, vec3(1.0f, 0.0f, 0.0f))
 			* rotate(m_y_angle, vec3(0.0f, 1.0f, 0.0f))
 			* rotate(m_z_angle, vec3(0.0f, 0.0f, 1.0f));
 
-		SetUniform(0, mv_matrix);
-		SetUniform(1, proj_matrix);
-		SetUniform(2, view_matrix);
-		*/
+		SetUniform(UNIFORM_MV_MATRIX, mv_matrix);
+		SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
+		SetUniform(UNIFORM_VIEW_MATRIX, view_matrix);
+		SetUniform(UNIFORM_LIGHT_POS, vec3(0.0f, 0.0f, 100.0f));
+		
 		Soft3dPipeline::Instance()->Clear(0);
 	}
 

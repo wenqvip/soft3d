@@ -9,7 +9,7 @@ using namespace vmath;
 namespace soft3d
 {
 
-	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManagerFbx());
+	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManagerPlane());
 
 	SceneManager::SceneManager()
 	{

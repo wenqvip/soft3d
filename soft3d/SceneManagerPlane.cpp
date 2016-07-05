@@ -2,6 +2,7 @@
 #include "SceneManagerPlane.h"
 #include "TextureLoader.h"
 #include "FbxLoader.h"
+#include <boost/bind.hpp>
 
 using namespace std;
 using namespace vmath;
@@ -14,6 +15,7 @@ namespace soft3d
 	{
 		m_width = width;
 		m_height = height;
+		m_z = 0.0f;
 
 		FbxLoader fbxLoader;
 		fbxLoader.LoadFbx("plane2x2.fbx");
@@ -30,7 +32,7 @@ namespace soft3d
 		Soft3dPipeline::Instance()->SetVBO(vbo);
 
 		shared_ptr<Texture> tex(new Texture());
-		TextureLoader::Instance().LoadTexture(L"cathead_super.png");
+		TextureLoader::Instance().LoadTexture(L"cathead_small.png");
 		tex->CopyFromBuffer(TextureLoader::Instance().GetData(), TextureLoader::Instance().GetWidth(), TextureLoader::Instance().GetHeight());
 
 		//uint32 tex_data[] = {
@@ -41,6 +43,8 @@ namespace soft3d
 		//};
 		//tex->CopyFromBuffer(tex_data, 4, 4);
 		Soft3dPipeline::Instance()->SetTexture(tex);
+
+		Soft3dPipeline::Instance()->AddKeyboardEventCB(boost::bind(&SceneManagerPlane::KeyboardEventCB, this, _1));
 	}
 
 	void SceneManagerPlane::Update()
@@ -51,7 +55,7 @@ namespace soft3d
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
 		float factor = -180;// ((int)GetTickCount() / 50 % 180) - 90;
-		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, 0.0f) * scale(1.0f) *rotate(factor, vec3(1.0f, 0.0f, 0.0f));
+		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, m_z) * scale(1.0f) *rotate(factor, vec3(1.0f, 0.0f, 0.0f));
 
 		SetUniform(UNIFORM_MV_MATRIX, mv_matrix);
 		SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
@@ -60,5 +64,16 @@ namespace soft3d
 		Soft3dPipeline::Instance()->Clear(0);
 	}
 
+	void SceneManagerPlane::KeyboardEventCB(const DIKEYBOARD dikeyboard)
+	{
+		if (dikeyboard[DIK_W] & 0x80)
+		{
+			m_z += 0.1f;
+		}
+		else if (dikeyboard[DIK_S] & 0x80)
+		{
+			m_z -= 0.1f;
+		}
+	}
 
 }

@@ -211,8 +211,20 @@ namespace soft3d
 				if (vbo->m_cullMode != VertexBufferObject::CULL_NONE && vbo->m_cullMode != cull_mode)
 					continue;
 
-				//todo:进行裁剪
-				//
+				//进行裁剪
+				if (vp1.vs_out.pos[2] < 0.0f
+					|| vp2.vs_out.pos[2] < 0.0f
+					|| vp3.vs_out.pos[2] < 0.0f)
+					continue;
+				//if (vp1.vs_out.pos[0] > m_width * 1.0f || vp1.vs_out.pos[1] > m_height * 1.0f
+				//	|| vp1.vs_out.pos[0] < 0 || vp1.vs_out.pos[1] < 0)
+				//	continue;
+				//if (vp2.vs_out.pos[0] > m_width * 1.0f || vp2.vs_out.pos[1] > m_height * 1.0f
+				//	|| vp2.vs_out.pos[0] < 0 || vp2.vs_out.pos[1] < 0)
+				//	continue;
+				//if (vp3.vs_out.pos[0] > m_width * 1.0f || vp3.vs_out.pos[1] > m_height * 1.0f
+				//	|| vp3.vs_out.pos[0] < 0 || vp3.vs_out.pos[1] < 0)
+				//	continue;
 
 				//make triangle always ccw sorting
 				uint32 index[3] = { i, i + 1, i + 2 };

@@ -39,6 +39,8 @@ namespace soft3d
 		InterpolateT(this->V[0], vo0->V[0], vo1->V[0], vo2->V[0], ratio0, ratio1, ratio2);
 		InterpolateT(this->V[1], vo0->V[1], vo1->V[1], vo2->V[1], ratio0, ratio1, ratio2);
 		InterpolateT(this->V[2], vo0->V[2], vo1->V[2], vo2->V[2], ratio0, ratio1, ratio2);
+
+		this->mode = vo0->mode;
 	}
 
 
@@ -51,9 +53,17 @@ namespace soft3d
 		mat4* proj_matrix = (mat4*)(uniforms[UNIFORM_PROJ_MATRIX]);
 		vec3* light_pos = (vec3*)(uniforms[UNIFORM_LIGHT_POS]);
 		vec4 P = (*mv_matrix) * (*pos);
-		vs_out.N = mat3(*mv_matrix) * (*normal);
-		vs_out.L = *light_pos - P.xyz();
-		vs_out.V = -P.xyz();
+		if (normal != nullptr)
+		{
+			vs_out.mode = VS_OUT::LIGHT_MODE;
+			vs_out.N = mat3(*mv_matrix) * (*normal);
+			vs_out.L = *light_pos - P.xyz();
+			vs_out.V = -P.xyz();
+		}
+		else
+		{
+			vs_out.mode = VS_OUT::TEXTURE_MODE;
+		}
 
 		//vs_out.N = normalize(vs_out.N);
 		//vs_out.L = normalize(vs_out.L);

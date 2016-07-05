@@ -98,6 +98,8 @@ namespace soft3d
 			this->B = std::min<float>(color[2], 1.0f) * 255;
 			return *this;
 		}
+
+		static const Color purple;
 	};
 
 	inline Color operator*(const Color& lf, float ratio)

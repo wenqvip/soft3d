@@ -1214,7 +1214,7 @@ static inline vecN<T,N> max(const vecN<T,N>& x, const vecN<T,N>& y)
 template <typename T, const int N>
 static inline vecN<T,N> clamp(const vecN<T,N>& x, const vecN<T,N>& minVal, const vecN<T,N>& maxVal)
 {
-    return min<T>(max<T>(x, minVal), maxVal);
+    return min<T,N>(max<T,N>(x, minVal), maxVal);
 }
 
 template <typename T, const int N>
@@ -1359,6 +1359,12 @@ template <typename T>
 static inline T lerp(const T& A, const T& B, float t)
 {
 	return A * (1.0f - t) + B * t;
+}
+
+template <typename T>
+static inline T clamp(T& x, T minVal, T maxVal)
+{
+	return min<T>(max<T>(x, minVal), maxVal);
 }
 
 };

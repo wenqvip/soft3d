@@ -33,7 +33,20 @@ namespace soft3d
 		return value - floor(value);
 	}
 
-	Color Texture::Sampler2D_low(const vmath::vec2* uv) const
+	Color Texture::Sampler2D(const vmath::vec2* uv) const
+	{
+		switch (filter_mode)
+		{
+		case NEAREST:
+			return Sampler2D_nearest(uv);
+		case NONE:
+			return Sampler2D_none(uv);
+		default:
+			return Sampler2D_nearest(uv);
+		}
+	}
+
+	Color Texture::Sampler2D_none(const vmath::vec2* uv) const
 	{
 		uint32 u = (uint32)(m_width * (*uv)[0]);
 		uint32 v = (uint32)(m_height * (*uv)[1]);
@@ -44,11 +57,11 @@ namespace soft3d
 		return Color(m_data[u + m_width * v]);
 	}
 
-	Color Texture::Sampler2D(const vmath::vec2* uv) const
+	Color Texture::Sampler2D_nearest(const vmath::vec2* uv) const
 	{
 		vmath::vec2 uv_offset = *uv + vmath::vec2(0.5 / (float)m_width, 0.5 / (float)m_height);
 		vmath::uvec2 uv0, uv1, uv2, uv3;
-		vmath::vec2 uv_clamp = vmath::clamp(uv_offset, vmath::vec2(0), vmath::vec2(1));
+		vmath::vec2 uv_clamp = vmath::clamp<float, 2>(uv_offset, vmath::vec2(0), vmath::vec2(1));
 		uv0[0] = (uint32)((m_width - 1) * uv_clamp[0]);
 		uv0[1] = (uint32)((m_height - 1) * uv_clamp[1]);
 

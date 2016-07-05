@@ -172,6 +172,7 @@
     <ClCompile Include="SceneManagerFbx.cpp" />
     <ClCompile Include="SceneManagerPlane.cpp" />
     <ClCompile Include="SceneManagerTriangle.cpp" />
+    <ClCompile Include="soft3d.cpp" />
     <ClCompile Include="Soft3dPipeline.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureLoader.cpp" />

@@ -125,7 +125,7 @@ namespace soft3d
 
 	const vec3* VertexBufferObject::GetNormal(uint32 index) const
 	{
-		if (m_normalBuffer == nullptr && index >= m_indexSize)
+		if (m_normalBuffer == nullptr || index >= m_indexSize)
 			return nullptr;
 		return &(m_normalBuffer[index]);
 	}

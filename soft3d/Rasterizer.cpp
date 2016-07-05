@@ -206,12 +206,30 @@ namespace soft3d
 		float Cy2 = C2 + Dx23 * miny - Dy23 * minx;
 		float Cy3 = C3 + Dx31 * miny - Dy31 * minx;
 
-		for (int y = miny; y <= maxy; y++)
+		int y = miny;
+		if (miny < 0)
+		{
+			int n = 0 - miny;
+			Cy1 += Dx12 * n;
+			Cy2 += Dx23 * n;
+			Cy3 += Dx31 * n;
+			y = 0;
+		}
+		for (; y <= maxy && y < m_height; y++)
 		{
 			float Cx1 = Cy1;
 			float Cx2 = Cy2;
 			float Cx3 = Cy3;
-			for (int x = minx; x <= maxx; x++)
+			int x = minx;
+			if (minx < 0)
+			{
+				int n = 0 - minx;
+				Cx1 -= Dy12 * n;
+				Cx2 -= Dy23 * n;
+				Cx3 -= Dy31 * n;
+				x = 0;
+			}
+			for (; x <= maxx && x < m_width; x++)
 			{
 				if (Cx1 <= 0 && Cx2 <= 0 && Cx3 <= 0)
 				{

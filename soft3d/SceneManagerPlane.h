@@ -12,6 +12,10 @@ namespace soft3d
 		virtual ~SceneManagerPlane() {};
 		virtual void InitScene(soft3d::uint16 width, soft3d::uint16 height);
 		virtual void Update();
+		void KeyboardEventCB(const DIKEYBOARD dikeyboard);
+
+	private:
+		float m_z;
 	};
 
 }

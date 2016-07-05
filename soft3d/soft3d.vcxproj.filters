@@ -110,6 +110,9 @@
     <ClCompile Include="TextureLoader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="soft3d.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="soft3d.rc">

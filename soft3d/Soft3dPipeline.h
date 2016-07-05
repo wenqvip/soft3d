@@ -77,6 +77,7 @@ namespace soft3d
 		uint32 m_curVBO;
 		std::shared_ptr<Texture> m_tex;
 		std::shared_ptr<Rasterizer> m_rasterizer;
+		std::vector<std::shared_ptr<Rasterizer>> m_rasterizers;
 		std::vector<std::shared_ptr<PipeLineData> > m_pipeDataVector;
 		std::vector<UniformStack> m_UniformVector;
 
@@ -92,6 +93,7 @@ namespace soft3d
 
 		bool m_haveFocus;
 		bool m_valid = false;
+		bool m_multiThread = true;
 	};
 
 	template<typename T>

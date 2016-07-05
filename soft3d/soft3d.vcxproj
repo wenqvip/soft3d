@@ -72,7 +72,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>..\fbxsdk\include;..\..\boost_1_58_0;$(IncludePath)</IncludePath>
-    <LibraryPath>..\fbxsdk\lib\vs2013\x86\debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\fbxsdk\lib\vs2013\x86\debug;..\..\boost_1_58_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -80,7 +80,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>..\fbxsdk\include;..\..\boost_1_58_0;$(IncludePath)</IncludePath>
-    <LibraryPath>..\fbxsdk\lib\vs2013\x86\release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\fbxsdk\lib\vs2013\x86\release;..\..\boost_1_58_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>

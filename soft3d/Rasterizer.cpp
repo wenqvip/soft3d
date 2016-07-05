@@ -2,24 +2,40 @@
 #include "FragmentProcessor.h"
 #include "Rasterizer.h"
 #include <stdlib.h>
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
 
 using namespace vmath;
 
 namespace soft3d
 {
+	uint32* Rasterizer::m_frameBuffer = nullptr;
+	float* Rasterizer::m_zBuffer = nullptr;
 
 	Rasterizer::Rasterizer(uint16 width, uint16 height)
+		: m_workThread(boost::bind(&Rasterizer::Rasterize, this))
 	{
 		m_width = width;
 		m_height = height;
-		m_frameBuffer = new uint32[width*height*sizeof(uint32)];
-		m_zBuffer = new float[width*height*sizeof(float)];
+		if(m_frameBuffer == nullptr)
+			m_frameBuffer = new uint32[width*height*sizeof(uint32)];
+		if(m_zBuffer == nullptr)
+			m_zBuffer = new float[width*height*sizeof(float)];
 	}
 
 
 	Rasterizer::~Rasterizer()
 	{
-		delete m_frameBuffer;
+		if (m_frameBuffer)
+		{
+			delete m_frameBuffer;
+			m_frameBuffer = nullptr;
+		}
+		if (m_zBuffer)
+		{
+			delete m_zBuffer;
+			m_zBuffer = nullptr;
+		}
 	}
 
 	uint32* Rasterizer::GetFBPixelPtr(uint16 x, uint16 y)
@@ -244,6 +260,62 @@ namespace soft3d
 			Cy1 += Dx12;
 			Cy2 += Dx23;
 			Cy3 += Dx31;
+		}
+	}
+
+	void Rasterizer::BeginTasks()
+	{
+		m_taskFlag = true;
+		m_mutex_async.lock();
+	}
+
+	void Rasterizer::AddTask(RasterizerTask& rt)
+	{
+		//boost::mutex::scoped_lock(m_mutex);
+		m_mutex.lock();
+		m_tasks.push_back(rt);
+		m_mutex.unlock();
+	}
+
+	void Rasterizer::EndTasks()
+	{
+		m_taskFlag = false;
+		m_mutex_async.lock();
+		m_mutex_async.unlock();
+	}
+
+	void Rasterizer::Rasterize()
+	{
+		while (true)
+		{
+			if (m_tasks_doing.size() > 0)
+			{
+				RasterizerTask& task = m_tasks_doing.back();
+				if (task.m_vo[2] == nullptr)
+				{
+					BresenhamLine(task.m_vo[0], task.m_vo[1]);
+				}
+				else
+				{
+					Triangle(task.m_vo[0], task.m_vo[1], task.m_vo[2]);
+				}
+				m_tasks_doing.pop_back();
+			}
+			else if (m_tasks.size() > 0)
+			{
+				//boost::mutex::scoped_lock(m_mutex);
+				m_mutex.lock();
+				m_tasks_doing.swap(m_tasks);
+				m_mutex.unlock();
+			}
+
+			if (m_taskFlag == false && m_tasks.size() == 0 && m_tasks_doing.size() == 0)
+			{
+				m_taskFlag = true;
+				m_mutex_async.unlock();
+			}
+
+			//Sleep(1);
 		}
 	}
 

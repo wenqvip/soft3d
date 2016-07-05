@@ -1,10 +1,11 @@
 #pragma once
 #include <memory>
+#include <boost/noncopyable.hpp>
 
 namespace soft3d
 {
 
-	class SceneManager
+	class SceneManager : public boost::noncopyable
 	{
 	public:
 		static std::shared_ptr<SceneManager> Instance() {

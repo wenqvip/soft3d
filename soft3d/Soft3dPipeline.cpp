@@ -36,7 +36,7 @@ namespace soft3d
 		return cc;
 	}*/
 
-
+	const int THREAD_COUNT = 8;
 	std::shared_ptr<Soft3dPipeline> Soft3dPipeline::s_instance(new Soft3dPipeline());
 
 	Soft3dPipeline::Soft3dPipeline()
@@ -60,7 +60,15 @@ namespace soft3d
 	{
 		m_width = width;
 		m_height = height;
-		m_rasterizer = shared_ptr<Rasterizer>(new Rasterizer(width, height));
+		if (m_multiThread)
+		{
+			for (int i = 0; i < THREAD_COUNT; i++)
+				m_rasterizers.push_back(shared_ptr<Rasterizer>(new Rasterizer(width, height)));
+		}
+		else
+		{
+			m_rasterizer = shared_ptr<Rasterizer>(new Rasterizer(width, height));
+		}
 		soft3d::DirectXHelper::Instance()->Init(hwnd);
 		SceneManager::Instance()->InitScene(width, height);
 
@@ -119,7 +127,15 @@ namespace soft3d
 
 	int Soft3dPipeline::Clear(uint32 color)
 	{
-		m_rasterizer->Clear(color);
+		if (m_multiThread)
+		{
+			for (int i = 0; i < THREAD_COUNT; i++)
+				m_rasterizers[i]->Clear(color);
+		}
+		else
+		{
+			m_rasterizer->Clear(color);
+		}
 		return 0;
 	}
 
@@ -145,6 +161,12 @@ namespace soft3d
 		}
 
 		SceneManager::Instance()->Update();
+
+		if (m_multiThread)
+		{
+			for (int i = 0; i < THREAD_COUNT; i++)
+				m_rasterizers[i]->BeginTasks();
+		}
 
 		for (int idx = 0; idx < m_pipeDataVector.size(); idx++)
 		{
@@ -238,15 +260,30 @@ namespace soft3d
 				{
 				case VertexBufferObject::RENDER_LINE:
 				{
-					m_rasterizer->BresenhamLine(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out));
-					m_rasterizer->BresenhamLine(&(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out));
-					m_rasterizer->BresenhamLine(&(pipeData->vp[index[2]].vs_out), &(pipeData->vp[index[0]].vs_out));
+					if (m_multiThread)
+					{
+
+					}
+					else
+					{
+						m_rasterizer->BresenhamLine(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out));
+						m_rasterizer->BresenhamLine(&(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out));
+						m_rasterizer->BresenhamLine(&(pipeData->vp[index[2]].vs_out), &(pipeData->vp[index[0]].vs_out));
+					}
+
 					break;
 				}
 
 				case VertexBufferObject::RENDER_TRIANGLE:
 				{
-					m_rasterizer->Triangle(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out));
+					if (m_multiThread)
+					{
+						m_rasterizers[(i/3)%THREAD_COUNT]->AddTask(RasterizerTask(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out)));
+					}
+					else
+					{
+						m_rasterizer->Triangle(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out));
+					}
 					break;
 				}
 
@@ -255,8 +292,18 @@ namespace soft3d
 				}
 			}
 		}
+		if (m_multiThread)
+		{
+			for (int i = 0; i < THREAD_COUNT; i++)
+			{
+				m_rasterizers[i]->EndTasks();
+			}
+		}
 
-		DirectXHelper::Instance()->Paint(m_rasterizer->GetFrameBuffer(), m_width, m_height);
+		if (m_multiThread)
+			DirectXHelper::Instance()->Paint(m_rasterizers[0]->GetFrameBuffer(), m_width, m_height);
+		else
+			DirectXHelper::Instance()->Paint(m_rasterizer->GetFrameBuffer(), m_width, m_height);
 	}
 
 	void Soft3dPipeline::LoseFocus()

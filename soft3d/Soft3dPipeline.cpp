@@ -36,7 +36,6 @@ namespace soft3d
 		return cc;
 	}*/
 
-	const int THREAD_COUNT = 4;
 	std::shared_ptr<Soft3dPipeline> Soft3dPipeline::s_instance(new Soft3dPipeline());
 
 	Soft3dPipeline::Soft3dPipeline()
@@ -58,6 +57,9 @@ namespace soft3d
 
 	void Soft3dPipeline::InitPipeline(HINSTANCE hInstance, HWND hwnd, uint16 width, uint16 height)
 	{
+		SYSTEM_INFO info;
+		GetSystemInfo(&info);
+		THREAD_COUNT = info.dwNumberOfProcessors - 1;
 		m_width = width;
 		m_height = height;
 		if (m_multiThread)
@@ -146,7 +148,7 @@ namespace soft3d
 			Sleep(50);
 			return;
 		}
-
+		DirectXHelper::Instance()->Profile(GetTickCount(), L"");
 		DIMOUSESTATE dimouse;
 		m_pMouseDevice->GetDeviceState(sizeof(dimouse), (LPVOID)&dimouse);
 		BOOST_FOREACH(MOUSE_EVENT_CB cb, m_mouseCB)
@@ -159,6 +161,7 @@ namespace soft3d
 		{
 			cb(dkeyboard);
 		}
+		DirectXHelper::Instance()->Profile(GetTickCount(), L"Input");
 
 		SceneManager::Instance()->Update();
 
@@ -168,6 +171,7 @@ namespace soft3d
 				m_rasterizers[i]->BeginTasks();
 		}
 
+		DirectXHelper::Instance()->Profile(GetTickCount(), L"Scene");
 		for (int idx = 0; idx < m_pipeDataVector.size(); idx++)
 		{
 			shared_ptr<PipeLineData>& pipeData = m_pipeDataVector[idx];
@@ -211,6 +215,7 @@ namespace soft3d
 
 				cur_vp.vs_out.uv *= rhw;//uv在这里除以w，以后乘回来，为了能正确计算纹理uv
 			}
+			DirectXHelper::Instance()->Profile(GetTickCount(), L"VP");
 
 			for (int i = 0; i < pipeData->capacity; i += 3)
 			{
@@ -291,6 +296,7 @@ namespace soft3d
 					break;
 				}
 			}
+			DirectXHelper::Instance()->Profile(GetTickCount(), L"FP_push");
 		}
 		if (m_multiThread)
 		{
@@ -299,6 +305,7 @@ namespace soft3d
 				m_rasterizers[i]->EndTasks();
 			}
 		}
+		DirectXHelper::Instance()->Profile(GetTickCount(), L"FP_wait");
 
 		if (m_multiThread)
 			DirectXHelper::Instance()->Paint(m_rasterizers[0]->GetFrameBuffer(), m_width, m_height);

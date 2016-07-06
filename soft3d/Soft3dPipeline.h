@@ -66,6 +66,8 @@ namespace soft3d
 		void LoseFocus();
 		void GetFocus();
 
+		inline uint16 GetWidth() { return m_width; }
+		inline uint16 GetHeight() { return m_height; }
 
 	protected:
 		Soft3dPipeline();
@@ -94,6 +96,7 @@ namespace soft3d
 		bool m_haveFocus;
 		bool m_valid = false;
 		bool m_multiThread = true;
+		int THREAD_COUNT = 4;
 	};
 
 	template<typename T>

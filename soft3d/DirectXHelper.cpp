@@ -154,17 +154,41 @@ namespace soft3d {
 
 		m_d2dContext->BeginDraw();
 
-		m_fps++;
-		if (GetTickCount() - m_lastTickCount > 1000)
+		wchar_t buf[64];
+		DWORD nowTick = GetTickCount();
+		if (false)
 		{
-			m_lastFps = m_fps;
-			m_fps = 0;
-			m_lastTickCount = GetTickCount();
+			m_fps++;
+			if (nowTick - m_lastTickCount > 1000)
+			{
+				m_lastFps = m_fps;
+				m_fps = 0;
+				m_lastTickCount = nowTick;
+			}
+			swprintf(buf, L"FPS:%d ", m_lastFps);
+		}
+		else
+		{
+			m_fps++;
+			
+			if (nowTick - m_lastTickCount > 100)
+			{
+				m_ffps = m_fps * 1000.0f / (float)(nowTick - m_lastTickCount);
+				m_fps = 0;
+				m_lastTickCount = nowTick;
+			}
+			swprintf(buf, L"FPS:%0.1f ", m_ffps);
 		}
 		D2D1_RECT_F rectf = { 0.0f, 0.0f, (float)width, 0.0f };
-		wchar_t buf[64];
-		swprintf(buf, L"FPS:%d", m_lastFps);
-		m_d2dContext->DrawTextW(buf, sizeof(wchar_t) * 3, m_pTextFormat, rectf, m_pGreenBrush);
+
+		std::wstring content = buf;
+		for (int i = 1; i < m_profileInfo.size(); i++)
+		{
+			swprintf(buf, L"%s:%dms ", m_profileInfo[i].second.c_str(), m_profileInfo[i].first - m_profileInfo[i - 1].first);
+			content += buf;
+		}
+		m_d2dContext->DrawTextW(content.c_str(), content.size(), m_pTextFormat, rectf, m_pGreenBrush);
+		m_profileInfo.clear();
 
 		ThrowIfFailed(m_d2dContext->EndDraw());
 
@@ -174,6 +198,11 @@ namespace soft3d {
 		parameters.pScrollOffset = NULL;
 		parameters.pScrollRect = NULL;
 		ThrowIfFailed(m_swapChain->Present1(1, 0, &parameters));
+	}
+
+	void DirectXHelper::Profile(DWORD tick, const wchar_t* work)
+	{
+		m_profileInfo.push_back(std::pair<DWORD, std::wstring>(tick, work));
 	}
 
 }

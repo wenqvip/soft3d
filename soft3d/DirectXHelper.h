@@ -10,6 +10,7 @@
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "d3d11.lib")
 #include <memory>
+#include <vector>
 
 namespace soft3d
 {
@@ -24,6 +25,7 @@ namespace soft3d
 
 		void Init(HWND hwnd);
 		void Paint(const uint32* buffer, uint16 width, uint16 height);
+		void Profile(DWORD tick, const wchar_t* work);
 
 	protected:
 		DirectXHelper();
@@ -55,6 +57,9 @@ namespace soft3d
 		DWORD m_lastTickCount;
 		uint16 m_fps;
 		uint16 m_lastFps;
+		float m_ffps;
+
+		std::vector<std::pair<DWORD, std::wstring>> m_profileInfo;
 
 		static std::shared_ptr<DirectXHelper> s_instance;
 	};

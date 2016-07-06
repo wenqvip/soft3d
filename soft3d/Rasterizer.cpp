@@ -304,6 +304,10 @@ namespace soft3d
 				boost::mutex::scoped_lock lock(m_mutex);
 				m_tasks_doing.swap(m_tasks);
 			}
+			else
+			{
+				Sleep(1);
+			}
 
 			if (m_taskFlag == false && m_tasks.size() == 0 && m_tasks_doing.size() == 0)
 			{

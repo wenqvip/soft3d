@@ -160,6 +160,7 @@
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="VertexBufferObject.h" />
     <ClInclude Include="VertexProcessor.h" />
+    <ClInclude Include="VertexProcessorUnit.h" />
     <ClInclude Include="vmath.h" />
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +179,7 @@
     <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="VertexBufferObject.cpp" />
     <ClCompile Include="VertexProcessor.cpp" />
+    <ClCompile Include="VertexProcessorUnit.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="soft3d.rc" />

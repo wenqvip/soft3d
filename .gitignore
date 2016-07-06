@@ -10,3 +10,4 @@ Release/*
 *.aps
 *.exe
 *.opensdf
+*.user

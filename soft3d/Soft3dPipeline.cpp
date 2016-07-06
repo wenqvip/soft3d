@@ -36,7 +36,7 @@ namespace soft3d
 		return cc;
 	}*/
 
-	const int THREAD_COUNT = 8;
+	const int THREAD_COUNT = 4;
 	std::shared_ptr<Soft3dPipeline> Soft3dPipeline::s_instance(new Soft3dPipeline());
 
 	Soft3dPipeline::Soft3dPipeline()

@@ -271,10 +271,8 @@ namespace soft3d
 
 	void Rasterizer::AddTask(RasterizerTask& rt)
 	{
-		//boost::mutex::scoped_lock(m_mutex);
-		m_mutex.lock();
+		boost::mutex::scoped_lock lock(m_mutex);
 		m_tasks.push_back(rt);
-		m_mutex.unlock();
 	}
 
 	void Rasterizer::EndTasks()
@@ -303,10 +301,8 @@ namespace soft3d
 			}
 			else if (m_tasks.size() > 0)
 			{
-				//boost::mutex::scoped_lock(m_mutex);
-				m_mutex.lock();
+				boost::mutex::scoped_lock lock(m_mutex);
 				m_tasks_doing.swap(m_tasks);
-				m_mutex.unlock();
 			}
 
 			if (m_taskFlag == false && m_tasks.size() == 0 && m_tasks_doing.size() == 0)

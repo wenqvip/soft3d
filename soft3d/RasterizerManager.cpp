@@ -1,48 +1,101 @@
-#include "soft3d.h"
-#include "FragmentProcessor.h"
 #include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
+#include "soft3d.h"
 #include "VertexBufferObject.h"
 #include <vector>
-#include <stdlib.h>
-#include <boost/bind.hpp>
+#include "FragmentProcessor.h"
 
-#include "Rasterizer.h"
-
-using namespace vmath;
+#include "RasterizerManager.h"
 
 namespace soft3d
 {
-	uint32* Rasterizer::m_frameBuffer = nullptr;
-	float* Rasterizer::m_zBuffer = nullptr;
+	uint32* RasterizerManager::m_frameBuffer = nullptr;
+	float* RasterizerManager::m_zBuffer = nullptr;
+	RasterizeData* RasterizerManager::m_rasterizeData = nullptr;
 
-	Rasterizer::Rasterizer(uint16 width, uint16 height)
-		: m_workThread(boost::bind(&Rasterizer::Rasterize, this))
+	RasterizerManager::RasterizerManager(uint16 width, uint16 height)
 	{
 		m_width = width;
 		m_height = height;
-		if(m_frameBuffer == nullptr)
+		if (m_frameBuffer == nullptr)
 			m_frameBuffer = new uint32[width*height*sizeof(uint32)];
-		if(m_zBuffer == nullptr)
+		if (m_zBuffer == nullptr)
 			m_zBuffer = new float[width*height*sizeof(float)];
+		if (m_rasterizeData == nullptr)
+			m_rasterizeData = new RasterizeData[width*height*sizeof(RasterizeData)];
+
+		SYSTEM_INFO info;
+		GetSystemInfo(&info);
+		m_threadCount = info.dwNumberOfProcessors - 1;
+		for (int i = 0; i < m_threadCount; i++)
+		{
+			m_threads.push_back(new boost::thread(boost::bind(&RasterizerManager::ThreadFun, this, i)));
+			m_fragmentProcessors.push_back(new FragmentProcessor());
+			m_taskStack.push_back(std::vector<uint32>());
+			m_mutexs.push_back(new boost::mutex());
+		}
 	}
 
-
-	Rasterizer::~Rasterizer()
+	RasterizerManager::~RasterizerManager()
 	{
 		if (m_frameBuffer)
 		{
-			delete m_frameBuffer;
+			delete[] m_frameBuffer;
 			m_frameBuffer = nullptr;
 		}
 		if (m_zBuffer)
 		{
-			delete m_zBuffer;
+			delete[] m_zBuffer;
 			m_zBuffer = nullptr;
+		}
+		if (m_rasterizeData)
+		{
+			delete[] m_rasterizeData;
+			m_rasterizeData = nullptr;
+		}
+
+		for (int i = 0; i < m_threadCount; i++)
+		{
+			delete m_threads[i];
+			delete m_fragmentProcessors[i];
+			delete m_mutexs[i];
 		}
 	}
 
-	uint32* Rasterizer::GetFBPixelPtr(uint16 x, uint16 y)
+	void RasterizerManager::ThreadFun(int id)
+	{
+		while (true)
+		{
+			if (m_taskStack_doing[id].size() > 0)
+			{
+				switch (m_mode)
+				{
+				case soft3d::VertexBufferObject::RENDER_LINE:
+					break;
+				case soft3d::VertexBufferObject::RENDER_TRIANGLE:
+				{
+					uint32 index = m_taskStack_doing[id].back();
+					RasterizeData* data = &(m_rasterizeData[index]);
+					uint32 x = index % m_width;
+					uint32 y = index / m_width;
+					Rasterize(m_fragmentProcessors[id], data->vo0, data->vo1, data->vo2, x, y, data->ratio0, data->ratio1);
+				}
+				break;
+				default:
+					break;
+				}
+			}
+			else if (m_taskStack[id].size() > 0)
+			{
+				boost::mutex::scoped_lock lock(*m_mutexs[id]);
+				m_taskStack_doing[id].swap(m_taskStack[id]);
+			}
+
+
+		}
+	}
+
+	uint32* RasterizerManager::GetFBPixelPtr(uint16 x, uint16 y)
 	{
 		y = 599 - y;//上下颠倒
 		if (x > m_width || y > m_height)
@@ -54,7 +107,7 @@ namespace soft3d
 		return &(m_frameBuffer[index]);
 	}
 
-	int Rasterizer::DrawPixel(uint16 x, uint16 y, uint32 color, uint16 size)
+	int RasterizerManager::DrawPixel(uint16 x, uint16 y, uint32 color, uint16 size)
 	{
 		y = 599 - y;//上下颠倒
 		if (x > m_width || y > m_height)
@@ -70,14 +123,14 @@ namespace soft3d
 		return 0;
 	}
 
-	void Rasterizer::SetFrameBuffer(uint32 index, uint32 value)
+	void RasterizerManager::SetFrameBuffer(uint32 index, uint32 value)
 	{
 		if (index >= (uint32)m_width * m_height)
 			return;
 		m_frameBuffer[index] = value;
 	}
 
-	void Rasterizer::SetZBufferV(uint32 x, uint32 y, float value)
+	void RasterizerManager::SetZBufferV(uint32 x, uint32 y, float value)
 	{
 		y = m_height - 1 - y;//上下颠倒
 		if (x > m_width || y > m_height)
@@ -86,7 +139,7 @@ namespace soft3d
 		m_zBuffer[index] = value;
 	}
 
-	float Rasterizer::GetZBufferV(uint32 x, uint32 y)
+	float RasterizerManager::GetZBufferV(uint32 x, uint32 y)
 	{
 		y = m_height - 1 - y;//上下颠倒
 		if (x > m_width || y > m_height)
@@ -95,44 +148,44 @@ namespace soft3d
 		return m_zBuffer[index];
 	}
 
-	int Rasterizer::Clear(uint32 color)
+	int RasterizerManager::Clear(uint32 color)
 	{
 		memset(m_frameBuffer, color, m_width * m_height * sizeof(uint32));
 		memset(m_zBuffer, 0, m_width* m_height* sizeof(float));
 		return 0;
 	}
 
-	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio)
+	void RasterizerManager::Rasterize(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio)
 	{
-		m_fp.fs_in.Interpolate(vo0, vo1, ratio, 1.0f - ratio);
-		if (m_fp.fs_in.rhw < GetZBufferV(x, y))
+		fp->fs_in.Interpolate(vo0, vo1, ratio, 1.0f - ratio);
+		if (fp->fs_in.rhw < GetZBufferV(x, y))
 			return;
-		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
+		fp->tex = Soft3dPipeline::Instance()->CurrentTex();
 
-		m_fp.out_color = GetFBPixelPtr(x, y);
-		if (m_fp.out_color == nullptr)
+		fp->out_color = GetFBPixelPtr(x, y);
+		if (fp->out_color == nullptr)
 			return;
-		m_fp.Process();
-		SetZBufferV(x, y, m_fp.fs_in.rhw);
+		fp->Process();
+		SetZBufferV(x, y, fp->fs_in.rhw);
 	}
 
-	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1)
+	void RasterizerManager::Rasterize(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1)
 	{
 		float ratio2 = 1.0f - ratio0 - ratio1;
-		m_fp.fs_in.Interpolate(vo0, vo1, vo2, ratio0, ratio1, ratio2);
-		if (m_fp.fs_in.rhw < GetZBufferV(x, y))
+		fp->fs_in.Interpolate(vo0, vo1, vo2, ratio0, ratio1, ratio2);
+		if (fp->fs_in.rhw < GetZBufferV(x, y))
 			return;
 
-		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
+		fp->tex = Soft3dPipeline::Instance()->CurrentTex();
 
-		m_fp.out_color = GetFBPixelPtr(x, y);
-		if (m_fp.out_color == nullptr)
+		fp->out_color = GetFBPixelPtr(x, y);
+		if (fp->out_color == nullptr)
 			return;
-		m_fp.Process();
-		SetZBufferV(x, y, m_fp.fs_in.rhw);
+		fp->Process();
+		SetZBufferV(x, y, fp->fs_in.rhw);
 	}
 
-	void Rasterizer::BresenhamLine(const VS_OUT* vo0, const VS_OUT* vo1)
+	void RasterizerManager::BresenhamLine(const VS_OUT* vo0, const VS_OUT* vo1)
 	{
 		int x0 = vo0->pos[0];
 		int y0 = vo0->pos[1];
@@ -161,7 +214,8 @@ namespace soft3d
 			for (int i = 0; i <= abs(dx); i++)
 			{
 				float ratio = (x1 - x) / (float)dx;
-				Fragment(vo0, vo1, x, y, ratio);
+				int id = x * m_width + y;
+				AddTask(id, vo0, vo1, nullptr, x, y, ratio, 0.0f);
 				x = dx > 0 ? x + 1 : x - 1;
 				e += 2 * abs(dy);
 				if (e >= 0)
@@ -177,7 +231,8 @@ namespace soft3d
 			for (int i = 0; i <= abs(dy); i++)
 			{
 				float ratio = (y1 - y) / (float)dy;
-				Fragment(vo0, vo1, x, y, ratio);
+				int id = x * m_width + y;
+				AddTask(id, vo0, vo1, nullptr, x, y, ratio, 0.0f);
 				y = dy > 0 ? y + 1 : y - 1;
 				e += 2 * abs(dx);
 				if (e >= 0)
@@ -189,7 +244,7 @@ namespace soft3d
 		}
 	}
 
-	void Rasterizer::Triangle(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2)
+	void RasterizerManager::Triangle(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2)
 	{
 		float fx1 = vo0->pos[0] + 0.5f;
 		float fy1 = vo0->pos[1] + 0.5f;
@@ -255,7 +310,8 @@ namespace soft3d
 				{
 					float ratio1 = ((y - y3)*(x1 - x3) - (y1 - y3)*(x - x3)) / (float)((y2 - y3)*(x1 - x3) - (y1 - y3)*(x2 - x3));
 					float ratio0 = ((y - y3)*(x2 - x3) - (x - x3)*(y2 - y3)) / (float)((y1 - y3)*(x2 - x3) - (x1 - x3)*(y2 - y3));
-					Fragment(vo0, vo1, vo2, x, y, ratio0, ratio1);
+					int id = x * m_width + y;
+					AddTask(id, vo0, vo1, vo2, x, y, ratio0, ratio1);
 				}
 				Cx1 -= Dy12;
 				Cx2 -= Dy23;
@@ -267,60 +323,15 @@ namespace soft3d
 		}
 	}
 
-	void Rasterizer::BeginTasks()
+	void RasterizerManager::AddTask(int id, const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1)
 	{
-		m_taskFlag = true;
-		m_mutex_async.lock();
+		m_rasterizeData[id].ratio0 = ratio0;
+		m_rasterizeData[id].ratio1 = ratio1;
+		m_rasterizeData[id].vo0 = vo0;
+		m_rasterizeData[id].vo1 = vo1;
+		m_rasterizeData[id].vo2 = vo2;
+
+		boost::mutex::scoped_lock lock(*m_mutexs[id%m_threadCount]);
+		m_taskStack[id%m_threadCount].push_back(id);
 	}
-
-	void Rasterizer::AddTask(RasterizerTask& rt)
-	{
-		boost::mutex::scoped_lock lock(m_mutex);
-		m_tasks.push_back(rt);
-	}
-
-	void Rasterizer::EndTasks()
-	{
-		m_taskFlag = false;
-		m_mutex_async.lock();
-		m_mutex_async.unlock();
-	}
-
-	void Rasterizer::Rasterize()
-	{
-		while (true)
-		{
-			if (m_tasks_doing.size() > 0)
-			{
-				RasterizerTask& task = m_tasks_doing.back();
-				if (task.m_vo[2] == nullptr)
-				{
-					BresenhamLine(task.m_vo[0], task.m_vo[1]);
-				}
-				else
-				{
-					Triangle(task.m_vo[0], task.m_vo[1], task.m_vo[2]);
-				}
-				m_tasks_doing.pop_back();
-			}
-			else if (m_tasks.size() > 0)
-			{
-				boost::mutex::scoped_lock lock(m_mutex);
-				m_tasks_doing.swap(m_tasks);
-			}
-			else
-			{
-				//Sleep(1);
-			}
-
-			if (m_taskFlag == false && m_tasks.size() == 0 && m_tasks_doing.size() == 0)
-			{
-				m_taskFlag = true;
-				m_mutex_async.unlock();
-			}
-
-			//Sleep(1);
-		}
-	}
-
 }

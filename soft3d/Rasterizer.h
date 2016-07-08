@@ -1,8 +1,4 @@
 #pragma once
-#include <boost/noncopyable.hpp>
-#include <boost/thread.hpp>
-#include "VertexBufferObject.h"
-#include <vector>
 
 namespace soft3d
 {

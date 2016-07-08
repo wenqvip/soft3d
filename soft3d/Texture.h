@@ -14,9 +14,9 @@ namespace soft3d
 		enum FILTER_MODE
 		{
 			NEAREST,
-			NONE,
+			BILINEAR,
 		};
-		FILTER_MODE filter_mode = NEAREST;
+		FILTER_MODE filter_mode = BILINEAR;
 
 	private:
 		uint32* m_data;
@@ -24,7 +24,7 @@ namespace soft3d
 		uint16 m_height;
 
 		Color Sampler2D_nearest(const vmath::vec2* uv) const;
-		Color Sampler2D_none(const vmath::vec2* uv) const;
+		Color Sampler2D_bilinear(const vmath::vec2* uv) const;
 	};
 
 }

@@ -37,16 +37,16 @@ namespace soft3d
 	{
 		switch (filter_mode)
 		{
+		case BILINEAR:
+			return Sampler2D_bilinear(uv);
 		case NEAREST:
 			return Sampler2D_nearest(uv);
-		case NONE:
-			return Sampler2D_none(uv);
 		default:
-			return Sampler2D_nearest(uv);
+			return Sampler2D_bilinear(uv);
 		}
 	}
 
-	Color Texture::Sampler2D_none(const vmath::vec2* uv) const
+	Color Texture::Sampler2D_nearest(const vmath::vec2* uv) const
 	{
 		uint32 u = (uint32)(m_width * (*uv)[0]);
 		uint32 v = (uint32)(m_height * (*uv)[1]);
@@ -57,7 +57,7 @@ namespace soft3d
 		return Color(m_data[u + m_width * v]);
 	}
 
-	Color Texture::Sampler2D_nearest(const vmath::vec2* uv) const
+	Color Texture::Sampler2D_bilinear(const vmath::vec2* uv) const
 	{
 		vmath::vec2 uv_offset = *uv + vmath::vec2(0.5 / (float)m_width, 0.5 / (float)m_height);
 		vmath::uvec2 uv0, uv1, uv2, uv3;

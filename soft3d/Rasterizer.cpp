@@ -306,7 +306,7 @@ namespace soft3d
 			}
 			else
 			{
-				Sleep(1);
+				//Sleep(1);
 			}
 
 			if (m_taskFlag == false && m_tasks.size() == 0 && m_tasks_doing.size() == 0)

@@ -1,6 +1,7 @@
 #include "soft3d.h"
 #include "DirectXHelper.h"
 #include <dwrite.h>
+#include <boost/foreach.hpp>
 #pragma comment(lib, "dwrite.lib")
 
 using namespace Microsoft::WRL;
@@ -154,6 +155,7 @@ namespace soft3d {
 
 		m_d2dContext->BeginDraw();
 
+		std::wstring content;
 		wchar_t buf[64];
 		DWORD nowTick = GetTickCount();
 		if (false)
@@ -166,6 +168,7 @@ namespace soft3d {
 				m_lastTickCount = nowTick;
 			}
 			swprintf(buf, L"FPS:%d ", m_lastFps);
+			content = buf;
 		}
 		else
 		{
@@ -173,20 +176,25 @@ namespace soft3d {
 			
 			if (nowTick - m_lastTickCount > 100)
 			{
+				for (auto it = m_profileInfo.begin(); it != m_profileInfo.end(); it++)
+				{
+					m_profileShow[it->first] = it->second / (float)m_fps;
+				}
+
 				m_ffps = m_fps * 1000.0f / (float)(nowTick - m_lastTickCount);
 				m_fps = 0;
 				m_lastTickCount = nowTick;
 			}
 			swprintf(buf, L"FPS:%0.1f ", m_ffps);
+			content = buf;
+			for (auto it = m_profileShow.begin(); it != m_profileShow.end(); it++)
+			{
+				swprintf(buf, L"%s:%0.1fms ", it->first.c_str(), it->second);
+				content += buf;
+			}
 		}
 		D2D1_RECT_F rectf = { 0.0f, 0.0f, (float)width, 0.0f };
 
-		std::wstring content = buf;
-		for (int i = 1; i < m_profileInfo.size(); i++)
-		{
-			swprintf(buf, L"%s:%dms ", m_profileInfo[i].second.c_str(), m_profileInfo[i].first - m_profileInfo[i - 1].first);
-			content += buf;
-		}
 		m_d2dContext->DrawTextW(content.c_str(), content.size(), m_pTextFormat, rectf, m_pGreenBrush);
 		m_profileInfo.clear();
 
@@ -202,7 +210,10 @@ namespace soft3d {
 
 	void DirectXHelper::Profile(DWORD tick, const wchar_t* work)
 	{
-		m_profileInfo.push_back(std::pair<DWORD, std::wstring>(tick, work));
+		DWORD gap = tick - m_lastTick;
+		if(work[0] != 0)
+			m_profileInfo[work] += gap;
+		m_lastTick = tick;
 	}
 
 }

@@ -10,7 +10,7 @@
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "d3d11.lib")
 #include <memory>
-#include <vector>
+#include <map>
 
 namespace soft3d
 {
@@ -59,7 +59,9 @@ namespace soft3d
 		uint16 m_lastFps;
 		float m_ffps;
 
-		std::vector<std::pair<DWORD, std::wstring>> m_profileInfo;
+		std::map<std::wstring, DWORD> m_profileInfo;
+		DWORD m_lastTick = 0;
+		std::map<std::wstring, float> m_profileShow;
 
 		static std::shared_ptr<DirectXHelper> s_instance;
 	};

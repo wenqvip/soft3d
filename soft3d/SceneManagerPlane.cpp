@@ -34,6 +34,7 @@ namespace soft3d
 		shared_ptr<Texture> tex(new Texture());
 		TextureLoader::Instance().LoadTexture(L"cathead_small.png");
 		tex->CopyFromBuffer(TextureLoader::Instance().GetData(), TextureLoader::Instance().GetWidth(), TextureLoader::Instance().GetHeight());
+		//tex->filter_mode = Texture::NEAREST;
 
 		//uint32 tex_data[] = {
 		//	0xFFFFFF, 0x000000, 0xFFFFFF, 0x000000,

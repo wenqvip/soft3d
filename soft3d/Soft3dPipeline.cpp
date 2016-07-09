@@ -5,6 +5,7 @@
 #include "VertexProcessor.h"
 #include "FragmentProcessor.h"
 #include "Rasterizer.h"
+#include "RasterizerManager.h"
 #include <boost/foreach.hpp>
 
 #pragma comment(lib, "dinput8.lib")
@@ -57,15 +58,20 @@ namespace soft3d
 
 	void Soft3dPipeline::InitPipeline(HINSTANCE hInstance, HWND hwnd, uint16 width, uint16 height)
 	{
+		m_threadMode = THREAD_MULTI_FRAGMENT;
 		SYSTEM_INFO info;
 		GetSystemInfo(&info);
 		THREAD_COUNT = info.dwNumberOfProcessors - 1;
 		m_width = width;
 		m_height = height;
-		if (m_multiThread)
+		if (m_threadMode == THREAD_MULTI_RASTERIZER)
 		{
 			for (int i = 0; i < THREAD_COUNT; i++)
 				m_rasterizers.push_back(shared_ptr<Rasterizer>(new Rasterizer(width, height)));
+		}
+		else if (m_threadMode == THREAD_MULTI_FRAGMENT)
+		{
+			m_rasterizerManager = shared_ptr<RasterizerManager>(new RasterizerManager(width, height));
 		}
 		else
 		{
@@ -129,10 +135,14 @@ namespace soft3d
 
 	int Soft3dPipeline::Clear(uint32 color)
 	{
-		if (m_multiThread)
+		if (m_threadMode == THREAD_MULTI_RASTERIZER)
 		{
 			for (int i = 0; i < THREAD_COUNT; i++)
 				m_rasterizers[i]->Clear(color);
+		}
+		else if (m_threadMode == THREAD_MULTI_FRAGMENT)
+		{
+			m_rasterizerManager->Clear(color);
 		}
 		else
 		{
@@ -165,10 +175,14 @@ namespace soft3d
 
 		SceneManager::Instance()->Update();
 
-		if (m_multiThread)
+		if (m_threadMode == THREAD_MULTI_RASTERIZER)
 		{
 			for (int i = 0; i < THREAD_COUNT; i++)
 				m_rasterizers[i]->BeginTasks();
+		}
+		else if (m_threadMode == THREAD_MULTI_FRAGMENT)
+		{
+			m_rasterizerManager->BeginTask();
 		}
 
 		DirectXHelper::Instance()->Profile(GetTickCount(), L"Scene");
@@ -216,7 +230,6 @@ namespace soft3d
 				cur_vp.vs_out.uv *= rhw;//uv在这里除以w，以后乘回来，为了能正确计算纹理uv
 			}
 			DirectXHelper::Instance()->Profile(GetTickCount(), L"VP");
-
 			for (int i = 0; i < pipeData->capacity; i += 3)
 			{
 				VertexProcessor& vp1 = pipeData->vp[i];
@@ -265,7 +278,11 @@ namespace soft3d
 				{
 				case VertexBufferObject::RENDER_LINE:
 				{
-					if (m_multiThread)
+					if (m_threadMode == THREAD_MULTI_RASTERIZER)
+					{
+
+					}
+					else if (m_threadMode == THREAD_MULTI_FRAGMENT)
 					{
 
 					}
@@ -281,9 +298,14 @@ namespace soft3d
 
 				case VertexBufferObject::RENDER_TRIANGLE:
 				{
-					if (m_multiThread)
+					if (m_threadMode == THREAD_MULTI_RASTERIZER)
 					{
 						m_rasterizers[(i/3)%THREAD_COUNT]->AddTask(RasterizerTask(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out)));
+					}
+					else if (m_threadMode == THREAD_MULTI_FRAGMENT)
+					{
+						m_rasterizerManager->AddRasterizeTask(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out));
+						//m_rasterizerManager->Triangle(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out));
 					}
 					else
 					{
@@ -298,19 +320,24 @@ namespace soft3d
 			}
 			DirectXHelper::Instance()->Profile(GetTickCount(), L"FP_push");
 		}
-		if (m_multiThread)
+		if (m_threadMode == THREAD_MULTI_RASTERIZER)
 		{
 			for (int i = 0; i < THREAD_COUNT; i++)
 			{
 				m_rasterizers[i]->EndTasks();
 			}
 		}
+		else if (m_threadMode == THREAD_MULTI_FRAGMENT)
+		{
+			m_rasterizerManager->EndTask();
+		}
 		DirectXHelper::Instance()->Profile(GetTickCount(), L"FP_wait");
 
-		if (m_multiThread)
-			DirectXHelper::Instance()->Paint(m_rasterizers[0]->GetFrameBuffer(), m_width, m_height);
+		if (m_threadMode == THREAD_MULTI_FRAGMENT)
+			DirectXHelper::Instance()->Paint(m_rasterizerManager->GetFrameBuffer(), m_width, m_height);
 		else
-			DirectXHelper::Instance()->Paint(m_rasterizer->GetFrameBuffer(), m_width, m_height);
+			DirectXHelper::Instance()->Paint(Rasterizer::GetFrameBuffer(), m_width, m_height);
+		DirectXHelper::Instance()->Profile(GetTickCount(), L"BLT");
 	}
 
 	void Soft3dPipeline::LoseFocus()

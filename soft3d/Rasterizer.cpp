@@ -1,7 +1,5 @@
 #include "soft3d.h"
 #include "FragmentProcessor.h"
-#include <boost/noncopyable.hpp>
-#include <boost/thread.hpp>
 #include "VertexBufferObject.h"
 #include <vector>
 #include <stdlib.h>
@@ -310,7 +308,7 @@ namespace soft3d
 			}
 			else
 			{
-				//Sleep(1);
+				boost::thread::yield();
 			}
 
 			if (m_taskFlag == false && m_tasks.size() == 0 && m_tasks_doing.size() == 0)

@@ -1,4 +1,6 @@
 #pragma once
+#include <boost/noncopyable.hpp>
+#include <boost/thread.hpp>
 
 namespace soft3d
 {
@@ -40,7 +42,7 @@ namespace soft3d
 		void BresenhamLine(const VS_OUT* vo0, const VS_OUT* vo1);
 		void Triangle(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2);
 
-		const uint32* GetFrameBuffer() {
+		static const uint32* GetFrameBuffer() {
 			return m_frameBuffer;
 		}
 

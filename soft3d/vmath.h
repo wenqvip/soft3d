@@ -1367,6 +1367,15 @@ static inline T clamp(T& x, T minVal, T maxVal)
 	return min<T>(max<T>(x, minVal), maxVal);
 }
 
+static inline float ceil(float val)
+{
+	long i = (int)val;
+	if (val - (float)i > 0.0f)
+		return (float)(i + 1);
+	else
+		return (float)i;
+}
+
 };
 
 #endif /* __VMATH_H__ */

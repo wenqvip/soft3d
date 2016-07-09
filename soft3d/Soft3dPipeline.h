@@ -13,6 +13,7 @@
 namespace soft3d
 {
 	class Rasterizer;
+	class RasterizerManager;
 	struct PipeLineData
 	{
 		boost::shared_array<VertexProcessor> vp;
@@ -78,6 +79,7 @@ namespace soft3d
 		std::vector<std::shared_ptr<VertexBufferObject> > m_vboVector;
 		uint32 m_curVBO;
 		std::shared_ptr<Texture> m_tex;
+		std::shared_ptr<RasterizerManager> m_rasterizerManager;
 		std::shared_ptr<Rasterizer> m_rasterizer;
 		std::vector<std::shared_ptr<Rasterizer>> m_rasterizers;
 		std::vector<std::shared_ptr<PipeLineData> > m_pipeDataVector;
@@ -93,9 +95,16 @@ namespace soft3d
 		std::vector<MOUSE_EVENT_CB> m_mouseCB;
 		std::vector<KEYBOARD_EVENT_CB> m_keyboardCB;
 
+		enum THREAD_MODE
+		{
+			THREAD_ONE,
+			THREAD_MULTI_RASTERIZER,
+			THREAD_MULTI_FRAGMENT,
+		};
+
 		bool m_haveFocus;
 		bool m_valid = false;
-		bool m_multiThread = true;
+		THREAD_MODE m_threadMode = THREAD_MULTI_RASTERIZER;
 		int THREAD_COUNT = 4;
 	};
 

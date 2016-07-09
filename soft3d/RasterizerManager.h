@@ -2,7 +2,7 @@
 
 namespace soft3d
 {
-	struct RasterizeData
+	struct FragmentData
 	{
 		const VS_OUT* vo0;
 		const VS_OUT* vo1;
@@ -12,18 +12,55 @@ namespace soft3d
 		float ratio1;
 	};
 
+	struct FragmentThread
+	{
+		FragmentProcessor* m_fragmentProcessors;
+		boost::thread* m_thread;
+		std::vector<int> m_task;
+		std::vector<int> m_task_doing;
+		boost::mutex m_swap_mutex;
+		boost::mutex m_async_mutex;
+		bool m_taskOver = false;
+	};
+
+	struct RasterizeData
+	{
+		RasterizeData(VS_OUT* vo0, VS_OUT* vo1) {
+			m_vo[0] = vo0;
+			m_vo[1] = vo1;
+			m_vo[2] = nullptr;
+		}
+		RasterizeData(VS_OUT* vo0, VS_OUT* vo1, VS_OUT* vo2) {
+			m_vo[0] = vo0;
+			m_vo[1] = vo1;
+			m_vo[2] = vo2;
+		}
+		~RasterizeData() = default;
+		const VS_OUT* m_vo[3];
+	};
+
+	struct RasterizeThread
+	{
+		boost::thread* m_thread;
+		std::vector<RasterizeData> m_task;
+		std::vector<RasterizeData> m_task_doing;
+		boost::mutex m_swap_mutex;
+		boost::mutex m_async_mutex;
+		bool m_taskOver = false;
+	};
+
 	class RasterizerManager : public boost::noncopyable
 	{
 	public:
 		RasterizerManager(uint16 width, uint16 height);
-		virtual ~RasterizerManager();
+		~RasterizerManager();
 
 		int Clear(uint32 color);
 		int DrawPixel(uint16 x, uint16 y, uint32 color, uint16 size = 1);
 		uint32* GetFBPixelPtr(uint16 x, uint16 y);
 
-		void Rasterize(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio);
-		void Rasterize(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1);
+		void Fragment(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio);
+		void Fragment(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1);
 
 		void BresenhamLine(const VS_OUT* vo0, const VS_OUT* vo1);
 		void Triangle(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2);
@@ -32,30 +69,32 @@ namespace soft3d
 			return m_frameBuffer;
 		}
 
-		void AddTask(int id, const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1);
+		void AddRasterizeTask(VS_OUT* vo0, VS_OUT* vo1, VS_OUT* vo2);
+		void AddFragTask(int id, const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1);
+		void BeginTask();
+		void EndTask();
 
-	protected:
-		void ThreadFun(int id);
+	private:
+		void FragThreadFun(int id);
+		void RasterizeThreadFun(int id);
 
 		void SetFrameBuffer(uint32 index, uint32 value);
 		void SetZBufferV(uint32 x, uint32 y, float value);
 		float GetZBufferV(uint32 x, uint32 y);
 
-	protected:
+	private:
 		uint16 m_width;
 		uint16 m_height;
-		static uint32* m_frameBuffer;
-		static float* m_zBuffer;
-		static RasterizeData* m_rasterizeData;
+		uint32* m_frameBuffer = nullptr;
+		float* m_zBuffer = nullptr;
+		FragmentData* m_fragmentData = nullptr;
 		VertexBufferObject::RENDER_MODE m_mode = VertexBufferObject::RENDER_TRIANGLE;
-		std::vector<FragmentProcessor*> m_fragmentProcessors;
 
-	private:
-		int m_threadCount = 1;
-		std::vector<boost::thread*> m_threads;
-		std::vector<std::vector<uint32>> m_taskStack;
-		std::vector<std::vector<uint32>> m_taskStack_doing;
-		std::vector<boost::mutex*> m_mutexs;
+		int m_fragThreadCount = 1;
+		int m_rasterizeThreadCount = 1;
+		std::vector<FragmentThread*> m_fragThreads;
+		std::vector<RasterizeThread*> m_rasterizeThreads;
+		float m_thread_ratio = 0.1f;
 	};
 
 

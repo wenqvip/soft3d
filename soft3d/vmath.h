@@ -1228,7 +1228,7 @@ static inline vecN<T,N> smoothstep(const vecN<T,N>& edge0, const vecN<T,N>& edge
 template <typename T, const int S>
 static inline vecN<T,S> reflect(const vecN<T,S>& I, const vecN<T,S>& N)
 {
-    return I - 2 * dot(N, I) * N;
+    return 2 * dot(N, I) * N - I;
 }
 
 template <typename T, const int S>

@@ -52,12 +52,16 @@ namespace soft3d
 		mat4* mv_matrix = (mat4*)(uniforms[UNIFORM_MV_MATRIX]);
 		mat4* proj_matrix = (mat4*)(uniforms[UNIFORM_PROJ_MATRIX]);
 		vec3* light_pos = (vec3*)(uniforms[UNIFORM_LIGHT_POS]);
+		vec3* light_dir = (vec3*)(uniforms[UNIFORM_LIGHT_DIR]);
 		vec4 P = (*mv_matrix) * (*pos);
 		if (normal != nullptr)
 		{
 			vs_out.mode = VS_OUT::LIGHT_MODE;
 			vs_out.N = mat3(*mv_matrix) * (*normal);
-			vs_out.L = *light_pos - P.xyz();
+			if (light_dir != nullptr)
+				vs_out.L = -*light_dir;
+			else
+				vs_out.L = *light_pos - P.xyz();
 			vs_out.V = -P.xyz();
 		}
 		else

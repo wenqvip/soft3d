@@ -56,15 +56,18 @@ namespace soft3d
 			}
 
 		float aspect = (float)m_width / (float)m_height;
-		mat4 proj_matrix = perspective(60.0f, aspect, 0.1f, 1000.0f);
+		mat4 proj_matrix = perspective(30.0f, aspect, 0.1f, 1000.0f);
 		mat4 view_matrix = lookat(vec3(0.0f, 0.0f, 3.0f),
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
 		float factor = GetTickCount() / 50 % 360;
 
+		float x = cos(m_light_angle_y) * 50000;
+		float z = sin(m_light_angle_y) * 50000;
+
 		Soft3dPipeline::Instance()->SelectVBO(m_vbo1);
 		mat4 mv_matrix = view_matrix
-			* translate(1.1f, 0.0f, -0.5f)
+			* translate(1.1f + m_x_offset, 0.0f + m_y_offset, -0.5f + m_z_offset)
 			* scale(1.0f)
 			* rotate(m_x_angle, vec3(1.0f, 0.0f, 0.0f))
 			* rotate(m_y_angle, vec3(0.0f, 1.0f, 0.0f))
@@ -74,11 +77,11 @@ namespace soft3d
 		SetUniform(UNIFORM_MV_MATRIX, mv_matrix);
 		SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
 		SetUniform(UNIFORM_VIEW_MATRIX, view_matrix);
-		SetUniform(UNIFORM_LIGHT_POS, vec3(0.0f, 0.0f, 100.0f));
+		SetUniform(UNIFORM_LIGHT_DIR, vec3(x, 0.0f, z));
 		
 		Soft3dPipeline::Instance()->SelectVBO(m_vbo2);
 		mv_matrix = view_matrix
-			* translate(-1.1f, 0.0f, -0.5f)
+			* translate(-1.1f + m_x_offset, 0.0f + m_y_offset, -0.5f + m_z_offset)
 			* scale(1.0f)
 			* rotate(m_x_angle, vec3(1.0f, 0.0f, 0.0f))
 			* rotate(m_y_angle, vec3(0.0f, 1.0f, 0.0f))
@@ -87,7 +90,7 @@ namespace soft3d
 		SetUniform(UNIFORM_MV_MATRIX, mv_matrix);
 		SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
 		SetUniform(UNIFORM_VIEW_MATRIX, view_matrix);
-		SetUniform(UNIFORM_LIGHT_POS, vec3(0.0f, 0.0f, 100.0f));
+		SetUniform(UNIFORM_LIGHT_DIR, vec3(x, 0.0f, z));
 		
 		Soft3dPipeline::Instance()->Clear(0);
 	}
@@ -119,6 +122,42 @@ namespace soft3d
 		else if (dikeyboard[DIK_E] & 0x80)
 		{
 			m_y_angle -= 1.0f;
+		}
+
+		if (dikeyboard[DIK_LEFT] & 0x80)
+		{
+			m_light_angle_y += 0.05f;
+		}
+		else if (dikeyboard[DIK_RIGHT] & 0x80)
+		{
+			m_light_angle_y -= 0.05f;
+		}
+
+		if (dikeyboard[DIK_Y] & 0x80)
+		{
+			m_x_offset += 0.05f;
+		}
+		else if (dikeyboard[DIK_U] & 0x80)
+		{
+			m_x_offset -= 0.05f;
+		}
+
+		if (dikeyboard[DIK_H] & 0x80)
+		{
+			m_y_offset += 0.05f;
+		}
+		else if (dikeyboard[DIK_J] & 0x80)
+		{
+			m_y_offset -= 0.05f;
+		}
+
+		if (dikeyboard[DIK_N] & 0x80)
+		{
+			m_z_offset += 0.05f;
+		}
+		else if (dikeyboard[DIK_M] & 0x80)
+		{
+			m_z_offset -= 0.05f;
 		}
 	}
 }

@@ -152,6 +152,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="DirectXHelper.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SceneManagerBigFbx.h" />
     <ClInclude Include="SceneManagerFbx.h" />
     <ClInclude Include="SceneManagerPlane.h" />
     <ClInclude Include="SceneManagerTriangle.h" />
@@ -172,6 +173,7 @@
     <ClCompile Include="Rasterizer.cpp" />
     <ClCompile Include="RasterizerManager.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SceneManagerBigFbx.cpp" />
     <ClCompile Include="SceneManagerFbx.cpp" />
     <ClCompile Include="SceneManagerPlane.cpp" />
     <ClCompile Include="SceneManagerTriangle.cpp" />

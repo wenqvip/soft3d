@@ -72,6 +72,9 @@
     <ClInclude Include="RasterizerManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="SceneManagerBigFbx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -123,6 +126,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="RasterizerManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManagerBigFbx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,13 +3,14 @@
 #include "SceneManagerTriangle.h"
 #include "SceneManagerFbx.h"
 #include "SceneManagerPlane.h"
+#include "SceneManagerBigFbx.h"
 
 using namespace std;
 using namespace vmath;
 namespace soft3d
 {
 
-	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManagerFbx());
+	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManagerBigFbx());
 
 	SceneManager::SceneManager()
 	{

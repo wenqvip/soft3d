@@ -47,7 +47,7 @@ namespace soft3d
 	void VertexProcessor::Process()
 	{
 		vs_out.uv[0] = 1.0 - vs_out.uv[0];
-		//vs_out.uv[1] = 1.0 - vs_out.uv[1];
+		vs_out.uv[1] = 1.0 - vs_out.uv[1];
 
 		mat4* mv_matrix = (mat4*)(uniforms[UNIFORM_MV_MATRIX]);
 		mat4* proj_matrix = (mat4*)(uniforms[UNIFORM_PROJ_MATRIX]);

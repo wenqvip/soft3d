@@ -26,7 +26,7 @@ namespace soft3d
 		SYSTEM_INFO info;
 		GetSystemInfo(&info);
 		int ThreadCount = info.dwNumberOfProcessors - 3;
-		if (info.dwNumberOfProcessors < 3)
+		if (true || info.dwNumberOfProcessors < 3)
 		{
 			m_fragThreadCount = 1;
 			m_rasterizeThreadCount = 1;
@@ -145,13 +145,15 @@ namespace soft3d
 	void RasterizerManager::Fragment(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio)
 	{
 		fp->fs_in.Interpolate(vo0, vo1, ratio, 1.0f - ratio);
+		fp->fs_in.rhw += 0.001f;
 		if (fp->fs_in.rhw < GetZBufferV(x, y))
 			return;
-		fp->tex = Soft3dPipeline::Instance()->CurrentTex();
+		fp->tex = nullptr;// Soft3dPipeline::Instance()->CurrentTex();
 
 		fp->out_color = GetFBPixelPtr(x, y);
 		if (fp->out_color == nullptr)
 			return;
+		fp->fs_in.mode = VS_OUT::COLOR_MODE;
 		fp->Process();
 		SetZBufferV(x, y, fp->fs_in.rhw);
 	}
@@ -188,7 +190,7 @@ namespace soft3d
 		if (y1 < 0 || y1 > m_height)
 			return;
 
-		DrawPixel(x0, y0, (uint32)(vo0->color), 5);
+		//DrawPixel(x0, y0, (uint32)(vo0->color), 5);
 
 		int x, y, dx, dy;
 		dx = x1 - x0;
@@ -201,8 +203,10 @@ namespace soft3d
 			for (int i = 0; i <= abs(dx); i++)
 			{
 				float ratio = (x1 - x) / (float)dx;
-				int id = x * m_width + y;
+				int id = y * m_width + x;
 				AddFragTask(id, vo0, vo1, nullptr, ratio, 0.0f);
+				//FragmentProcessor fp;
+				//Fragment(&fp, vo0, vo1, x, y, ratio);
 				x = dx > 0 ? x + 1 : x - 1;
 				e += 2 * abs(dy);
 				if (e >= 0)
@@ -218,8 +222,10 @@ namespace soft3d
 			for (int i = 0; i <= abs(dy); i++)
 			{
 				float ratio = (y1 - y) / (float)dy;
-				int id = x * m_width + y;
+				int id = y * m_width + x;
 				AddFragTask(id, vo0, vo1, nullptr, ratio, 0.0f);
+				//FragmentProcessor fp;
+				//Fragment(&fp, vo0, vo1, x, y, ratio);
 				y = dy > 0 ? y + 1 : y - 1;
 				e += 2 * abs(dx);
 				if (e >= 0)
@@ -326,19 +332,21 @@ namespace soft3d
 			RasterizeThread* rt = m_rasterizeThreads[id];
 			if (rt->m_task_doing.size() > 0)
 			{
-				switch (m_mode)
+				RasterizeData& data = rt->m_task_doing[rt->m_doing_index];
+				if (data.m_vo[2] == nullptr)
 				{
-				case soft3d::VertexBufferObject::RENDER_LINE:
-					break;
-				case soft3d::VertexBufferObject::RENDER_TRIANGLE:
-					{
-						RasterizeData& data = rt->m_task_doing.back();
-						Triangle(data.m_vo[0], data.m_vo[1], data.m_vo[2]);
-						rt->m_task_doing.pop_back();
-					}
-					break;
-				default:
-					break;
+					BresenhamLine(data.m_vo[0], data.m_vo[1]);
+				}
+				else
+				{
+					Triangle(data.m_vo[0], data.m_vo[1], data.m_vo[2]);
+				}
+
+				rt->m_doing_index++;
+				if (rt->m_doing_index >= rt->m_task_doing.size())
+				{
+					rt->m_task_doing.clear();
+					rt->m_doing_index = 0;
 				}
 			}
 			else if (rt->m_task.size() > 0)
@@ -415,40 +423,44 @@ namespace soft3d
 			//	m_fragThreads[id]->m_async_mutex.unlock();
 			//	continue;
 			//}
-			if (m_fragThreads[id]->m_task_doing.size() > 0)
+
+			FragmentThread* ft = m_fragThreads[id];
+			if (ft->m_task_doing.size() > 0)
 			{
-				switch (m_mode)
+				uint32 index = ft->m_task_doing[ft->m_doing_index];
+				FragmentData* data = &(m_fragmentData[index]);
+				uint32 x = index % m_width;
+				uint32 y = index / m_width;
+				if (data->vo2 == nullptr)
 				{
-				case soft3d::VertexBufferObject::RENDER_LINE:
-					break;
-				case soft3d::VertexBufferObject::RENDER_TRIANGLE:
-				{
-					uint32 index = m_fragThreads[id]->m_task_doing.back();
-					m_fragThreads[id]->m_task_doing.pop_back();
-					FragmentData* data = &(m_fragmentData[index]);
-					uint32 x = index % m_width;
-					uint32 y = index / m_width;
-					Fragment(m_fragThreads[id]->m_fragmentProcessors, data->vo0, data->vo1, data->vo2, x, y, data->ratio0, data->ratio1);
+					Fragment(ft->m_fragmentProcessors, data->vo0, data->vo1, x, y, data->ratio0);
 				}
-				break;
-				default:
-					break;
+				else
+				{
+					Fragment(ft->m_fragmentProcessors, data->vo0, data->vo1, data->vo2, x, y, data->ratio0, data->ratio1);
+				}
+
+				ft->m_doing_index++;
+				if (ft->m_doing_index >= ft->m_task_doing.size())
+				{
+					ft->m_task_doing.clear();
+					ft->m_doing_index = 0;
 				}
 			}
-			else if (m_fragThreads[id]->m_task.size() > 0)
+			else if (ft->m_task.size() > 0)
 			{
-				boost::mutex::scoped_lock lock(m_fragThreads[id]->m_swap_mutex);
-				m_fragThreads[id]->m_task_doing.swap(m_fragThreads[id]->m_task);
+				boost::mutex::scoped_lock lock(ft->m_swap_mutex);
+				ft->m_task_doing.swap(ft->m_task);
 			}
 			else
 			{
 				boost::thread::yield();
 			}
 
-			if (m_fragThreads[id]->m_taskOver == true && m_fragThreads[id]->m_task.size() == 0 && m_fragThreads[id]->m_task_doing.size() == 0)
+			if (ft->m_taskOver == true && ft->m_task.size() == 0 && ft->m_task_doing.size() == 0)
 			{
-				m_fragThreads[id]->m_taskOver = false;
-				m_fragThreads[id]->m_async_mutex.unlock();
+				ft->m_taskOver = false;
+				ft->m_async_mutex.unlock();
 			}
 		}
 	}

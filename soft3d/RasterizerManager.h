@@ -18,6 +18,7 @@ namespace soft3d
 		boost::thread* m_thread;
 		std::vector<int> m_task;
 		std::vector<int> m_task_doing;
+		uint32 m_doing_index = 0;
 		boost::mutex m_swap_mutex;
 		boost::mutex m_async_mutex;
 		bool m_taskOver = false;
@@ -44,6 +45,7 @@ namespace soft3d
 		boost::thread* m_thread;
 		std::vector<RasterizeData> m_task;
 		std::vector<RasterizeData> m_task_doing;
+		uint32 m_doing_index = 0;
 		boost::mutex m_swap_mutex;
 		boost::mutex m_async_mutex;
 		bool m_taskOver = false;
@@ -88,7 +90,6 @@ namespace soft3d
 		uint32* m_frameBuffer = nullptr;
 		float* m_zBuffer = nullptr;
 		FragmentData* m_fragmentData = nullptr;
-		VertexBufferObject::RENDER_MODE m_mode = VertexBufferObject::RENDER_TRIANGLE;
 
 		int m_fragThreadCount = 1;
 		int m_rasterizeThreadCount = 1;

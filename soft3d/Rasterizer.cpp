@@ -103,13 +103,15 @@ namespace soft3d
 	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio)
 	{
 		m_fp.fs_in.Interpolate(vo0, vo1, ratio, 1.0f - ratio);
+		m_fp.fs_in.rhw += 0.001f;
 		if (m_fp.fs_in.rhw < GetZBufferV(x, y))
 			return;
-		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
+		m_fp.tex = nullptr;// Soft3dPipeline::Instance()->CurrentTex();
 
 		m_fp.out_color = GetFBPixelPtr(x, y);
 		if (m_fp.out_color == nullptr)
 			return;
+		m_fp.fs_in.mode = VS_OUT::COLOR_MODE;
 		m_fp.Process();
 		SetZBufferV(x, y, m_fp.fs_in.rhw);
 	}
@@ -146,7 +148,7 @@ namespace soft3d
 		if (y1 < 0 || y1 > m_height)
 			return;
 
-		DrawPixel(x0, y0, (uint32)(vo0->color), 5);
+		//DrawPixel(x0, y0, (uint32)(vo0->color), 5);
 
 		int x, y, dx, dy;
 		dx = x1 - x0;

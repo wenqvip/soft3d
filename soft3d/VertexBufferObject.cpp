@@ -21,7 +21,7 @@ namespace soft3d
 
 		m_normalBuffer = nullptr;
 
-		m_mode = RENDER_LINE;
+		m_mode = RENDER_TRIANGLE;
 		m_cullMode = CULL_CCW;
 	}
 

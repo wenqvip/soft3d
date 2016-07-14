@@ -19,6 +19,7 @@ namespace soft3d
 		boost::shared_array<VertexProcessor> vp;
 
 		VertexBufferObject::CULL_MODE cullMode;
+		VertexBufferObject::RENDER_MODE renderMode;
 		uint32 capacity;
 	};
 

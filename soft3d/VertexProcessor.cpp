@@ -19,6 +19,8 @@ namespace soft3d
 		this->color = vo0->color * ratio0 + vo1->color * ratio1;
 		this->uv[0] = (vo0->uv[0] * ratio0 + vo1->uv[0] * ratio1) / this->rhw;
 		this->uv[1] = (vo0->uv[1] * ratio0 + vo1->uv[1] * ratio1) / this->rhw;
+
+		this->mode = vo0->mode;
 	}
 
 	void VS_OUT::Interpolate(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2)
@@ -46,9 +48,6 @@ namespace soft3d
 
 	void VertexProcessor::Process()
 	{
-		vs_out.uv[0] = 1.0 - vs_out.uv[0];
-		vs_out.uv[1] = 1.0 - vs_out.uv[1];
-
 		mat4* mv_matrix = (mat4*)(uniforms[UNIFORM_MV_MATRIX]);
 		mat4* proj_matrix = (mat4*)(uniforms[UNIFORM_PROJ_MATRIX]);
 		vec3* light_pos = (vec3*)(uniforms[UNIFORM_LIGHT_POS]);

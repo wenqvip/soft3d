@@ -15,7 +15,6 @@ namespace soft3d
 	{
 		m_width = width;
 		m_height = height;
-		m_z = 0.0f;
 
 		FbxLoader fbxLoader;
 		fbxLoader.LoadFbx("plane2x2.fbx");
@@ -26,21 +25,22 @@ namespace soft3d
 		vbo->CopyNormalBuffer(fbxLoader.GetNormalBuffer(), fbxLoader.GetNormalCount() * 3);
 		vbo->CopyUVBuffer(fbxLoader.GetUVBuffer(), fbxLoader.GetUVCount() * 2);
 
-		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
 		vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
 		vbo->m_cullMode = VertexBufferObject::CULL_NONE;
-		Soft3dPipeline::Instance()->SetVBO(vbo);
+		m_vbo1 = Soft3dPipeline::Instance()->SetVBO(vbo);
+		vbo->m_mode = VertexBufferObject::RENDER_LINE;
+		m_vbo2 = Soft3dPipeline::Instance()->SetVBO(vbo);
 
 		shared_ptr<Texture> tex(new Texture());
 		TextureLoader::Instance().LoadTexture(L"cathead_small.png");
 		tex->CopyFromBuffer(TextureLoader::Instance().GetData(), TextureLoader::Instance().GetWidth(), TextureLoader::Instance().GetHeight());
-		//tex->filter_mode = Texture::NEAREST;
+		tex->filter_mode = Texture::NEAREST;
 
 		//uint32 tex_data[] = {
 		//	0xFFFFFF, 0x000000, 0xFFFFFF, 0x000000,
 		//	0x000000, 0xFFFFFF, 0x000000, 0xFFFFFF,
 		//	0xFFFFFF, 0x000000, 0xFFFFFF, 0x000000,
-		//	0x000000, 0xFFFFFF, 0x000000, 0xFFFFFF,
+		//	0x000000, 0xFFFFFF, 0x000000, 0xFFFF00,
 		//};
 		//tex->CopyFromBuffer(tex_data, 4, 4);
 		Soft3dPipeline::Instance()->SetTexture(tex);
@@ -55,9 +55,14 @@ namespace soft3d
 		mat4 view_matrix = lookat(vec3(0.0f, 0.0f, 3.0f),
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
-		float factor = -180;// ((int)GetTickCount() / 50 % 180) - 90;
-		mat4 mv_matrix = view_matrix * translate(0.0f, 0.0f, m_z) * scale(1.0f) *rotate(factor, vec3(1.0f, 0.0f, 0.0f));
+		float factor = 180;// ((int)GetTickCount() / 50 % 180) - 90;
+		mat4 mv_matrix = view_matrix * translate(m_x_offset, m_y_offset, m_z_offset) * scale(1.0f) *rotate(factor, vec3(0.0f, 1.0f, 0.0f));
 
+		Soft3dPipeline::Instance()->SelectVBO(m_vbo1);
+		SetUniform(UNIFORM_MV_MATRIX, mv_matrix);
+		SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
+		SetUniform(UNIFORM_LIGHT_POS, vec3(0.0f, 0.0f, -100.0f));
+		Soft3dPipeline::Instance()->SelectVBO(m_vbo2);
 		SetUniform(UNIFORM_MV_MATRIX, mv_matrix);
 		SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
 		SetUniform(UNIFORM_LIGHT_POS, vec3(0.0f, 0.0f, -100.0f));
@@ -67,13 +72,31 @@ namespace soft3d
 
 	void SceneManagerPlane::KeyboardEventCB(const DIKEYBOARD dikeyboard)
 	{
-		if (dikeyboard[DIK_W] & 0x80)
+		if (dikeyboard[DIK_Y] & 0x80)
 		{
-			m_z += 0.1f;
+			m_x_offset += 0.05f;
 		}
-		else if (dikeyboard[DIK_S] & 0x80)
+		else if (dikeyboard[DIK_U] & 0x80)
 		{
-			m_z -= 0.1f;
+			m_x_offset -= 0.05f;
+		}
+
+		if (dikeyboard[DIK_H] & 0x80)
+		{
+			m_y_offset += 0.05f;
+		}
+		else if (dikeyboard[DIK_J] & 0x80)
+		{
+			m_y_offset -= 0.05f;
+		}
+
+		if (dikeyboard[DIK_N] & 0x80)
+		{
+			m_z_offset += 0.05f;
+		}
+		else if (dikeyboard[DIK_M] & 0x80)
+		{
+			m_z_offset -= 0.05f;
 		}
 	}
 

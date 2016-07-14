@@ -23,10 +23,11 @@ namespace soft3d
 		vbo->CopyNormalBuffer(m_fbx.GetNormalBuffer(), m_fbx.GetNormalCount() * 3);
 		vbo->CopyUVBuffer(m_fbx.GetUVBuffer(), m_fbx.GetUVCount() * 2);
 
-		//vbo->m_cullMode = VertexBufferObject::CULL_NONE;
-		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
+		//vbo->m_cullMode = VertexBufferObject::CULL_CW;
 		vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
 		m_vbo1 = Soft3dPipeline::Instance()->SetVBO(vbo);
+		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
+		//m_vbo2 = Soft3dPipeline::Instance()->SetVBO(vbo);
 
 		TextureLoader::Instance().LoadTexture(L"zhankuang.png");
 
@@ -70,6 +71,11 @@ namespace soft3d
 		SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
 		SetUniform(UNIFORM_VIEW_MATRIX, view_matrix);
 		SetUniform(UNIFORM_LIGHT_DIR, vec3(x, 0.0f, z));
+		//Soft3dPipeline::Instance()->SelectVBO(m_vbo2);
+		//SetUniform(UNIFORM_MV_MATRIX, mv_matrix);
+		//SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
+		//SetUniform(UNIFORM_VIEW_MATRIX, view_matrix);
+		//SetUniform(UNIFORM_LIGHT_DIR, vec3(x, 0.0f, z));
 		
 		Soft3dPipeline::Instance()->Clear(0);
 	}

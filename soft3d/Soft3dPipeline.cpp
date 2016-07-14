@@ -58,7 +58,7 @@ namespace soft3d
 
 	void Soft3dPipeline::InitPipeline(HINSTANCE hInstance, HWND hwnd, uint16 width, uint16 height)
 	{
-		m_threadMode = THREAD_MULTI_FRAGMENT;
+		m_threadMode = THREAD_ONE;
 		SYSTEM_INFO info;
 		GetSystemInfo(&info);
 		THREAD_COUNT = info.dwNumberOfProcessors - 1;
@@ -100,6 +100,7 @@ namespace soft3d
 		shared_ptr<PipeLineData> pd(new PipeLineData());
 		pd->vp = boost::shared_array<VertexProcessor>(new VertexProcessor[vbo->GetSize()]);
 		pd->cullMode = vbo->m_cullMode;
+		pd->renderMode = vbo->m_mode;
 		pd->capacity = vbo->GetSize();
 		UniformStack stack = new UniformPtr[16]{ nullptr };
 
@@ -213,6 +214,9 @@ namespace soft3d
 				if (vbo->hasUV())
 					cur_vp.vs_out.uv = *(vbo->GetUV(i));
 
+				//cur_vp.vs_out.uv[0] = 1.0 - cur_vp.vs_out.uv[0];
+				cur_vp.vs_out.uv[1] = 1.0 - cur_vp.vs_out.uv[1];//资源里的uv是从左下角开始算，而管线的uv从左上开始算，所以这里上下翻转
+
 				cur_vp.uniforms = m_UniformVector[idx];
 				cur_vp.Process();//这一步进行视图变换和投影变换
 
@@ -248,7 +252,7 @@ namespace soft3d
 				else if (r[2] > 0.0f)
 					cull_mode = VertexBufferObject::CULL_CCW;
 
-				if (vbo->m_cullMode != VertexBufferObject::CULL_NONE && vbo->m_cullMode != cull_mode)
+				if (pipeData->cullMode != VertexBufferObject::CULL_NONE && pipeData->cullMode != cull_mode)
 					continue;
 
 				//进行裁剪
@@ -274,17 +278,21 @@ namespace soft3d
 					index[2] = i;
 				}
 
-				switch (vbo->m_mode)
+				switch (pipeData->renderMode)
 				{
 				case VertexBufferObject::RENDER_LINE:
 				{
 					if (m_threadMode == THREAD_MULTI_RASTERIZER)
 					{
-
+						m_rasterizers[(i/3)%THREAD_COUNT]->AddTask(RasterizerTask(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out)));
+						m_rasterizers[(i/3)%THREAD_COUNT]->AddTask(RasterizerTask(&(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out)));
+						m_rasterizers[(i/3)%THREAD_COUNT]->AddTask(RasterizerTask(&(pipeData->vp[index[2]].vs_out), &(pipeData->vp[index[0]].vs_out)));
 					}
 					else if (m_threadMode == THREAD_MULTI_FRAGMENT)
 					{
-
+						m_rasterizerManager->AddRasterizeTask(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out), nullptr);
+						m_rasterizerManager->AddRasterizeTask(&(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out), nullptr);
+						m_rasterizerManager->AddRasterizeTask(&(pipeData->vp[index[2]].vs_out), &(pipeData->vp[index[0]].vs_out), nullptr);
 					}
 					else
 					{

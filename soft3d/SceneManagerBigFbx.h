@@ -26,6 +26,7 @@ namespace soft3d
 		float m_z_offset = -1000.0f;
 
 		int m_vbo1;
+		int m_vbo2;
 
 		FbxLoader m_fbx;
 	};

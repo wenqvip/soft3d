@@ -58,7 +58,7 @@ namespace soft3d
 
 	void Soft3dPipeline::InitPipeline(HINSTANCE hInstance, HWND hwnd, uint16 width, uint16 height)
 	{
-		m_threadMode = THREAD_ONE;
+		m_threadMode = THREAD_MULTI_FRAGMENT;
 		SYSTEM_INFO info;
 		GetSystemInfo(&info);
 		THREAD_COUNT = info.dwNumberOfProcessors - 1;

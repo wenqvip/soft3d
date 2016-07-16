@@ -15,7 +15,7 @@ namespace soft3d
 		void KeyboardEventCB(const DIKEYBOARD dikeyboard);
 
 	private:
-		float m_x_angle = 90.0f;
+		float m_x_angle = 0.0f;
 		float m_y_angle = 0.0f;
 		float m_z_angle = 0.0f;
 

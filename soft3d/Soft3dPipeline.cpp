@@ -214,6 +214,10 @@ namespace soft3d
 				if (vbo->hasUV())
 					cur_vp.vs_out.uv = *(vbo->GetUV(i));
 
+				cur_vp.vs_out.vertexID = i;
+				cur_vp.vs_out.triangleID = i / 3;
+				cur_vp.vs_out.instanceID = idx;
+
 				//cur_vp.vs_out.uv[0] = 1.0 - cur_vp.vs_out.uv[0];
 				cur_vp.vs_out.uv[1] = 1.0 - cur_vp.vs_out.uv[1];//资源里的uv是从左下角开始算，而管线的uv从左上开始算，所以这里上下翻转
 
@@ -361,6 +365,11 @@ namespace soft3d
 			m_pMouseDevice->Acquire();
 			m_pKeyboardDevice->Acquire();
 		}
+	}
+
+	void Soft3dPipeline::Quit()
+	{
+		m_rasterizerManager->Quit();
 	}
 
 }

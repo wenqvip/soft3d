@@ -19,7 +19,10 @@ namespace soft3d
 			vec3 diffuse = vmath::max<float>(dot(fs_in.N, fs_in.L), 0.0f) * vec3(0.8f);
 			vec3 specular = pow(vmath::max<float>(dot(R, fs_in.V), 0.0f), 128.0f) * vec3(0.8f);
 			vec3 finalcolor = diffuse + specular + vec3(0.1);
-			*out_color = tex->Sampler2D(&fs_in.uv) * (&finalcolor);
+			if (tex)
+				*out_color = tex->Sampler2D(&fs_in.uv) * (&finalcolor);
+			else
+				*out_color = Color(0xffffff) * &finalcolor;
 		}
 		else
 		{

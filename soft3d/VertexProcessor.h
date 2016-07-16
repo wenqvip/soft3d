@@ -24,8 +24,13 @@ namespace soft3d
 		vmath::vec3 V;
 		MODE mode = LIGHT_MODE;
 
+		uint32 vertexID = 0xffffffff;
+		uint32 triangleID = 0;
+		uint32 instanceID = 0;
+
 		void Interpolate(const VS_OUT* vo0, const VS_OUT* vo1, float ratio0, float ratio1);
 		void Interpolate(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2);
+		float InterpolateRHW(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2);
 	};
 
 	struct VertexProcessor

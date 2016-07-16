@@ -4,12 +4,13 @@ namespace soft3d
 {
 	struct FragmentData
 	{
-		const VS_OUT* vo0;
-		const VS_OUT* vo1;
-		const VS_OUT* vo2;
+		boost::mutex _mutex;
+		const VS_OUT* vo0 = nullptr;//这个指针同时作为此结构体是否有数据的标识，空指针表示整个结构体没有数据
+		const VS_OUT* vo1 = nullptr;
+		const VS_OUT* vo2 = nullptr;
 
-		float ratio0;
-		float ratio1;
+		float ratio0 = 0.0f;
+		float ratio1 = 0.0f;
 	};
 
 	struct FragmentThread
@@ -76,6 +77,8 @@ namespace soft3d
 		void BeginTask();
 		void EndTask();
 
+		void Quit();
+
 	private:
 		void FragThreadFun(int id);
 		void RasterizeThreadFun(int id);
@@ -96,6 +99,7 @@ namespace soft3d
 		std::vector<FragmentThread*> m_fragThreads;
 		std::vector<RasterizeThread*> m_rasterizeThreads;
 		float m_thread_ratio = 0.1f;
+		bool m_bQuit = true;
 	};
 
 

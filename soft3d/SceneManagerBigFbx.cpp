@@ -40,14 +40,14 @@ namespace soft3d
 
 	void SceneManagerBigFbx::Update()
 	{
-		double time = GetTickCount() / 1000.0;
-		FbxAMatrix& fmat = m_fbx.GetRootMatrixLocalAtTime(time);
-		mat4 anim_mat;
-		for (int m = 0; m < 4; m++)
-			for (int n = 0; n < 4; n++)
-			{
-				anim_mat[m][n] = fmat.mData[m][n];
-			}
+		//double time = GetTickCount() / 1000.0;
+		//FbxAMatrix& fmat = m_fbx.GetRootMatrixLocalAtTime(time);
+		//mat4 anim_mat;
+		//for (int m = 0; m < 4; m++)
+		//	for (int n = 0; n < 4; n++)
+		//	{
+		//		anim_mat[m][n] = fmat.mData[m][n];
+		//	}
 
 		float aspect = (float)m_width / (float)m_height;
 		mat4 proj_matrix = perspective(30.0f, aspect, 0.1f, 1000.0f);
@@ -61,7 +61,7 @@ namespace soft3d
 
 		Soft3dPipeline::Instance()->SelectVBO(m_vbo1);
 		mat4 mv_matrix = view_matrix
-			* translate(1.1f + m_x_offset, 0.0f + m_y_offset, -0.5f + m_z_offset)
+			* translate(m_x_offset, m_y_offset, m_z_offset)
 			* scale(1.0f)
 			* rotate(m_x_angle, vec3(1.0f, 0.0f, 0.0f))
 			* rotate(m_y_angle, vec3(0.0f, 1.0f, 0.0f))

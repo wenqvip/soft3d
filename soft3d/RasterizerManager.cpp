@@ -68,18 +68,24 @@ namespace soft3d
 			delete[] m_fragmentData;
 			m_fragmentData = nullptr;
 		}
-
 		for (int i = 0; i < m_fragThreadCount; i++)
 		{
 			delete m_fragThreads[i]->m_fragmentProcessors;
+			m_fragThreads[i]->m_thread->join();
 			delete m_fragThreads[i]->m_thread;
 			delete m_fragThreads[i];
 		}
 		for (int i = 0; i < m_rasterizeThreadCount; i++)
 		{
+			m_rasterizeThreads[i]->m_thread->join();
 			delete m_rasterizeThreads[i]->m_thread;
 			delete m_rasterizeThreads[i];
 		}
+	}
+
+	void RasterizerManager::Quit()
+	{
+		m_bQuit = false;
 	}
 
 	uint32* RasterizerManager::GetFBPixelPtr(uint16 x, uint16 y)
@@ -161,10 +167,10 @@ namespace soft3d
 	void RasterizerManager::Fragment(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1)
 	{
 		float ratio2 = 1.0f - ratio0 - ratio1;
-		fp->fs_in.Interpolate(vo0, vo1, vo2, ratio0, ratio1, ratio2);
-		if (fp->fs_in.rhw < GetZBufferV(x, y))
+		if (fp->fs_in.InterpolateRHW(vo0, vo1, vo2, ratio0, ratio1, ratio2) < GetZBufferV(x, y))
 			return;
 
+		fp->fs_in.Interpolate(vo0, vo1, vo2, ratio0, ratio1, ratio2);
 		fp->tex = Soft3dPipeline::Instance()->CurrentTex();
 
 		fp->out_color = GetFBPixelPtr(x, y);
@@ -239,12 +245,12 @@ namespace soft3d
 
 	void RasterizerManager::Triangle(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2)
 	{
-		float fx1 = vo0->pos[0] + 0.5f;
-		float fy1 = vo0->pos[1] + 0.5f;
-		float fx2 = vo1->pos[0] + 0.5f;
-		float fy2 = vo1->pos[1] + 0.5f;
-		float fx3 = vo2->pos[0] + 0.5f;
-		float fy3 = vo2->pos[1] + 0.5f;
+		double fx1 = vo0->pos[0] + 0.5f;
+		double fy1 = vo0->pos[1] + 0.5f;
+		double fx2 = vo1->pos[0] + 0.5f;
+		double fy2 = vo1->pos[1] + 0.5f;
+		double fx3 = vo2->pos[0] + 0.5f;
+		double fy3 = vo2->pos[1] + 0.5f;
 
 		int x1 = fx1;
 		int x2 = fx2;
@@ -253,22 +259,22 @@ namespace soft3d
 		int y2 = fy2;
 		int y3 = fy3;
 
-		float Dx12 = fx1 - fx2;
-		float Dx23 = fx2 - fx3;
-		float Dx31 = fx3 - fx1;
+		double Dx12 = fx1 - fx2;
+		double Dx23 = fx2 - fx3;
+		double Dx31 = fx3 - fx1;
 
-		float Dy12 = fy1 - fy2;
-		float Dy23 = fy2 - fy3;
-		float Dy31 = fy3 - fy1;
+		double Dy12 = fy1 - fy2;
+		double Dy23 = fy2 - fy3;
+		double Dy31 = fy3 - fy1;
 
 		int minx = vmath::min<int>(fx1, fx2, fx3);
 		int maxx = vmath::max<int>(fx1, fx2, fx3);
 		int miny = vmath::min<int>(fy1, fy2, fy3);
 		int maxy = vmath::max<int>(fy1, fy2, fy3);
 
-		float C1 = Dy12 * fx1 - Dx12 * fy1;
-		float C2 = Dy23 * fx2 - Dx23 * fy2;
-		float C3 = Dy31 * fx3 - Dx31 * fy3;
+		double C1 = Dy12 * fx1 - Dx12 * fy1;
+		double C2 = Dy23 * fx2 - Dx23 * fy2;
+		double C3 = Dy31 * fx3 - Dx31 * fy3;
 
 		float Cy1 = C1 + Dx12 * miny - Dy12 * minx;
 		float Cy2 = C2 + Dx23 * miny - Dy23 * minx;
@@ -327,7 +333,7 @@ namespace soft3d
 
 	void RasterizerManager::RasterizeThreadFun(int id)
 	{
-		while (true)
+		while (m_bQuit)
 		{
 			RasterizeThread* rt = m_rasterizeThreads[id];
 			if (rt->m_task_doing.size() > 0)
@@ -369,6 +375,13 @@ namespace soft3d
 
 	void RasterizerManager::AddFragTask(int id, const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1)
 	{
+		while (true)
+		{
+			boost::mutex::scoped_lock lock(m_fragmentData[id]._mutex);
+			if (m_fragmentData[id].vo0 == nullptr)
+				break;
+			boost::thread::yield();
+		}
 		m_fragmentData[id].ratio0 = ratio0;
 		m_fragmentData[id].ratio1 = ratio1;
 		m_fragmentData[id].vo0 = vo0;
@@ -381,6 +394,8 @@ namespace soft3d
 
 	void RasterizerManager::BeginTask()
 	{
+		if (m_bQuit == false)
+			return;
 		for (int i = 0; i < m_rasterizeThreadCount; i++)
 		{
 			m_rasterizeThreads[i]->m_taskOver = false;
@@ -395,6 +410,8 @@ namespace soft3d
 
 	void RasterizerManager::EndTask()
 	{
+		if (m_bQuit == false)
+			return;
 		for (int i = 0; i < m_rasterizeThreadCount; i++)
 		{
 			m_rasterizeThreads[i]->m_taskOver = true;
@@ -411,19 +428,8 @@ namespace soft3d
 
 	void RasterizerManager::FragThreadFun(int id)
 	{
-		while (true)
+		while (m_bQuit)
 		{
-			//if (id == 1 || id == 3 || id == 5 || id == 6 || id == 4 || id == 2 || id == 0)
-			//{
-			//	if(m_fragThreads[id]->m_task.size() > 500)
-			//	{
-			//		boost::mutex::scoped_lock lock(m_fragThreads[id]->m_swap_mutex);
-			//		m_fragThreads[id]->m_task.clear();
-			//	}
-			//	m_fragThreads[id]->m_async_mutex.unlock();
-			//	continue;
-			//}
-
 			FragmentThread* ft = m_fragThreads[id];
 			if (ft->m_task_doing.size() > 0)
 			{
@@ -431,13 +437,24 @@ namespace soft3d
 				FragmentData* data = &(m_fragmentData[index]);
 				uint32 x = index % m_width;
 				uint32 y = index / m_width;
-				if (data->vo2 == nullptr)
+				if (data->vo0)
 				{
-					Fragment(ft->m_fragmentProcessors, data->vo0, data->vo1, x, y, data->ratio0);
+					if (data->vo2 == nullptr)
+					{
+						Fragment(ft->m_fragmentProcessors, data->vo0, data->vo1, x, y, data->ratio0);
+					}
+					else
+					{
+						Fragment(ft->m_fragmentProcessors, data->vo0, data->vo1, data->vo2, x, y, data->ratio0, data->ratio1);
+					}
+					{
+						boost::mutex::scoped_lock lock(data->_mutex);
+						data->vo0 = nullptr;
+					}
 				}
 				else
 				{
-					Fragment(ft->m_fragmentProcessors, data->vo0, data->vo1, data->vo2, x, y, data->ratio0, data->ratio1);
+					DrawPixel(x, y, 0xff00ff00);
 				}
 
 				ft->m_doing_index++;

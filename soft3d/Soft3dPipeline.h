@@ -72,6 +72,8 @@ namespace soft3d
 		inline uint16 GetWidth() { return m_width; }
 		inline uint16 GetHeight() { return m_height; }
 
+		void Quit();
+
 	protected:
 		Soft3dPipeline();
 		Soft3dPipeline(Soft3dPipeline&) {};

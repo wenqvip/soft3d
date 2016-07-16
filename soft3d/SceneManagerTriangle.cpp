@@ -68,8 +68,8 @@ void SceneManagerTriangle::InitScene(uint16 width, uint16 height)
 	uint32 cubeIndex[] = {
 		0, 2, 1,
 		0, 3, 2,
-		4, 6, 5,
-		4, 7, 6,
+		//4, 6, 5,
+		//4, 7, 6,
 	};
 
 	shared_ptr<VertexBufferObject> vbo(new VertexBufferObject());
@@ -111,11 +111,38 @@ void SceneManagerTriangle::Update()
 	SetUniform(0, mv_matrix);
 	SetUniform(1, proj_matrix);
 
-	Soft3dPipeline::Instance()->Clear(0);
+	Soft3dPipeline::Instance()->Clear(0xffffff);
 }
 
 void SceneManagerTriangle::KeyboardEventCB(const DIKEYBOARD dikeyboard)
 {
+	if (dikeyboard[DIK_A] & 0x80)
+	{
+		m_z_angle += 1.0f;
+	}
+	else if (dikeyboard[DIK_D] & 0x80)
+	{
+		m_z_angle -= 1.0f;
+	}
+
+	if (dikeyboard[DIK_W] & 0x80)
+	{
+		m_x_angle += 1.0f;
+	}
+	else if (dikeyboard[DIK_S] & 0x80)
+	{
+		m_x_angle -= 1.0f;
+	}
+
+	if (dikeyboard[DIK_Q] & 0x80)
+	{
+		m_y_angle += 1.0f;
+	}
+	else if (dikeyboard[DIK_E] & 0x80)
+	{
+		m_y_angle -= 1.0f;
+	}
+
 	if (dikeyboard[DIK_Y] & 0x80)
 	{
 		m_x_offset += 0.05f;

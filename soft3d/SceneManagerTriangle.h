@@ -17,6 +17,10 @@ private:
 	float m_x_offset = 0.0f;
 	float m_y_offset = 0.0f;
 	float m_z_offset = 0.0f;
+
+	float m_x_angle = 0.0f;
+	float m_y_angle = 0.0f;
+	float m_z_angle = 0.0f;
 };
 
 

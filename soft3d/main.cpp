@@ -8,8 +8,11 @@
 
 void QuitProgram(const soft3d::DIKEYBOARD dikeyboard)
 {
-	if(dikeyboard[DIK_ESCAPE] & 0x80)
+	if (dikeyboard[DIK_ESCAPE] & 0x80)
+	{
+		soft3d::Soft3dPipeline::Instance()->Quit();
 		PostQuitMessage(0);
+	}
 }
 
 // 全局变量: 

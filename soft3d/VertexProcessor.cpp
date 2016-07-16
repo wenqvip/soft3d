@@ -23,9 +23,14 @@ namespace soft3d
 		this->mode = vo0->mode;
 	}
 
-	void VS_OUT::Interpolate(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2)
+	float VS_OUT::InterpolateRHW(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2)
 	{
 		this->rhw = vo0->rhw * ratio0 + vo1->rhw * ratio1 + vo2->rhw * ratio2;
+		return this->rhw;
+	}
+
+	void VS_OUT::Interpolate(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2)
+	{
 		this->color = vo0->color * ratio0 + vo1->color * ratio1 + vo2->color * ratio2;
 		this->uv[0] = (vo0->uv[0] * ratio0 + vo1->uv[0] * ratio1 + vo2->uv[0] * ratio2) / this->rhw;
 		this->uv[1] = (vo0->uv[1] * ratio0 + vo1->uv[1] * ratio1 + vo2->uv[1] * ratio2) / this->rhw;
@@ -43,6 +48,8 @@ namespace soft3d
 		InterpolateT(this->V[2], vo0->V[2], vo1->V[2], vo2->V[2], ratio0, ratio1, ratio2);
 
 		this->mode = vo0->mode;
+		this->triangleID = vo0->triangleID;
+		this->instanceID = vo0->instanceID;
 	}
 
 
@@ -53,7 +60,7 @@ namespace soft3d
 		vec3* light_pos = (vec3*)(uniforms[UNIFORM_LIGHT_POS]);
 		vec3* light_dir = (vec3*)(uniforms[UNIFORM_LIGHT_DIR]);
 		vec4 P = (*mv_matrix) * (*pos);
-		if (normal != nullptr)
+		if (normal != nullptr && (light_pos != nullptr || light_dir != nullptr))
 		{
 			vs_out.mode = VS_OUT::LIGHT_MODE;
 			vs_out.N = mat3(*mv_matrix) * (*normal);

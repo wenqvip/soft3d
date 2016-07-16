@@ -28,13 +28,13 @@ namespace soft3d
 		vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
 		vbo->m_cullMode = VertexBufferObject::CULL_NONE;
 		m_vbo1 = Soft3dPipeline::Instance()->SetVBO(vbo);
-		vbo->m_mode = VertexBufferObject::RENDER_LINE;
-		m_vbo2 = Soft3dPipeline::Instance()->SetVBO(vbo);
+		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
+		//m_vbo2 = Soft3dPipeline::Instance()->SetVBO(vbo);
 
 		shared_ptr<Texture> tex(new Texture());
 		TextureLoader::Instance().LoadTexture(L"cathead_small.png");
 		tex->CopyFromBuffer(TextureLoader::Instance().GetData(), TextureLoader::Instance().GetWidth(), TextureLoader::Instance().GetHeight());
-		tex->filter_mode = Texture::NEAREST;
+		//tex->filter_mode = Texture::NEAREST;
 
 		//uint32 tex_data[] = {
 		//	0xFFFFFF, 0x000000, 0xFFFFFF, 0x000000,
@@ -56,22 +56,54 @@ namespace soft3d
 			vec3(0.0f, 0.0f, 0.0f),
 			vec3(0.0f, 1.0f, 0.0f));
 		float factor = 180;// ((int)GetTickCount() / 50 % 180) - 90;
-		mat4 mv_matrix = view_matrix * translate(m_x_offset, m_y_offset, m_z_offset) * scale(1.0f) *rotate(factor, vec3(0.0f, 1.0f, 0.0f));
+		mat4 mv_matrix = view_matrix
+			* translate(m_x_offset, m_y_offset, m_z_offset)
+			* scale(1.0f)
+			* rotate(m_x_angle, vec3(1.0f, 0.0f, 0.0f))
+			* rotate(m_y_angle, vec3(0.0f, 1.0f, 0.0f))
+			* rotate(m_z_angle, vec3(0.0f, 0.0f, 1.0f));
 
 		Soft3dPipeline::Instance()->SelectVBO(m_vbo1);
 		SetUniform(UNIFORM_MV_MATRIX, mv_matrix);
 		SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
-		SetUniform(UNIFORM_LIGHT_POS, vec3(0.0f, 0.0f, -100.0f));
-		Soft3dPipeline::Instance()->SelectVBO(m_vbo2);
-		SetUniform(UNIFORM_MV_MATRIX, mv_matrix);
-		SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
-		SetUniform(UNIFORM_LIGHT_POS, vec3(0.0f, 0.0f, -100.0f));
+		//SetUniform(UNIFORM_LIGHT_POS, vec3(0.0f, 0.0f, -100.0f));
+		//Soft3dPipeline::Instance()->SelectVBO(m_vbo2);
+		//SetUniform(UNIFORM_MV_MATRIX, mv_matrix);
+		//SetUniform(UNIFORM_PROJ_MATRIX, proj_matrix);
+		//SetUniform(UNIFORM_LIGHT_POS, vec3(0.0f, 0.0f, -100.0f));
 
-		Soft3dPipeline::Instance()->Clear(0);
+		Soft3dPipeline::Instance()->Clear(0xffffff);
 	}
 
 	void SceneManagerPlane::KeyboardEventCB(const DIKEYBOARD dikeyboard)
 	{
+		if (dikeyboard[DIK_A] & 0x80)
+		{
+			m_z_angle += 1.0f;
+		}
+		else if (dikeyboard[DIK_D] & 0x80)
+		{
+			m_z_angle -= 1.0f;
+		}
+
+		if (dikeyboard[DIK_W] & 0x80)
+		{
+			m_x_angle += 1.0f;
+		}
+		else if (dikeyboard[DIK_S] & 0x80)
+		{
+			m_x_angle -= 1.0f;
+		}
+
+		if (dikeyboard[DIK_Q] & 0x80)
+		{
+			m_y_angle += 1.0f;
+		}
+		else if (dikeyboard[DIK_E] & 0x80)
+		{
+			m_y_angle -= 1.0f;
+		}
+
 		if (dikeyboard[DIK_Y] & 0x80)
 		{
 			m_x_offset += 0.05f;

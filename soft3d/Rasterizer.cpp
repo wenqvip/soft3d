@@ -119,9 +119,10 @@ namespace soft3d
 	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1)
 	{
 		float ratio2 = 1.0f - ratio0 - ratio1;
-		m_fp.fs_in.Interpolate(vo0, vo1, vo2, ratio0, ratio1, ratio2);
-		if (m_fp.fs_in.rhw < GetZBufferV(x, y))
+		if (m_fp.fs_in.InterpolateRHW(vo0, vo1, vo2, ratio0, ratio1, ratio2) < GetZBufferV(x, y))
 			return;
+
+		m_fp.fs_in.Interpolate(vo0, vo1, vo2, ratio0, ratio1, ratio2);
 
 		m_fp.tex = Soft3dPipeline::Instance()->CurrentTex();
 

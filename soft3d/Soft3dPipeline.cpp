@@ -58,7 +58,7 @@ namespace soft3d
 
 	void Soft3dPipeline::InitPipeline(HINSTANCE hInstance, HWND hwnd, uint16 width, uint16 height)
 	{
-		m_threadMode = THREAD_MULTI_FRAGMENT;
+		m_threadMode = THREAD_MULTI_RASTERIZER;
 		SYSTEM_INFO info;
 		GetSystemInfo(&info);
 		THREAD_COUNT = info.dwNumberOfProcessors - 1;
@@ -317,7 +317,6 @@ namespace soft3d
 					else if (m_threadMode == THREAD_MULTI_FRAGMENT)
 					{
 						m_rasterizerManager->AddRasterizeTask(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out));
-						//m_rasterizerManager->Triangle(&(pipeData->vp[index[0]].vs_out), &(pipeData->vp[index[1]].vs_out), &(pipeData->vp[index[2]].vs_out));
 					}
 					else
 					{

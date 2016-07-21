@@ -109,7 +109,7 @@ namespace soft3d
 		bool m_haveFocus;
 		bool m_valid = false;
 		THREAD_MODE m_threadMode = THREAD_MULTI_RASTERIZER;
-		int THREAD_COUNT = 4;
+		int THREAD_COUNT = 7;
 	};
 
 	template<typename T>

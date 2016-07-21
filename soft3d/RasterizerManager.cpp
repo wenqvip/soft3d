@@ -445,6 +445,7 @@ namespace soft3d
 					}
 					else
 					{
+						//if(index % 2 == 0)
 						Fragment(ft->m_fragmentProcessors, data->vo0, data->vo1, data->vo2, x, y, data->ratio0, data->ratio1);
 					}
 					{
@@ -471,7 +472,7 @@ namespace soft3d
 			}
 			else
 			{
-				boost::thread::yield();
+				//boost::thread::yield();
 			}
 
 			if (ft->m_taskOver == true && ft->m_task.size() == 0 && ft->m_task_doing.size() == 0)

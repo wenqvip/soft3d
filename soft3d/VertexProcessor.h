@@ -22,6 +22,7 @@ namespace soft3d
 		vmath::vec3 N;
 		vmath::vec3 L;
 		vmath::vec3 V;
+		vmath::vec3 H;
 		MODE mode = LIGHT_MODE;
 
 		uint32 vertexID = 0xffffffff;

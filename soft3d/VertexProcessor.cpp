@@ -43,9 +43,13 @@ namespace soft3d
 		InterpolateT(this->N[1], vo0->N[1], vo1->N[1], vo2->N[1], ratio0, ratio1, ratio2);
 		InterpolateT(this->N[2], vo0->N[2], vo1->N[2], vo2->N[2], ratio0, ratio1, ratio2);
 
-		InterpolateT(this->V[0], vo0->V[0], vo1->V[0], vo2->V[0], ratio0, ratio1, ratio2);
-		InterpolateT(this->V[1], vo0->V[1], vo1->V[1], vo2->V[1], ratio0, ratio1, ratio2);
-		InterpolateT(this->V[2], vo0->V[2], vo1->V[2], vo2->V[2], ratio0, ratio1, ratio2);
+		//InterpolateT(this->V[0], vo0->V[0], vo1->V[0], vo2->V[0], ratio0, ratio1, ratio2);
+		//InterpolateT(this->V[1], vo0->V[1], vo1->V[1], vo2->V[1], ratio0, ratio1, ratio2);
+		//InterpolateT(this->V[2], vo0->V[2], vo1->V[2], vo2->V[2], ratio0, ratio1, ratio2);
+
+		InterpolateT(this->H[0], vo0->H[0], vo1->H[0], vo2->H[0], ratio0, ratio1, ratio2);
+		InterpolateT(this->H[1], vo0->H[1], vo1->H[1], vo2->H[1], ratio0, ratio1, ratio2);
+		InterpolateT(this->H[2], vo0->H[2], vo1->H[2], vo2->H[2], ratio0, ratio1, ratio2);
 
 		this->mode = vo0->mode;
 		this->triangleID = vo0->triangleID;
@@ -69,6 +73,7 @@ namespace soft3d
 			else
 				vs_out.L = *light_pos - P.xyz();
 			vs_out.V = -P.xyz();
+			vs_out.H = (vs_out.V + vs_out.L) / 2.0f;
 		}
 		else
 		{

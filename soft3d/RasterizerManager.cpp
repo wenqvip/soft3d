@@ -26,7 +26,7 @@ namespace soft3d
 		SYSTEM_INFO info;
 		GetSystemInfo(&info);
 		int ThreadCount = info.dwNumberOfProcessors - 3;
-		if (true || info.dwNumberOfProcessors < 3)
+		if (info.dwNumberOfProcessors < 3)
 		{
 			m_fragThreadCount = 1;
 			m_rasterizeThreadCount = 1;

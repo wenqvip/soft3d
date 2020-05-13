@@ -40,7 +40,7 @@ namespace soft3d
 			delete[] m_normalBuffer;
 	}
 
-	void VertexBufferObject::CopyVertexBuffer(const void* buffer, uint32 size)
+	void VertexBufferObject::CopyVertexBuffer(const void* buffer, uint32_t size)
 	{
 		if (m_vertexBuffer != nullptr)
 			delete[] m_vertexBuffer;
@@ -49,38 +49,38 @@ namespace soft3d
 		memcpy(m_vertexBuffer, buffer, m_size * 4 * sizeof(float));
 	}
 
-	const vec4* VertexBufferObject::GetPos(uint32 index) const
+	const vec4* VertexBufferObject::GetPos(uint32_t index) const
 	{
 		if (m_vertexBuffer == nullptr || index >= m_size)
 			return nullptr;
 		return &(m_vertexBuffer[index]);
 	}
 
-	void VertexBufferObject::CopyColorBuffer(const void* buffer, uint32 size)
+	void VertexBufferObject::CopyColorBuffer(const void* buffer, uint32_t size)
 	{
 		if (m_colorBuffer != nullptr)
 			delete[] m_colorBuffer;
-		m_colorBuffer = new uint32[size];
-		memcpy(m_colorBuffer, buffer, size * sizeof(uint32));
+		m_colorBuffer = new uint32_t[size];
+		memcpy(m_colorBuffer, buffer, size * sizeof(uint32_t));
 	}
 
-	const uint32* VertexBufferObject::GetColor(uint32 index) const
+	const uint32_t* VertexBufferObject::GetColor(uint32_t index) const
 	{
 		if (m_colorBuffer == nullptr || index >= m_size)
 			return nullptr;
-		return (uint32*)&(m_colorBuffer[index]);
+		return (uint32_t*)&(m_colorBuffer[index]);
 	}
 
-	void VertexBufferObject::CopyIndexBuffer(const void* buffer, uint32 size)
+	void VertexBufferObject::CopyIndexBuffer(const void* buffer, uint32_t size)
 	{
 		if (m_indexBuffer != nullptr)
 			delete[] m_indexBuffer;
 		m_indexSize = size;
-		m_indexBuffer = new uint32[size];
-		memcpy(m_indexBuffer, buffer, size * sizeof(uint32));
+		m_indexBuffer = new uint32_t[size];
+		memcpy(m_indexBuffer, buffer, size * sizeof(uint32_t));
 	}
 
-	uint32 VertexBufferObject::GetIndex(uint32 index)
+	uint32_t VertexBufferObject::GetIndex(uint32_t index)
 	{
 		if (m_indexBuffer == nullptr || index < m_indexSize)
 			return m_indexBuffer[index];
@@ -88,16 +88,16 @@ namespace soft3d
 			return 0xffffffff;
 	}
 
-	void VertexBufferObject::CopyUVBuffer(const void* buffer, uint32 size)
+	void VertexBufferObject::CopyUVBuffer(const void* buffer, uint32_t size)
 	{
 		if (m_uvBuffer != nullptr)
 			delete[] m_uvBuffer;
-		uint32 uvsize = size / 2;
+		uint32_t uvsize = size / 2;
 		m_uvBuffer = new vec2[uvsize];
 		memcpy(m_uvBuffer, buffer, uvsize * 2 * sizeof(void*));
 	}
 
-	const vec2* VertexBufferObject::GetUV(uint32 index) const
+	const vec2* VertexBufferObject::GetUV(uint32_t index) const
 	{
 		if (m_indexBuffer != nullptr)
 		{
@@ -114,7 +114,7 @@ namespace soft3d
 		return &(m_uvBuffer[index]);
 	}
 
-	void VertexBufferObject::CopyNormalBuffer(const void* buffer, uint32 size)
+	void VertexBufferObject::CopyNormalBuffer(const void* buffer, uint32_t size)
 	{
 		if (m_normalBuffer != nullptr)
 			delete[] m_normalBuffer;
@@ -123,7 +123,7 @@ namespace soft3d
 		memcpy(m_normalBuffer, buffer, size * 3 * sizeof(float));
 	}
 
-	const vec3* VertexBufferObject::GetNormal(uint32 index) const
+	const vec3* VertexBufferObject::GetNormal(uint32_t index) const
 	{
 		if (m_normalBuffer == nullptr || index >= m_indexSize)
 			return nullptr;

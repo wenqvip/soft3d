@@ -15,17 +15,17 @@ namespace soft3d
 	}
 
 
-	void Texture::CopyFromBuffer(const uint32* buf, int width, int height)
+	void Texture::CopyFromBuffer(const uint32_t* buf, int width, int height)
 	{
-		m_data = new uint32[width * height];
-		memcpy(m_data, buf, width * height * sizeof(uint32));
+		m_data = new uint32_t[width * height];
+		memcpy(m_data, buf, width * height * sizeof(uint32_t));
 		m_width = width;
 		m_height = height;
 	}
 
 	float floor(float value)
 	{
-		return (float)(uint32)value;
+		return (float)(uint32_t)value;
 	}
 
 	float frac(float value)
@@ -48,8 +48,8 @@ namespace soft3d
 
 	Color Texture::Sampler2D_nearest(const vmath::vec2* uv) const
 	{
-		uint32 u = (uint32)(m_width * (*uv)[0]);
-		uint32 v = (uint32)(m_height * (*uv)[1]);
+		uint32_t u = (uint32_t)(m_width * (*uv)[0]);
+		uint32_t v = (uint32_t)(m_height * (*uv)[1]);
 		if (u >= m_width)
 			u = m_width - 1;
 		if (v >= m_height)
@@ -62,8 +62,8 @@ namespace soft3d
 		vmath::vec2 uv_offset = *uv + vmath::vec2(0.5 / (float)m_width, 0.5 / (float)m_height);
 		vmath::uvec2 uv0, uv1, uv2, uv3;
 		vmath::vec2 uv_clamp = vmath::clamp<float, 2>(uv_offset, vmath::vec2(0), vmath::vec2(1));
-		uv0[0] = (uint32)((m_width - 1) * uv_clamp[0]);
-		uv0[1] = (uint32)((m_height - 1) * uv_clamp[1]);
+		uv0[0] = (uint32_t)((m_width - 1) * uv_clamp[0]);
+		uv0[1] = (uint32_t)((m_height - 1) * uv_clamp[1]);
 
 		float fu = ((m_width-1) * uv_clamp[0]);
 		float fv = ((m_height-1) * uv_clamp[1]);

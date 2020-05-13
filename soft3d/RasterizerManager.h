@@ -1,11 +1,13 @@
 #pragma once
+#include <thread>
+#include <mutex>
 
 namespace soft3d
 {
 	struct FragmentData
 	{
-		boost::mutex _mutex;
-		const VS_OUT* vo0 = nullptr;//Õâ¸öÖ¸ÕëÍ¬Ê±×÷Îª´Ë½á¹¹ÌåÊÇ·ñÓĞÊı¾İµÄ±êÊ¶£¬¿ÕÖ¸Õë±íÊ¾Õû¸ö½á¹¹ÌåÃ»ÓĞÊı¾İ
+		std::mutex _mutex;
+		const VS_OUT* vo0 = nullptr;//è¿™ä¸ªæŒ‡é’ˆåŒæ—¶ä½œä¸ºæ­¤ç»“æ„ä½“æ˜¯å¦æœ‰æ•°æ®çš„æ ‡è¯†ï¼Œç©ºæŒ‡é’ˆè¡¨ç¤ºæ•´ä¸ªç»“æ„ä½“æ²¡æœ‰æ•°æ®
 		const VS_OUT* vo1 = nullptr;
 		const VS_OUT* vo2 = nullptr;
 
@@ -16,12 +18,12 @@ namespace soft3d
 	struct FragmentThread
 	{
 		FragmentProcessor* m_fragmentProcessors;
-		boost::thread* m_thread;
+		std::thread* m_thread;
 		std::vector<int> m_task;
 		std::vector<int> m_task_doing;
-		uint32 m_doing_index = 0;
-		boost::mutex m_swap_mutex;
-		boost::mutex m_async_mutex;
+		uint32_t m_doing_index = 0;
+		std::mutex m_swap_mutex;
+		std::mutex m_async_mutex;
 		bool m_taskOver = false;
 	};
 
@@ -43,32 +45,33 @@ namespace soft3d
 
 	struct RasterizeThread
 	{
-		boost::thread* m_thread;
+		std::thread* m_thread;
 		std::vector<RasterizeData> m_task;
 		std::vector<RasterizeData> m_task_doing;
-		uint32 m_doing_index = 0;
-		boost::mutex m_swap_mutex;
-		boost::mutex m_async_mutex;
+		uint32_t m_doing_index = 0;
+		std::mutex m_swap_mutex;
+		std::mutex m_async_mutex;
 		bool m_taskOver = false;
 	};
 
-	class RasterizerManager : public boost::noncopyable
+	class RasterizerManager
 	{
 	public:
-		RasterizerManager(uint16 width, uint16 height);
+		RasterizerManager(uint16_t width, uint16_t height);
+		RasterizerManager(const RasterizerManager&) = delete;
 		~RasterizerManager();
 
-		int Clear(uint32 color);
-		int DrawPixel(uint16 x, uint16 y, uint32 color, uint16 size = 1);
-		uint32* GetFBPixelPtr(uint16 x, uint16 y);
+		int Clear(uint32_t color);
+		int DrawPixel(uint16_t x, uint16_t y, uint32_t color, uint16_t size = 1);
+		uint32_t* GetFBPixelPtr(uint16_t x, uint16_t y);
 
-		void Fragment(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio);
-		void Fragment(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1);
+		void Fragment(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, uint32_t x, uint32_t y, float ratio);
+		void Fragment(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32_t x, uint32_t y, float ratio0, float ratio1);
 
 		void BresenhamLine(const VS_OUT* vo0, const VS_OUT* vo1);
 		void Triangle(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2);
 
-		const uint32* GetFrameBuffer() {
+		const uint32_t* GetFrameBuffer() {
 			return m_frameBuffer;
 		}
 
@@ -83,14 +86,14 @@ namespace soft3d
 		void FragThreadFun(int id);
 		void RasterizeThreadFun(int id);
 
-		void SetFrameBuffer(uint32 index, uint32 value);
-		void SetZBufferV(uint32 x, uint32 y, float value);
-		float GetZBufferV(uint32 x, uint32 y);
+		void SetFrameBuffer(uint32_t index, uint32_t value);
+		void SetZBufferV(uint32_t x, uint32_t y, float value);
+		float GetZBufferV(uint32_t x, uint32_t y);
 
 	private:
-		uint16 m_width;
-		uint16 m_height;
-		uint32* m_frameBuffer = nullptr;
+		uint16_t m_width;
+		uint16_t m_height;
+		uint32_t* m_frameBuffer = nullptr;
 		float* m_zBuffer = nullptr;
 		FragmentData* m_fragmentData = nullptr;
 

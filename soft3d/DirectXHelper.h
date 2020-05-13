@@ -24,7 +24,7 @@ namespace soft3d
 		~DirectXHelper();
 
 		void Init(HWND hwnd);
-		void Paint(const uint32* buffer, uint16 width, uint16 height);
+		void Paint(const uint32_t* buffer, uint16_t width, uint16_t height);
 		void Profile(DWORD tick, const wchar_t* work);
 
 	protected:
@@ -55,8 +55,8 @@ namespace soft3d
 		IDWriteTextFormat* m_pTextFormat;
 
 		DWORD m_lastTickCount;
-		uint16 m_fps;
-		uint16 m_lastFps;
+		uint16_t m_fps;
+		uint16_t m_lastFps;
 		float m_ffps;
 
 		std::map<std::wstring, DWORD> m_profileInfo;

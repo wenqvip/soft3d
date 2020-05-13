@@ -10,7 +10,7 @@ using namespace vmath;
 namespace soft3d
 {
 
-	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManagerBigFbx());
+	shared_ptr<SceneManager> SceneManager::s_instance(new SceneManager());
 
 	SceneManager::SceneManager()
 	{
@@ -22,7 +22,7 @@ namespace soft3d
 	}
 
 
-	void SceneManager::InitScene(uint16 width, uint16 height)
+	void SceneManager::InitScene(uint16_t width, uint16_t height)
 	{
 		m_width = width;
 		m_height = height;
@@ -38,7 +38,7 @@ namespace soft3d
 			-1.0f, -1.0f, -1.0f, 1.0f,
 		};
 
-		uint32 cubeColor[] = {
+		uint32_t cubeColor[] = {
 			0xff0000,
 			0x00ff00,
 			0x0000ff,
@@ -49,7 +49,7 @@ namespace soft3d
 			0xffff00,
 		};
 
-		uint32 cubeIndex[] = {
+		uint32_t cubeIndex[] = {
 			0, 1, 2,
 			1, 3, 2,
 			4, 5, 0,
@@ -81,15 +81,15 @@ namespace soft3d
 
 		shared_ptr<VertexBufferObject> vbo(new VertexBufferObject());
 		vbo->CopyVertexBuffer(cube, sizeof(cube) / sizeof(float));
-		vbo->CopyColorBuffer(cubeColor, sizeof(cubeColor) / sizeof(uint32));
-		vbo->CopyIndexBuffer(cubeIndex, sizeof(cubeIndex) / sizeof(uint32));
+		vbo->CopyColorBuffer(cubeColor, sizeof(cubeColor) / sizeof(uint32_t));
+		vbo->CopyIndexBuffer(cubeIndex, sizeof(cubeIndex) / sizeof(uint32_t));
 		vbo->CopyUVBuffer(cubeuv, sizeof(cubeuv)/sizeof(float));
 
 		vbo->m_mode = VertexBufferObject::RENDER_TRIANGLE;
 		//vbo->m_mode = VertexBufferObject::RENDER_LINE;
 		Soft3dPipeline::Instance()->SetVBO(vbo);
 
-		uint32 tex_data[] = {
+		uint32_t tex_data[] = {
 			0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
 			0x3FBCEF, 0xFFFFFF, 0x3FBCEF, 0xFFFFFF,
 			0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,

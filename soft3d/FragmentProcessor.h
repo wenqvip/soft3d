@@ -12,7 +12,7 @@ namespace soft3d
 		virtual void Process();
 
 		VS_OUT fs_in;
-		uint32* out_color = nullptr;
+		uint32_t* out_color = nullptr;
 		const Texture* tex = nullptr;
 	};
 

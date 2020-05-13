@@ -1,7 +1,6 @@
 #include "soft3d.h"
 #include "DirectXHelper.h"
 #include <dwrite.h>
-#include <boost/foreach.hpp>
 #pragma comment(lib, "dwrite.lib")
 
 using namespace Microsoft::WRL;
@@ -145,7 +144,7 @@ namespace soft3d {
 		m_d2dFactory->Release();
 	}
 
-	void DirectXHelper::Paint(const uint32* buffer, uint16 width, uint16 height)
+	void DirectXHelper::Paint(const uint32_t* buffer, uint16_t width, uint16_t height)
 	{
 		if (m_d2dContext == NULL)
 			return;

@@ -9,18 +9,18 @@ namespace soft3d
 		VertexBufferObject();
 		~VertexBufferObject();
 
-		void CopyVertexBuffer(const void* buffer, uint32 size);
-		void CopyIndexBuffer(const void* buffer, uint32 size);
-		void CopyColorBuffer(const void* buffer, uint32 size);
-		void CopyUVBuffer(const void* buffer, uint32 size);
-		void CopyNormalBuffer(const void* buffer, uint32 size);
+		void CopyVertexBuffer(const void* buffer, uint32_t size);
+		void CopyIndexBuffer(const void* buffer, uint32_t size);
+		void CopyColorBuffer(const void* buffer, uint32_t size);
+		void CopyUVBuffer(const void* buffer, uint32_t size);
+		void CopyNormalBuffer(const void* buffer, uint32_t size);
 
-		const vmath::vec4* GetPos(uint32 index) const;
-		const uint32* GetColor(uint32 index) const;
-		const vmath::vec3* GetNormal(uint32 index) const;
-		const vmath::vec2* GetUV(uint32 index) const;
+		const vmath::vec4* GetPos(uint32_t index) const;
+		const uint32_t* GetColor(uint32_t index) const;
+		const vmath::vec3* GetNormal(uint32_t index) const;
+		const vmath::vec2* GetUV(uint32_t index) const;
 
-		inline uint32 GetSize() const {
+		inline uint32_t GetSize() const {
 			if (m_indexBuffer == nullptr)
 				return m_size;
 			else
@@ -30,7 +30,7 @@ namespace soft3d
 		inline bool useIndex() {
 			return m_indexBuffer != nullptr;
 		}
-		uint32 GetIndex(uint32 index);
+		uint32_t GetIndex(uint32_t index);
 
 		inline bool hasUV() {
 			return m_uvBuffer != nullptr;
@@ -61,12 +61,12 @@ namespace soft3d
 
 	private:
 		vmath::vec4* m_vertexBuffer;
-		uint32 m_size;
+		uint32_t m_size;
 
-		uint32* m_colorBuffer;
+		uint32_t* m_colorBuffer;
 
-		uint32* m_indexBuffer;
-		uint32 m_indexSize;
+		uint32_t* m_indexBuffer;
+		uint32_t m_indexSize;
 
 		vmath::vec2* m_uvBuffer;
 

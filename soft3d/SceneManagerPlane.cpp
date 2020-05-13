@@ -2,7 +2,7 @@
 #include "SceneManagerPlane.h"
 #include "TextureLoader.h"
 #include "FbxLoader.h"
-#include <boost/bind.hpp>
+#include <functional>
 
 using namespace std;
 using namespace vmath;
@@ -11,7 +11,7 @@ namespace soft3d
 {
 
 
-	void SceneManagerPlane::InitScene(uint16 width, uint16 height)
+	void SceneManagerPlane::InitScene(uint16_t width, uint16_t height)
 	{
 		m_width = width;
 		m_height = height;
@@ -32,20 +32,20 @@ namespace soft3d
 		//m_vbo2 = Soft3dPipeline::Instance()->SetVBO(vbo);
 
 		shared_ptr<Texture> tex(new Texture());
-		TextureLoader::Instance().LoadTexture(L"cathead_small.png");
-		tex->CopyFromBuffer(TextureLoader::Instance().GetData(), TextureLoader::Instance().GetWidth(), TextureLoader::Instance().GetHeight());
-		//tex->filter_mode = Texture::NEAREST;
 
-		//uint32 tex_data[] = {
-		//	0xFFFFFF, 0x000000, 0xFFFFFF, 0x000000,
-		//	0x000000, 0xFFFFFF, 0x000000, 0xFFFFFF,
-		//	0xFFFFFF, 0x000000, 0xFFFFFF, 0x000000,
-		//	0x000000, 0xFFFFFF, 0x000000, 0xFFFF00,
-		//};
-		//tex->CopyFromBuffer(tex_data, 4, 4);
+		//TextureLoader::Instance().LoadTexture(L"cathead_small.png");
+		//tex->CopyFromBuffer(TextureLoader::Instance().GetData(), TextureLoader::Instance().GetWidth(), TextureLoader::Instance().GetHeight());
+
+		uint32_t tex_data[] = {
+			0x0FFFFF, 0x000FF0,
+			0x000FF0, 0x0FFFFF,
+		};
+		tex->CopyFromBuffer(tex_data, 2, 2);
+
+		tex->filter_mode = Texture::NEAREST;
 		Soft3dPipeline::Instance()->SetTexture(tex);
 
-		Soft3dPipeline::Instance()->AddKeyboardEventCB(boost::bind(&SceneManagerPlane::KeyboardEventCB, this, _1));
+		Soft3dPipeline::Instance()->AddKeyboardEventCB(std::bind(&SceneManagerPlane::KeyboardEventCB, this, std::placeholders::_1));
 	}
 
 	void SceneManagerPlane::Update()

@@ -16,13 +16,13 @@ namespace soft3d
 		~TextureLoader();
 		void LoadTexture(const wchar_t* filename);
 
-		const uint32* GetData() const {
+		const uint32_t* GetData() const {
 			return m_buffer;
 		}
-		uint32 GetWidth() const {
+		uint32_t GetWidth() const {
 			return m_width;
 		}
-		uint32 GetHeight() const {
+		uint32_t GetHeight() const {
 			return m_height;
 		}
 
@@ -31,9 +31,9 @@ namespace soft3d
 
 	private:
 		IWICImagingFactory* m_pIWICFactory;
-		uint32* m_buffer;
-		uint32 m_width;
-		uint32 m_height;
+		uint32_t* m_buffer;
+		uint32_t m_width;
+		uint32_t m_height;
 
 		static TextureLoader* s_instance;
 	};

@@ -10,7 +10,7 @@ namespace soft3d
 	public:
 		SceneManagerFbx() {};
 		virtual ~SceneManagerFbx() {};
-		virtual void InitScene(soft3d::uint16 width, soft3d::uint16 height);
+		virtual void InitScene(uint16_t width, uint16_t height);
 		virtual void Update();
 		void KeyboardEventCB(const DIKEYBOARD dikeyboard);
 

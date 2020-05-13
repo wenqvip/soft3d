@@ -1,6 +1,6 @@
 #include "soft3d.h"
 #include "VertexProcessorUnit.h"
-#include <boost/bind.hpp>
+#include <functional>
 
 namespace soft3d
 {
@@ -9,7 +9,7 @@ namespace soft3d
 	{
 		for (int i = 0; i < m_threadCount; i++)
 		{
-			m_threads.push_back(new boost::thread(boost::bind(&VertexProcessorUnit::ThreadFun, this, i)));
+			m_threads.push_back(new std::thread(std::bind(&VertexProcessorUnit::ThreadFun, this, i)));
 		}
 	}
 
@@ -24,7 +24,7 @@ namespace soft3d
 
 	void VertexProcessorUnit::SetData(std::shared_ptr<PipeLineData> pipeData, std::shared_ptr<VertexBufferObject> vbo, UniformStack uniform)
 	{
-		boost::unique_lock<boost::shared_mutex> wlock(m_rwmutex);
+		std::unique_lock<std::shared_mutex> wlock(m_rwmutex);
 		m_pipeData = pipeData;
 		m_vbo = vbo;
 		m_uniform = uniform;
@@ -39,11 +39,11 @@ namespace soft3d
 				Sleep(1);
 				continue;
 			}
-			boost::shared_lock<boost::shared_mutex> rlock(m_rwmutex);
+			std::shared_lock<std::shared_mutex> rlock(m_rwmutex);
 			for (int i = 0; i < m_pipeData->capacity; i++)
 			{
 				VertexProcessor& cur_vp = m_pipeData->vp[i];
-				const uint32* colorptr = nullptr;
+				const uint32_t* colorptr = nullptr;
 				if (m_vbo->useIndex())
 				{
 					colorptr = m_vbo->GetColor(m_vbo->GetIndex(i));
@@ -57,16 +57,16 @@ namespace soft3d
 				if (colorptr != nullptr)
 					cur_vp.color = colorptr;
 				else
-					cur_vp.color = (uint32*)this;//随机颜色
+					cur_vp.color = (uint32_t*)this;//闅忔満棰滆壊
 				cur_vp.normal = m_vbo->GetNormal(i);
 
 				if (m_vbo->hasUV())
 					cur_vp.vs_out.uv = *(m_vbo->GetUV(i));
 
 				cur_vp.uniforms = m_uniform;
-				cur_vp.Process();//这一步进行视图变换和投影变换
+				cur_vp.Process();//杩欎竴姝ヨ繘琛岃鍥惧彉鎹㈠拰鎶曞奖鍙樻崲
 
-								 //除以w
+								 //闄や互w
 				float rhw = 1.0f / cur_vp.vs_out.pos[3];
 				cur_vp.vs_out.pos[0] *= rhw;
 				cur_vp.vs_out.pos[1] *= rhw;
@@ -77,7 +77,7 @@ namespace soft3d
 				cur_vp.vs_out.pos[0] = (cur_vp.vs_out.pos[0] + 1.0f) * 0.5f * Soft3dPipeline::Instance()->GetWidth();
 				cur_vp.vs_out.pos[1] = (cur_vp.vs_out.pos[1] + 1.0f) * 0.5f * Soft3dPipeline::Instance()->GetHeight();
 
-				cur_vp.vs_out.uv *= rhw;//uv在这里除以w，以后乘回来，为了能正确计算纹理uv
+				cur_vp.vs_out.uv *= rhw;//uv鍦ㄨ繖閲岄櫎浠锛屼互鍚庝箻鍥炴潵锛屼负浜嗚兘姝ｇ‘璁＄畻绾圭悊uv
 			}
 		}
 	}

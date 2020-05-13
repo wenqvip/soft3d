@@ -25,9 +25,9 @@ namespace soft3d
 		vmath::vec3 H;
 		MODE mode = LIGHT_MODE;
 
-		uint32 vertexID = 0xffffffff;
-		uint32 triangleID = 0;
-		uint32 instanceID = 0;
+		uint32_t vertexID = 0xffffffff;
+		uint32_t triangleID = 0;
+		uint32_t instanceID = 0;
 
 		void Interpolate(const VS_OUT* vo0, const VS_OUT* vo1, float ratio0, float ratio1);
 		void Interpolate(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2);
@@ -39,7 +39,7 @@ namespace soft3d
 		virtual void Process();
 
 		const vmath::vec4* pos = nullptr;
-		const uint32* color = nullptr;
+		const uint32_t* color = nullptr;
 		const vmath::vec3* normal = nullptr;
 
 		VS_OUT vs_out;

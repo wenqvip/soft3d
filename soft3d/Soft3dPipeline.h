@@ -7,7 +7,7 @@
 #include "Texture.h"
 #include "VertexProcessor.h"
 #include <boost/shared_array.hpp>
-#include <boost/function.hpp>
+#include <functional>
 #include <dinput.h>
 
 namespace soft3d
@@ -20,15 +20,15 @@ namespace soft3d
 
 		VertexBufferObject::CULL_MODE cullMode;
 		VertexBufferObject::RENDER_MODE renderMode;
-		uint32 capacity;
+		uint32_t capacity;
 	};
 
 	typedef void* UniformPtr;
 	typedef UniformPtr* UniformStack;
 
 	typedef char DIKEYBOARD[256];
-	typedef boost::function<void(const DIMOUSESTATE& dimouse)> MOUSE_EVENT_CB;
-	typedef boost::function<void(const DIKEYBOARD& dikeyboard)> KEYBOARD_EVENT_CB;
+	typedef std::function<void(const DIMOUSESTATE& dimouse)> MOUSE_EVENT_CB;
+	typedef std::function<void(const DIKEYBOARD& dikeyboard)> KEYBOARD_EVENT_CB;
 
 	enum UNIFORM_LABEL
 	{
@@ -48,16 +48,16 @@ namespace soft3d
 			return s_instance.get();
 		}
 		~Soft3dPipeline();
-		void InitPipeline(HINSTANCE hInstance, HWND hwnd, uint16 width, uint16 height);
+		void InitPipeline(HINSTANCE hInstance, HWND hwnd, uint16_t width, uint16_t height);
 		int SetVBO(std::shared_ptr<VertexBufferObject> vbo);
-		void SelectVBO(uint32 vboIndex);
-		void SetUniform(uint16 index, void* uniform);
+		void SelectVBO(uint32_t vboIndex);
+		void SetUniform(uint16_t index, void* uniform);
 		void SetTexture(std::shared_ptr<Texture> tex);
 		const Texture* CurrentTex() {
 			return m_tex.get();
 		}
 		void Process();
-		int Clear(uint32 color);
+		int Clear(uint32_t color);
 
 		//input
 		void AddMouseEventCB(MOUSE_EVENT_CB cb) {
@@ -69,8 +69,8 @@ namespace soft3d
 		void LoseFocus();
 		void GetFocus();
 
-		inline uint16 GetWidth() { return m_width; }
-		inline uint16 GetHeight() { return m_height; }
+		inline uint16_t GetWidth() { return m_width; }
+		inline uint16_t GetHeight() { return m_height; }
 
 		void Quit();
 
@@ -81,7 +81,7 @@ namespace soft3d
 
 	private:
 		std::vector<std::shared_ptr<VertexBufferObject> > m_vboVector;
-		uint32 m_curVBO;
+		uint32_t m_curVBO;
 		std::shared_ptr<Texture> m_tex;
 		std::shared_ptr<RasterizerManager> m_rasterizerManager;
 		std::shared_ptr<Rasterizer> m_rasterizer;
@@ -89,8 +89,8 @@ namespace soft3d
 		std::vector<std::shared_ptr<PipeLineData> > m_pipeDataVector;
 		std::vector<UniformStack> m_UniformVector;
 
-		uint16 m_width;
-		uint16 m_height;
+		uint16_t m_width;
+		uint16_t m_height;
 
 		LPDIRECTINPUT8 m_pDirectInput;
 		LPDIRECTINPUTDEVICE8 m_pMouseDevice;
@@ -113,7 +113,7 @@ namespace soft3d
 	};
 
 	template<typename T>
-	void SetUniform(uint16 index, const T& val)
+	void SetUniform(uint16_t index, const T& val)
 	{
 		T* p = new T(val);
 		Soft3dPipeline::Instance()->SetUniform(index, (void*)p);

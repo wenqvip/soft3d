@@ -1,4 +1,3 @@
-
 #pragma comment(lib, "libfbxsdk.lib")
 #include "FbxLoader.h"
 
@@ -75,7 +74,7 @@ namespace soft3d
 
 			int* pIndices = pMesh->GetPolygonVertices();
 			m_indexCount = pMesh->GetPolygonVertexCount();
-			m_indexBuffer = new uint32[m_indexCount];
+			m_indexBuffer = new uint32_t[m_indexCount];
 			for (int i = 0; i < m_indexCount; ++i)
 			{
 				m_indexBuffer[i] = pIndices[i];

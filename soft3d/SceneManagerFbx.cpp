@@ -1,7 +1,7 @@
 #include "soft3d.h"
 #include "SceneManagerFbx.h"
 #include "TextureLoader.h"
-#include <boost/bind.hpp>
+#include <functional>
 
 using namespace std;
 using namespace vmath;
@@ -10,7 +10,7 @@ namespace soft3d
 {
 
 
-	void SceneManagerFbx::InitScene(uint16 width, uint16 height)
+	void SceneManagerFbx::InitScene(uint16_t width, uint16_t height)
 	{
 		m_width = width;
 		m_height = height;
@@ -29,7 +29,7 @@ namespace soft3d
 		m_vbo1 = Soft3dPipeline::Instance()->SetVBO(vbo);
 		m_vbo2 = Soft3dPipeline::Instance()->SetVBO(vbo);
 
-		//uint32 tex_data[] = {
+		//uint32_t tex_data[] = {
 		//	0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
 		//	0x3FBCEF, 0xFFFFFF, 0x3FBCEF, 0xFFFFFF,
 		//	0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
@@ -41,7 +41,7 @@ namespace soft3d
 		tex->CopyFromBuffer(TextureLoader::Instance().GetData(), TextureLoader::Instance().GetWidth(), TextureLoader::Instance().GetHeight());
 		Soft3dPipeline::Instance()->SetTexture(tex);
 
-		Soft3dPipeline::Instance()->AddKeyboardEventCB(boost::bind(&SceneManagerFbx::KeyboardEventCB, this, _1));
+		Soft3dPipeline::Instance()->AddKeyboardEventCB(std::bind(&SceneManagerFbx::KeyboardEventCB, this, std::placeholders::_1));
 	}
 
 	void SceneManagerFbx::Update()

@@ -77,7 +77,7 @@ namespace soft3d
 				{
 					hr = pILock->GetDataPointer(&cbBufferSize, &pv);
 				}
-				m_buffer = new uint32[m_width * m_height];
+				m_buffer = new uint32_t[m_width * m_height];
 				for (unsigned long long i = 0; i < cbBufferSize / 3; i++)
 				{
 					unsigned long long j = i * 3;

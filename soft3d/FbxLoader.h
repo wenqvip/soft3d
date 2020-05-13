@@ -17,16 +17,16 @@ namespace soft3d
 		{
 			return m_vertexBuffer;
 		}
-		uint32 GetVertexCount()
+		uint32_t GetVertexCount()
 		{
 			return m_vertexCount;
 		}
 
-		const uint32* GetIndexBuffer() const
+		const uint32_t* GetIndexBuffer() const
 		{
 			return m_indexBuffer;
 		}
-		uint32 GetIndexCount()
+		uint32_t GetIndexCount()
 		{
 			return m_indexCount;
 		}
@@ -35,7 +35,7 @@ namespace soft3d
 		{
 			return m_normalBuffer;
 		}
-		uint32 GetNormalCount()
+		uint32_t GetNormalCount()
 		{
 			return m_normalCount;
 		}
@@ -44,7 +44,7 @@ namespace soft3d
 		{
 			return m_uvBuffer;
 		}
-		uint32 GetUVCount()
+		uint32_t GetUVCount()
 		{
 			return m_uvCount;
 		}
@@ -58,16 +58,16 @@ namespace soft3d
 
 	private:
 		float* m_vertexBuffer;
-		uint32 m_vertexCount;
+		uint32_t m_vertexCount;
 
-		uint32* m_indexBuffer;
-		uint32 m_indexCount;
+		uint32_t* m_indexBuffer;
+		uint32_t m_indexCount;
 
 		float* m_normalBuffer;
-		uint32 m_normalCount;
+		uint32_t m_normalCount;
 
 		float* m_uvBuffer;
-		uint32 m_uvCount;
+		uint32_t m_uvCount;
 
 		FbxNode* m_rootNode;
 		FbxNode* m_firstNode;

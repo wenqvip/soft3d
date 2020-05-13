@@ -5,9 +5,12 @@
 *.ipch
 soft3d/Debug/*
 soft3d/x64/Debug/*
+soft3d/x64/Release/*
 soft3d/Release/*
 Release/*
 *.aps
 *.exe
 *.opensdf
 *.user
+*.iobj
+*.ipdb

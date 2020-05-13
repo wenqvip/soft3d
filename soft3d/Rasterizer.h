@@ -1,6 +1,6 @@
 #pragma once
-#include <boost/noncopyable.hpp>
-#include <boost/thread.hpp>
+#include <thread>
+#include <mutex>
 
 namespace soft3d
 {
@@ -23,49 +23,50 @@ namespace soft3d
 		VS_OUT* m_vo[3];
 	};
 
-	class Rasterizer : public boost::noncopyable
+	class Rasterizer
 	{
 	public:
-		Rasterizer(uint16 width, uint16 height);
+		Rasterizer(uint16_t width, uint16_t height);
+		Rasterizer(const Rasterizer& rf) = delete;
 		virtual ~Rasterizer();
 
-		int Clear(uint32 color);
-		int DrawPixel(uint16 x, uint16 y, uint32 color, uint16 size = 1);
-		uint32* GetFBPixelPtr(uint16 x, uint16 y);
+		int Clear(uint32_t color);
+		int DrawPixel(uint16_t x, uint16_t y, uint32_t color, uint16_t size = 1);
+		uint32_t* GetFBPixelPtr(uint16_t x, uint16_t y);
 
 		void BeginTasks();
 		void AddTask(RasterizerTask& rt);
 		void EndTasks();
 
-		void Fragment(const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio);
-		void Fragment(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1);
+		void Fragment(const VS_OUT* vo0, const VS_OUT* vo1, uint32_t x, uint32_t y, float ratio);
+		void Fragment(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32_t x, uint32_t y, float ratio0, float ratio1);
 		void BresenhamLine(const VS_OUT* vo0, const VS_OUT* vo1);
 		void Triangle(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2);
 
-		static const uint32* GetFrameBuffer() {
+		static const uint32_t* GetFrameBuffer() {
 			return m_frameBuffer;
 		}
 
 	protected:
-		void SetFrameBuffer(uint32 index, uint32 value);
-		void SetZBufferV(uint32 x, uint32 y, float value);
-		float GetZBufferV(uint32 x, uint32 y);
+		void SetFrameBuffer(uint32_t index, uint32_t value);
+		void SetZBufferV(uint32_t x, uint32_t y, float value);
+		float GetZBufferV(uint32_t x, uint32_t y);
 
 		void Rasterize();
 
 	protected:
 		FragmentProcessor m_fp;
 
-		uint16 m_width;
-		uint16 m_height;
-		static uint32* m_frameBuffer;
+		uint16_t m_width;
+		uint16_t m_height;
+		static uint32_t* m_frameBuffer;
 		static float* m_zBuffer;
 		VertexBufferObject::RENDER_MODE m_mode = VertexBufferObject::RENDER_TRIANGLE;
 
 	private:
-		boost::thread m_workThread;
-		boost::mutex m_mutex;
-		boost::mutex m_mutex_async;
+		std::thread m_workThread;
+		std::mutex m_mutex;
+		std::mutex m_mutex_async;
 		std::vector<RasterizerTask> m_tasks;
 		std::vector<RasterizerTask> m_tasks_doing;
 		bool m_taskFlag = true;

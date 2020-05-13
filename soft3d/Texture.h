@@ -8,7 +8,7 @@ namespace soft3d
 	public:
 		Texture();
 		~Texture();
-		void CopyFromBuffer(const uint32* buf, int width, int height);
+		void CopyFromBuffer(const uint32_t* buf, int width, int height);
 		Color Sampler2D(const vmath::vec2* uv) const;
 
 		enum FILTER_MODE
@@ -19,9 +19,9 @@ namespace soft3d
 		FILTER_MODE filter_mode = BILINEAR;
 
 	private:
-		uint32* m_data;
-		uint16 m_width;
-		uint16 m_height;
+		uint32_t* m_data;
+		uint16_t m_width;
+		uint16_t m_height;
 
 		Color Sampler2D_nearest(const vmath::vec2* uv) const;
 		Color Sampler2D_bilinear(const vmath::vec2* uv) const;

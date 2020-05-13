@@ -3,7 +3,8 @@
 #include "VertexBufferObject.h"
 #include <vector>
 #include <stdlib.h>
-#include <boost/bind.hpp>
+#include <functional>
+#include <mutex>
 
 #include "Rasterizer.h"
 
@@ -11,16 +12,16 @@ using namespace vmath;
 
 namespace soft3d
 {
-	uint32* Rasterizer::m_frameBuffer = nullptr;
+	uint32_t* Rasterizer::m_frameBuffer = nullptr;
 	float* Rasterizer::m_zBuffer = nullptr;
 
-	Rasterizer::Rasterizer(uint16 width, uint16 height)
-		: m_workThread(boost::bind(&Rasterizer::Rasterize, this))
+	Rasterizer::Rasterizer(uint16_t width, uint16_t height)
+		: m_workThread(std::bind(&Rasterizer::Rasterize, this))
 	{
 		m_width = width;
 		m_height = height;
 		if(m_frameBuffer == nullptr)
-			m_frameBuffer = new uint32[width*height*sizeof(uint32)];
+			m_frameBuffer = new uint32_t[width*height*sizeof(uint32_t)];
 		if(m_zBuffer == nullptr)
 			m_zBuffer = new float[width*height*sizeof(float)];
 	}
@@ -40,67 +41,67 @@ namespace soft3d
 		}
 	}
 
-	uint32* Rasterizer::GetFBPixelPtr(uint16 x, uint16 y)
+	uint32_t* Rasterizer::GetFBPixelPtr(uint16_t x, uint16_t y)
 	{
-		y = 599 - y;//ÉÏÏÂµßµ¹
+		y = 599 - y;//ä¸Šä¸‹é¢ å€’
 		if (x > m_width || y > m_height)
 			return nullptr;
 
 		int index = y * m_width + x;
-		if (index >= (uint32)m_width * m_height)
+		if (index >= (uint32_t)m_width * m_height)
 			return nullptr;
 		return &(m_frameBuffer[index]);
 	}
 
-	int Rasterizer::DrawPixel(uint16 x, uint16 y, uint32 color, uint16 size)
+	int Rasterizer::DrawPixel(uint16_t x, uint16_t y, uint32_t color, uint16_t size)
 	{
-		y = 599 - y;//ÉÏÏÂµßµ¹
+		y = 599 - y;//ä¸Šä¸‹é¢ å€’
 		if (x > m_width || y > m_height)
 			return -1;
 		if (size > 100 || size < 1)
 			size = 1;
 
-		for (uint16 i = 0; i < size; i++)
+		for (uint16_t i = 0; i < size; i++)
 		{
-			for (uint16 j = 0; j < size; j++)
+			for (uint16_t j = 0; j < size; j++)
 				SetFrameBuffer((y + j - size / 2) * m_width + x + i - size / 2, color);
 		}
 		return 0;
 	}
 
-	void Rasterizer::SetFrameBuffer(uint32 index, uint32 value)
+	void Rasterizer::SetFrameBuffer(uint32_t index, uint32_t value)
 	{
-		if (index >= (uint32)m_width * m_height)
+		if (index >= (uint32_t)m_width * m_height)
 			return;
 		m_frameBuffer[index] = value;
 	}
 
-	void Rasterizer::SetZBufferV(uint32 x, uint32 y, float value)
+	void Rasterizer::SetZBufferV(uint32_t x, uint32_t y, float value)
 	{
-		y = m_height - 1 - y;//ÉÏÏÂµßµ¹
+		y = m_height - 1 - y;//ä¸Šä¸‹é¢ å€’
 		if (x > m_width || y > m_height)
 			return;
 		int index = y * m_width + x;
 		m_zBuffer[index] = value;
 	}
 
-	float Rasterizer::GetZBufferV(uint32 x, uint32 y)
+	float Rasterizer::GetZBufferV(uint32_t x, uint32_t y)
 	{
-		y = m_height - 1 - y;//ÉÏÏÂµßµ¹
+		y = m_height - 1 - y;//ä¸Šä¸‹é¢ å€’
 		if (x > m_width || y > m_height)
 			return 0.0f;
 		int index = y * m_width + x;
 		return m_zBuffer[index];
 	}
 
-	int Rasterizer::Clear(uint32 color)
+	int Rasterizer::Clear(uint32_t color)
 	{
-		memset(m_frameBuffer, color, m_width * m_height * sizeof(uint32));
+		memset(m_frameBuffer, color, m_width * m_height * sizeof(uint32_t));
 		memset(m_zBuffer, 0, m_width* m_height* sizeof(float));
 		return 0;
 	}
 
-	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, uint32 x, uint32 y, float ratio)
+	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, uint32_t x, uint32_t y, float ratio)
 	{
 		m_fp.fs_in.Interpolate(vo0, vo1, ratio, 1.0f - ratio);
 		m_fp.fs_in.rhw += 0.001f;
@@ -116,7 +117,7 @@ namespace soft3d
 		SetZBufferV(x, y, m_fp.fs_in.rhw);
 	}
 
-	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32 x, uint32 y, float ratio0, float ratio1)
+	void Rasterizer::Fragment(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32_t x, uint32_t y, float ratio0, float ratio1)
 	{
 		float ratio2 = 1.0f - ratio0 - ratio1;
 		if (m_fp.fs_in.InterpolateRHW(vo0, vo1, vo2, ratio0, ratio1, ratio2) < GetZBufferV(x, y))
@@ -149,7 +150,7 @@ namespace soft3d
 		if (y1 < 0 || y1 > m_height)
 			return;
 
-		//DrawPixel(x0, y0, (uint32)(vo0->color), 5);
+		//DrawPixel(x0, y0, (uint32_t)(vo0->color), 5);
 
 		int x, y, dx, dy;
 		dx = x1 - x0;
@@ -276,7 +277,7 @@ namespace soft3d
 
 	void Rasterizer::AddTask(RasterizerTask& rt)
 	{
-		boost::mutex::scoped_lock lock(m_mutex);
+		std::scoped_lock lock(m_mutex);
 		m_tasks.push_back(rt);
 	}
 
@@ -306,12 +307,12 @@ namespace soft3d
 			}
 			else if (m_tasks.size() > 0)
 			{
-				boost::mutex::scoped_lock lock(m_mutex);
+				std::scoped_lock lock(m_mutex);
 				m_tasks_doing.swap(m_tasks);
 			}
 			else
 			{
-				boost::thread::yield();
+				std::this_thread::yield();
 			}
 
 			if (m_taskFlag == false && m_tasks.size() == 0 && m_tasks_doing.size() == 0)

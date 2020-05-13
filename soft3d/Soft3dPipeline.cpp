@@ -6,7 +6,6 @@
 #include "FragmentProcessor.h"
 #include "Rasterizer.h"
 #include "RasterizerManager.h"
-#include <boost/foreach.hpp>
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "DXGuid.lib")
@@ -46,7 +45,7 @@ namespace soft3d
 
 	Soft3dPipeline::~Soft3dPipeline()
 	{
-		BOOST_FOREACH(UniformPtr* us, m_UniformVector)
+		for(UniformPtr* us : m_UniformVector)
 		{
 			for (int i = 0; i < 16; i++)
 			{
@@ -56,9 +55,9 @@ namespace soft3d
 		}
 	}
 
-	void Soft3dPipeline::InitPipeline(HINSTANCE hInstance, HWND hwnd, uint16 width, uint16 height)
+	void Soft3dPipeline::InitPipeline(HINSTANCE hInstance, HWND hwnd, uint16_t width, uint16_t height)
 	{
-		m_threadMode = THREAD_MULTI_RASTERIZER;
+		m_threadMode = THREAD_MULTI_FRAGMENT;
 		SYSTEM_INFO info;
 		GetSystemInfo(&info);
 		THREAD_COUNT = info.dwNumberOfProcessors - 1;
@@ -111,12 +110,12 @@ namespace soft3d
 		return m_curVBO;
 	}
 
-	void Soft3dPipeline::SelectVBO(uint32 vboIndex)
+	void Soft3dPipeline::SelectVBO(uint32_t vboIndex)
 	{
 		m_curVBO = vboIndex;
 	}
 
-	void Soft3dPipeline::SetUniform(uint16 index, void* uniform)
+	void Soft3dPipeline::SetUniform(uint16_t index, void* uniform)
 	{
 		if (index < VertexBufferObject::MAX_UNIFORM_COUNT)
 		{
@@ -134,7 +133,7 @@ namespace soft3d
 		m_tex = tex;
 	}
 
-	int Soft3dPipeline::Clear(uint32 color)
+	int Soft3dPipeline::Clear(uint32_t color)
 	{
 		if (m_threadMode == THREAD_MULTI_RASTERIZER)
 		{
@@ -162,13 +161,13 @@ namespace soft3d
 		DirectXHelper::Instance()->Profile(GetTickCount(), L"");
 		DIMOUSESTATE dimouse;
 		m_pMouseDevice->GetDeviceState(sizeof(dimouse), (LPVOID)&dimouse);
-		BOOST_FOREACH(MOUSE_EVENT_CB cb, m_mouseCB)
+		for(MOUSE_EVENT_CB cb : m_mouseCB)
 		{
 			cb(dimouse);
 		}
 		DIKEYBOARD dkeyboard;
 		m_pKeyboardDevice->GetDeviceState(sizeof(dkeyboard), (LPVOID)dkeyboard);
-		BOOST_FOREACH(KEYBOARD_EVENT_CB cb, m_keyboardCB)
+		for(KEYBOARD_EVENT_CB cb : m_keyboardCB)
 		{
 			cb(dkeyboard);
 		}
@@ -194,7 +193,7 @@ namespace soft3d
 			for (int i = 0; i < pipeData->capacity; i++)
 			{
 				VertexProcessor& cur_vp = pipeData->vp[i];
-				const uint32* colorptr = nullptr;
+				const uint32_t* colorptr = nullptr;
 				if (vbo->useIndex())
 				{
 					colorptr = vbo->GetColor(vbo->GetIndex(i));
@@ -208,7 +207,7 @@ namespace soft3d
 				if (colorptr != nullptr)
 					cur_vp.color = colorptr;
 				else
-					cur_vp.color = (uint32*)this;//ÀÊª˙—’…´
+					cur_vp.color = (uint32_t*)this;//ÈöèÊú∫È¢úËâ≤
 				cur_vp.normal = vbo->GetNormal(i);
 
 				if (vbo->hasUV())
@@ -219,12 +218,12 @@ namespace soft3d
 				cur_vp.vs_out.instanceID = idx;
 
 				//cur_vp.vs_out.uv[0] = 1.0 - cur_vp.vs_out.uv[0];
-				cur_vp.vs_out.uv[1] = 1.0 - cur_vp.vs_out.uv[1];//◊ ‘¥¿Ôµƒuv «¥”◊Ûœ¬Ω«ø™ ºÀ„£¨∂¯π‹œﬂµƒuv¥”◊Û…œø™ ºÀ„£¨À˘“‘’‚¿Ô…œœ¬∑≠◊™
+				cur_vp.vs_out.uv[1] = 1.0 - cur_vp.vs_out.uv[1];//ËµÑÊ∫êÈáåÁöÑuvÊòØ‰ªéÂ∑¶‰∏ãËßíÂºÄÂßãÁÆóÔºåËÄåÁÆ°Á∫øÁöÑuv‰ªéÂ∑¶‰∏äÂºÄÂßãÁÆóÔºåÊâÄ‰ª•ËøôÈáå‰∏ä‰∏ãÁøªËΩ¨
 
 				cur_vp.uniforms = m_UniformVector[idx];
-				cur_vp.Process();//’‚“ª≤ΩΩ¯–– ”Õº±‰ªª∫ÕÕ∂”∞±‰ªª
+				cur_vp.Process();//Ëøô‰∏ÄÊ≠•ËøõË°åËßÜÂõæÂèòÊç¢ÂíåÊäïÂΩ±ÂèòÊç¢
 
-				//≥˝“‘w
+				//Èô§‰ª•w
 				float rhw = 1.0f / cur_vp.vs_out.pos[3];
 				cur_vp.vs_out.pos[0] *= rhw;
 				cur_vp.vs_out.pos[1] *= rhw;
@@ -235,7 +234,7 @@ namespace soft3d
 				cur_vp.vs_out.pos[0] = (cur_vp.vs_out.pos[0] + 1.0f) * 0.5f * m_width;
 				cur_vp.vs_out.pos[1] = (cur_vp.vs_out.pos[1] + 1.0f) * 0.5f * m_height;
 
-				cur_vp.vs_out.uv *= rhw;//uv‘⁄’‚¿Ô≥˝“‘w£¨“‘∫Û≥Àªÿ¿¥£¨Œ™¡Àƒ‹’˝»∑º∆À„Œ∆¿Ìuv
+				cur_vp.vs_out.uv *= rhw;//uvÂú®ËøôÈáåÈô§‰ª•wÔºå‰ª•Âêé‰πòÂõûÊù•Ôºå‰∏∫‰∫ÜËÉΩÊ≠£Á°ÆËÆ°ÁÆóÁ∫πÁêÜuv
 			}
 			DirectXHelper::Instance()->Profile(GetTickCount(), L"VP");
 			for (int i = 0; i < pipeData->capacity; i += 3)
@@ -245,7 +244,7 @@ namespace soft3d
 				VertexProcessor& vp3 = pipeData->vp[i + 2];
 
 				VertexBufferObject::CULL_MODE cull_mode = VertexBufferObject::CULL_NONE;
-				//Ω¯––±≥√Êº—°
+				//ËøõË°åËÉåÈù¢Êã£ÈÄâ
 				vec4 a = vp1.vs_out.pos - vp2.vs_out.pos;
 				vec4 b = vp2.vs_out.pos - vp3.vs_out.pos;
 				vec3 c = vec3(a[0], a[1], a[2]);
@@ -259,7 +258,7 @@ namespace soft3d
 				if (pipeData->cullMode != VertexBufferObject::CULL_NONE && pipeData->cullMode != cull_mode)
 					continue;
 
-				//Ω¯––≤√ºÙ
+				//ËøõË°åË£ÅÂâ™
 				if (vp1.vs_out.pos[2] < 0.0f
 					|| vp2.vs_out.pos[2] < 0.0f
 					|| vp3.vs_out.pos[2] < 0.0f)
@@ -275,7 +274,7 @@ namespace soft3d
 				//	continue;
 
 				//make triangle always ccw sorting
-				uint32 index[3] = { i, i + 1, i + 2 };
+				uint32_t index[3] = { i, i + 1, i + 2 };
 				if (cull_mode == VertexBufferObject::CULL_CW)
 				{
 					index[0] = i + 2;

@@ -12,7 +12,7 @@ namespace soft3d
 		void CopyVertexBuffer(const void* buffer, uint32_t size);
 		void CopyIndexBuffer(const void* buffer, uint32_t size);
 		void CopyColorBuffer(const void* buffer, uint32_t size);
-		void CopyUVBuffer(const void* buffer, uint32_t size);
+		void CopyUVBuffer(const float* buffer, uint32_t size);
 		void CopyNormalBuffer(const void* buffer, uint32_t size);
 
 		const vmath::vec4* GetPos(uint32_t index) const;

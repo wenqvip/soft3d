@@ -88,13 +88,13 @@ namespace soft3d
 			return 0xffffffff;
 	}
 
-	void VertexBufferObject::CopyUVBuffer(const void* buffer, uint32_t size)
+	void VertexBufferObject::CopyUVBuffer(const float* buffer, uint32_t size)
 	{
 		if (m_uvBuffer != nullptr)
 			delete[] m_uvBuffer;
 		uint32_t uvsize = size / 2;
 		m_uvBuffer = new vec2[uvsize];
-		memcpy(m_uvBuffer, buffer, uvsize * 2 * sizeof(void*));
+		memcpy(m_uvBuffer, buffer, uvsize * 2 * sizeof(float));
 	}
 
 	const vec2* VertexBufferObject::GetUV(uint32_t index) const

@@ -6,7 +6,6 @@
 #include "VertexBufferObject.h"
 #include "Texture.h"
 #include "VertexProcessor.h"
-#include <boost/shared_array.hpp>
 #include <functional>
 #include <dinput.h>
 
@@ -16,7 +15,7 @@ namespace soft3d
 	class RasterizerManager;
 	struct PipeLineData
 	{
-		boost::shared_array<VertexProcessor> vp;
+		std::shared_ptr<VertexProcessor[]> vp;
 
 		VertexBufferObject::CULL_MODE cullMode;
 		VertexBufferObject::RENDER_MODE renderMode;

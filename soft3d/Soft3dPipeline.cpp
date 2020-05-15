@@ -97,7 +97,7 @@ namespace soft3d
 	int Soft3dPipeline::SetVBO(shared_ptr<VertexBufferObject> vbo)
 	{
 		shared_ptr<PipeLineData> pd(new PipeLineData());
-		pd->vp = std::shared_ptr<VertexProcessor[]>(new VertexProcessor[vbo->GetSize()]);
+		pd->vp = shared_ptr<VertexProcessor[]>(new VertexProcessor[vbo->GetSize()]);
 		pd->cullMode = vbo->m_cullMode;
 		pd->renderMode = vbo->m_mode;
 		pd->capacity = vbo->GetSize();

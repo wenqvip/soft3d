@@ -105,7 +105,7 @@ namespace soft3d
 		shared_ptr<Texture> tex(new Texture());
 		tex->CopyFromBuffer(tex_data1, 4, 4);
 		Soft3dPipeline::Instance()->SetTexture(tex);
-		tex->filter_mode = Texture::-;
+		tex->filter_mode = Texture::NEAREST;
 	}
 
 	void SceneManager::Update()

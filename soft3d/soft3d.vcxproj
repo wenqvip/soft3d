@@ -151,7 +151,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="block.hpp" />
     <ClInclude Include="FbxLoader.h" />
     <ClInclude Include="FragmentProcessor.h" />
     <ClInclude Include="Rasterizer.h" />

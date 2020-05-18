@@ -95,11 +95,17 @@ namespace soft3d
 			0xFFFFFF, 0x3FBCEF, 0xFFFFFF, 0x3FBCEF,
 			0x3FBCEF, 0xFFFFFF, 0x3FBCEF, 0xFFFFFF,
 		};
+		uint32_t tex_data1[] = {
+			0xFFFFFF, 0xFF0000, 0xFFFFFF, 0xFF0000,
+			0xFF0000, 0xFFFFFF, 0xFF0000, 0xFFFFFF,
+			0xFFFFFF, 0xFF0000, 0xFFFFFF, 0xFF0000,
+			0xFF0000, 0xFFFFFF, 0xFF0000, 0xFFFFFF,
+		};
 
 		shared_ptr<Texture> tex(new Texture());
-		tex->CopyFromBuffer(tex_data, 4, 4);
+		tex->CopyFromBuffer(tex_data1, 4, 4);
 		Soft3dPipeline::Instance()->SetTexture(tex);
-		tex->filter_mode = Texture::NEAREST;
+		tex->filter_mode = Texture::-;
 	}
 
 	void SceneManager::Update()
@@ -116,7 +122,7 @@ namespace soft3d
 		SetUniform(0, mv_matrix);
 		SetUniform(1, proj_matrix);
 
-		Soft3dPipeline::Instance()->Clear(0);
+		Soft3dPipeline::Instance()->Clear(0x36);
 	}
 
 }

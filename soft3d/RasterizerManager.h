@@ -24,6 +24,7 @@ namespace soft3d
 		uint32_t m_doing_index = 0;
 		std::mutex m_swap_mutex;
 		std::mutex m_async_mutex;
+		std::condition_variable m_condition;
 		bool m_taskOver = false;
 	};
 
@@ -51,6 +52,7 @@ namespace soft3d
 		uint32_t m_doing_index = 0;
 		std::mutex m_swap_mutex;
 		std::mutex m_async_mutex;
+		std::condition_variable m_condition;
 		bool m_taskOver = false;
 	};
 

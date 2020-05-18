@@ -75,6 +75,9 @@
     <ClInclude Include="SceneManagerBigFbx.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="block.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

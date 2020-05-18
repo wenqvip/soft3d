@@ -143,7 +143,7 @@ namespace soft3d
 	int RasterizerManager::Clear(uint32_t color)
 	{
 		memset(m_frameBuffer, color, m_width * m_height * sizeof(uint32_t));
-		memset(m_zBuffer, 0, m_width* m_height* sizeof(float));
+		memset(m_zBuffer, 0, m_width * m_height * sizeof(float));
 		return 0;
 	}
 
@@ -366,8 +366,7 @@ namespace soft3d
 
 			if (rt->m_taskOver == true && rt->m_task.size() == 0 && rt->m_task_doing.size() == 0)
 			{
-				rt->m_taskOver = false;
-				rt->m_async_mutex.unlock();
+				rt->m_condition.notify_all();
 			}
 		}
 	}
@@ -398,12 +397,10 @@ namespace soft3d
 		for (int i = 0; i < m_rasterizeThreadCount; i++)
 		{
 			m_rasterizeThreads[i]->m_taskOver = false;
-			m_rasterizeThreads[i]->m_async_mutex.lock();
 		}
 		for (int i = 0; i < m_fragThreadCount; i++)
 		{
 			m_fragThreads[i]->m_taskOver = false;
-			m_fragThreads[i]->m_async_mutex.lock();
 		}
 	}
 
@@ -414,14 +411,16 @@ namespace soft3d
 		for (int i = 0; i < m_rasterizeThreadCount; i++)
 		{
 			m_rasterizeThreads[i]->m_taskOver = true;
-			m_rasterizeThreads[i]->m_async_mutex.lock();
-			m_rasterizeThreads[i]->m_async_mutex.unlock();
+			std::unique_lock<std::mutex> lock(m_rasterizeThreads[i]->m_async_mutex);
+			m_rasterizeThreads[i]->m_condition.wait(lock);
+			m_rasterizeThreads[i]->m_taskOver = false;
 		}
 		for (int i = 0; i < m_fragThreadCount; i++)
 		{
 			m_fragThreads[i]->m_taskOver = true;
-			m_fragThreads[i]->m_async_mutex.lock();
-			m_fragThreads[i]->m_async_mutex.unlock();
+			std::unique_lock<std::mutex> lock(m_fragThreads[i]->m_async_mutex);
+			m_fragThreads[i]->m_condition.wait(lock);
+			m_fragThreads[i]->m_taskOver = false;
 		}
 	}
 
@@ -476,8 +475,7 @@ namespace soft3d
 
 			if (ft->m_taskOver == true && ft->m_task.size() == 0 && ft->m_task_doing.size() == 0)
 			{
-				ft->m_taskOver = false;
-				ft->m_async_mutex.unlock();
+				ft->m_condition.notify_all();
 			}
 		}
 	}

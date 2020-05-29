@@ -1,2 +1,3 @@
 # soft3d
-a soft rendering project with multi-thread, realtime lighting, fbx-loading. Just For Fun !
+A soft rendering program.
+Just For Fun!

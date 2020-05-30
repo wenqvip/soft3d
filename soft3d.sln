@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "soft3d", "soft3d\soft3d.vcxproj", "{6D6731DD-4219-4E49-B824-87A1B1DFBF30}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "soft3d", "src\soft3d.vcxproj", "{6D6731DD-4219-4E49-B824-87A1B1DFBF30}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3CBA3536-52B3-4C1B-AF23-B39C6145AF05}
 	EndGlobalSection
 EndGlobal

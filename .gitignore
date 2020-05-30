@@ -3,10 +3,10 @@
 *.ilk
 *.pdb
 *.ipch
-soft3d/Debug/*
-soft3d/x64/Debug/*
-soft3d/x64/Release/*
-soft3d/Release/*
+src/Debug/*
+src/x64/Debug/*
+src/x64/Release/*
+src/Release/*
 Release/*
 *.aps
 *.exe

@@ -1,5 +1,6 @@
 #include "soft3d.h"
 #include "SceneManagerTriangle.h"
+#include "TextureLoader.h"
 #include <functional>
 
 using namespace std;
@@ -91,7 +92,9 @@ void SceneManagerTriangle::InitScene(uint16_t width, uint16_t height)
 	};
 
 	shared_ptr<Texture> tex(new Texture());
-	tex->CopyFromBuffer(tex_data, 6, 3);
+	TextureLoader::Instance().LoadTexture(L"cathead_small.png");
+	tex->CopyFromBuffer(TextureLoader::Instance().GetData(), TextureLoader::Instance().GetWidth(), TextureLoader::Instance().GetHeight());
+	//tex->CopyFromBuffer(tex_data, 6, 3);
 	tex->filter_mode = Texture::NEAREST;
 	Soft3dPipeline::Instance()->SetTexture(tex);
 

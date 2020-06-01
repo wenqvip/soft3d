@@ -11,6 +11,5 @@ Release/*
 *.aps
 *.exe
 *.opensdf
-*.user
 *.iobj
 *.ipdb

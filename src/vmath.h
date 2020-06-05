@@ -1362,6 +1362,12 @@ static inline T lerp(const T& A, const T& B, float t)
 }
 
 template <typename T>
+static inline T lerp(const T& A, const T& B, const T& C, float a, float b)
+{
+    return A * a + B * b + C * (1.0f - a - b);
+}
+
+template <typename T>
 static inline T clamp(T& x, T minVal, T maxVal)
 {
 	return min<T>(max<T>(x, minVal), maxVal);

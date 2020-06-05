@@ -26,6 +26,7 @@ namespace soft3d
 		void Init(HWND hwnd);
 		void Paint(const uint32_t* buffer, uint16_t width, uint16_t height);
 		void Profile(DWORD tick, const wchar_t* work);
+		void SetText(const wchar_t* text);
 
 	protected:
 		DirectXHelper();
@@ -60,6 +61,7 @@ namespace soft3d
 		float m_ffps;
 
 		std::map<std::wstring, DWORD> m_profileInfo;
+		std::wstring m_text;
 		DWORD m_lastTick = 0;
 		std::map<std::wstring, float> m_profileShow;
 

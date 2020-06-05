@@ -32,6 +32,7 @@ namespace soft3d
 		void Interpolate(const VS_OUT* vo0, const VS_OUT* vo1, float ratio0, float ratio1);
 		void Interpolate(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2);
 		float InterpolateRHW(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2);
+		bool InterpolateZ(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2);
 	};
 
 	struct VertexProcessor

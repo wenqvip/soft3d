@@ -176,7 +176,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		soft3d::Soft3dPipeline::Instance()->LoseFocus();
 		break;
 	}
-    case WM_DESTROY:
+	case WM_DESTROY:
+		soft3d::Soft3dPipeline::Instance()->Quit();
         PostQuitMessage(0);
         break;
     default:

@@ -56,9 +56,9 @@ namespace soft3d
 			}
 
 		float aspect = (float)m_width / (float)m_height;
-		mat4 proj_matrix = perspective(30.0f, aspect, 0.1f, 1000.0f);
-		mat4 view_matrix = lookat(vec3(0.0f, 0.0f, 3.0f),
-			vec3(0.0f, 0.0f, 0.0f),
+		mat4 proj_matrix = perspective(30.0f, aspect, 3.0f, 10.0f);
+		mat4 view_matrix = lookat(vec3(0.0f, 0.0f, 0.0f),
+			vec3(0.0f, 0.0f, -1.0f),
 			vec3(0.0f, 1.0f, 0.0f));
 		float factor = GetTickCount() / 50 % 360;
 
@@ -67,7 +67,7 @@ namespace soft3d
 
 		Soft3dPipeline::Instance()->SelectVBO(m_vbo1);
 		mat4 mv_matrix = view_matrix
-			* translate(1.1f + m_x_offset, 0.0f + m_y_offset, -0.5f + m_z_offset)
+			* translate(1.1f + m_x_offset, 0.0f + m_y_offset, m_z_offset)
 			* scale(1.0f)
 			* rotate(m_x_angle, vec3(1.0f, 0.0f, 0.0f))
 			* rotate(m_y_angle, vec3(0.0f, 1.0f, 0.0f))
@@ -81,7 +81,7 @@ namespace soft3d
 		
 		Soft3dPipeline::Instance()->SelectVBO(m_vbo2);
 		mv_matrix = view_matrix
-			* translate(-1.1f + m_x_offset, 0.0f + m_y_offset, -0.5f + m_z_offset)
+			* translate(-1.1f + m_x_offset, 0.0f + m_y_offset, m_z_offset)
 			* scale(1.0f)
 			* rotate(m_x_angle, vec3(1.0f, 0.0f, 0.0f))
 			* rotate(m_y_angle, vec3(0.0f, 1.0f, 0.0f))
@@ -93,6 +93,10 @@ namespace soft3d
 		SetUniform(UNIFORM_LIGHT_DIR, vec3(x, 0.0f, z));
 		
 		Soft3dPipeline::Instance()->Clear(0);
+
+		wchar_t buf[256] = { 0 };
+		swprintf_s<256>(buf, L"position:(%f, %f, %f)", m_x_offset, m_y_offset, m_z_offset);
+		Soft3dPipeline::Instance()->Print(buf);
 	}
 
 	void SceneManagerFbx::KeyboardEventCB(const DIKEYBOARD dikeyboard)

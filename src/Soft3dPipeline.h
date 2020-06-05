@@ -57,6 +57,7 @@ namespace soft3d
 		}
 		void Process();
 		int Clear(uint32_t color);
+		void Print(const wchar_t* text);
 
 		//input
 		void AddMouseEventCB(MOUSE_EVENT_CB cb) {

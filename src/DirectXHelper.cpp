@@ -192,10 +192,12 @@ namespace soft3d {
 				content += buf;
 			}
 		}
-		D2D1_RECT_F rectf = { 0.0f, 0.0f, (float)width, 0.0f };
-
+		D2D1_RECT_F rectf = { 0.0f, 0.0f, (float)width, 20.0f };
 		m_d2dContext->DrawTextW(content.c_str(), content.size(), m_pTextFormat, rectf, m_pGreenBrush);
 		m_profileInfo.clear();
+
+		D2D1_RECT_F rectf2 = { 0.0f, 22, (float)width, 42.0f };
+		m_d2dContext->DrawTextW(m_text.c_str(), m_text.size(), m_pTextFormat, rectf2, m_pGreenBrush);
 
 		ThrowIfFailed(m_d2dContext->EndDraw());
 
@@ -213,6 +215,11 @@ namespace soft3d {
 		if(work[0] != 0)
 			m_profileInfo[work] += gap;
 		m_lastTick = tick;
+	}
+
+	void DirectXHelper::SetText(const wchar_t* text)
+	{
+		m_text = text;
 	}
 
 }

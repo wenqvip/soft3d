@@ -166,6 +166,7 @@ namespace soft3d
 	void RasterizerManager::Fragment(FragmentProcessor* fp, const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, uint32_t x, uint32_t y, float ratio0, float ratio1)
 	{
 		float ratio2 = 1.0f - ratio0 - ratio1;
+
 		if (fp->fs_in.InterpolateRHW(vo0, vo1, vo2, ratio0, ratio1, ratio2) < GetZBufferV(x, y))
 			return;
 
@@ -195,8 +196,6 @@ namespace soft3d
 		if (y1 < 0 || y1 > m_height)
 			return;
 
-		//DrawPixel(x0, y0, (uint32_t)(vo0->color), 5);
-
 		int x, y, dx, dy;
 		dx = x1 - x0;
 		dy = y1 - y0;
@@ -208,10 +207,13 @@ namespace soft3d
 			for (int i = 0; i <= abs(dx); i++)
 			{
 				float ratio = (x1 - x) / (float)dx;
-				int id = y * m_width + x;
-				AddFragTask(id, vo0, vo1, nullptr, ratio, 0.0f);
-				//FragmentProcessor fp;
-				//Fragment(&fp, vo0, vo1, x, y, ratio);
+				float z = vmath::lerp(vo0->pos[2], vo1->pos[2], ratio);
+				if (-1.0f <= z && z <= 1.0f)
+				{
+					int id = y * m_width + x;
+					AddFragTask(id, vo0, vo1, nullptr, ratio, 0.0f);
+				}
+
 				x = dx > 0 ? x + 1 : x - 1;
 				e += 2 * abs(dy);
 				if (e >= 0)
@@ -227,10 +229,13 @@ namespace soft3d
 			for (int i = 0; i <= abs(dy); i++)
 			{
 				float ratio = (y1 - y) / (float)dy;
-				int id = y * m_width + x;
-				AddFragTask(id, vo0, vo1, nullptr, ratio, 0.0f);
-				//FragmentProcessor fp;
-				//Fragment(&fp, vo0, vo1, x, y, ratio);
+				float z = vmath::lerp(vo0->pos[2], vo1->pos[2], ratio);
+				if (-1.0f <= z && z <= 1.0f)
+				{
+					int id = y * m_width + x;
+					AddFragTask(id, vo0, vo1, nullptr, ratio, 0.0f);
+				}
+
 				y = dy > 0 ? y + 1 : y - 1;
 				e += 2 * abs(dx);
 				if (e >= 0)
@@ -308,8 +313,12 @@ namespace soft3d
 				{
 					float ratio1 = ((y - y3)*(x1 - x3) - (y1 - y3)*(x - x3)) / (float)((y2 - y3)*(x1 - x3) - (y1 - y3)*(x2 - x3));
 					float ratio0 = ((y - y3)*(x2 - x3) - (x - x3)*(y2 - y3)) / (float)((y1 - y3)*(x2 - x3) - (x1 - x3)*(y2 - y3));
-					int id = y * m_width + x;
-					AddFragTask(id, vo0, vo1, vo2, ratio0, ratio1);
+					float z = vmath::lerp(vo0->pos[2], vo1->pos[2], vo2->pos[2], ratio0, ratio1);
+					if (-1 <= z && z <= 1.0f)
+					{
+						int id = y * m_width + x;
+						AddFragTask(id, vo0, vo1, vo2, ratio0, ratio1);
+					}
 				}
 				Cx1 -= Dy12;
 				Cx2 -= Dy23;

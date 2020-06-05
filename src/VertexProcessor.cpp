@@ -29,6 +29,12 @@ namespace soft3d
 		return this->rhw;
 	}
 
+	bool VS_OUT::InterpolateZ(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2)
+	{
+		this->pos[2] = vo0->pos[2] * ratio0 + vo1->pos[2] * ratio1 + vo2->pos[2] * ratio2;
+		return this->pos[2] >= -1.0f && this->pos[2] <= 1.0f;
+	}
+
 	void VS_OUT::Interpolate(const VS_OUT* vo0, const VS_OUT* vo1, const VS_OUT* vo2, float ratio0, float ratio1, float ratio2)
 	{
 		this->color = vo0->color * ratio0 + vo1->color * ratio1 + vo2->color * ratio2;
